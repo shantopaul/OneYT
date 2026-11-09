@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · **Phase 20 — Custom CSS Templates (v1.12) ✅ code complete (branch, merge next)** |
-| **Version** | 1.11.0 in `main`; 1.12.0 code complete on branch `feature/css-templates` |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · **Phase 20 — Custom CSS Templates (v1.12) ✅ (merged)** |
+| **Version** | 1.12.0 in `main` |
 | **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `1077140` (Phases 1–12 + 14–16 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`, Phase 15 merge `69a9471`, Phase 16 merge `1077140`) |
 | **Code written** | Phases 1–12 + 14–16 + YouTube domains: all modules + dashboard (10 sections, 106 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + presets / profiles + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 20 code complete; merge to `main` next, per the standing rule) |
+| **Currently working on** | — (Phase 20 merged; browser check still open) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
-| **Last verified** | 2026-11-09 — `npm test` 193/193 pass on branch `feature/css-templates` @ `c0e7e05`, `npm run lint` clean, `npm run format` clean, manifest valid (1.12.0), `npm run package` builds a clean `oneyt-1.12.0.zip` |
+| **Last verified** | 2026-11-09 — `npm test` 193/193 pass on `main` after the Phase 20 merge, `npm run lint` clean, `npm run format` clean, manifest valid, `npm run package` builds a clean `oneyt-1.12.0.zip` |
 
 ---
 
@@ -776,8 +776,7 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   YouTube pages. All listed in the new Phase 20 section
   of `tests/manual-checklist.md`. Phase 20 is
   code-complete, not browser-verified.
-- **Merge to `main` next** (per the standing rule:
-  feature complete → merge to main).
+- **Merged to `main` 2026-11-09** (merge `8af093d`, per the standing rule: feature complete → merge to main). Verified on `main` after the merge: `npm test` 193/193 pass, lint + format clean, manifest valid, `npm run package` builds a clean `oneyt-1.12.0.zip`. Follow-up docs commit records the merge in Phases.md + Memory.md.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

@@ -925,7 +925,7 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 18 is the health check (merged). v1.11.0 is
 unambiguous: 1.10.0 is in `main` now.
 
-## Phase 20 — Custom CSS Templates (v1.12) 🔄 IN PROGRESS (2026-11-09)
+## Phase 20 — Custom CSS Templates (v1.12) ✅ MERGED (2026-11-09)
 
 (PRD PL-20 + plan), engine, dashboard wiring, tests,
 checklist, version, docs.
@@ -981,7 +981,10 @@ checklist, version, docs.
   Phase 20).
 **Status 2026-11-09:** code complete on branch
 `feature/css-templates` (8 part-by-part commits on top
-of `main` `c3732a3`, pushed after completion).
+of `main` `c3732a3`, pushed after completion) and
+**merged to `main` — merge `8af093d`, `main` now
+`8af093d`** (per the standing rule: feature complete →
+merge to main).
 `npm test` 193/193 pass (183 baseline + 10 new),
 lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.12.0.zip`
