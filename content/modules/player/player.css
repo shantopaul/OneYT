@@ -95,6 +95,26 @@ html.oneyt-enabled.oneyt-player-hide-endscreen #movie_player .ytp-endscreen-cont
   display: none;
 }
 
+/* --- Hide counts (Phase 11) ---
+ * Only the numbers are hidden — the Like button stays
+ * clickable, the Subscribe button stays. Class-only hiding,
+ * like the focus module: removing a class restores the
+ * number exactly. Verify live — YouTube renames DOM
+ * elements, and the views line moved into the description
+ * box in the 2023 layout, so the views selector is the one
+ * most likely to need a correction. */
+html.oneyt-enabled.oneyt-player-hide-like-count #segmented-like-button .yt-spec-button-shape-next__button-text-content {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-player-hide-view-count ytd-video-primary-info-renderer #info-text {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-player-hide-subscriber-count ytd-video-owner-renderer #subscriber-count {
+  display: none;
+}
+
 /* --- Mini-player (Phase 4) ---
  * Only when the user configures it; with nothing configured no
  * rule applies and the native mini-player (open/close/drag) is
