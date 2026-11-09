@@ -1,11 +1,18 @@
-/* OneYT — options/options.css (dashboard, Phase 5).
+/* OneYT — options/options.css (dashboard, Phase 5; theme Phase 9).
  *
  * Design tokens from Design.md §2.2 (extension UI, dark-first):
  * no gradients, no glassmorphism, flat surfaces, accent used
- * sparingly. The dashboard also respects the system light theme
- * via prefers-color-scheme.
+ * sparingly. The theme is user-selectable (ui.dashboardTheme):
+ * JS sets data-theme on <html> and the attribute rules below
+ * are the source of truth. The prefers-color-scheme block is
+ * only the pre-JS fallback (first paint, before the app loads),
+ * so its light tokens must stay in sync with the
+ * [data-theme='light'] block. color-scheme keeps native
+ * controls (checkbox, range, select dropdown, scrollbars) in
+ * the right scheme.
  */
 :root {
+  color-scheme: dark;
   --ui-bg: #0f0f0f;
   --ui-surface: #181818;
   --ui-surface-hover: #212121;
@@ -25,7 +32,10 @@
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
+  /* Pre-JS fallback only. Skipped when the user forced dark,
+   * so a light OS never flashes light over a dark choice. */
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
     --ui-bg: #ffffff;
     --ui-surface: #f9f9f9;
     --ui-surface-hover: #f0f0f0;
@@ -34,8 +44,52 @@
     --ui-text: #0f0f0f;
     --ui-text-secondary: #606060;
     --ui-text-muted: #6b6b6b; /* AA 4.5+ on white (was #909090, 3.2 — Phase 6 a11y) */
-    --ui-accent-soft: rgba(255, 0, 51, 0.08);
+    --ui-accent: #e6002e; /* darker than dark-mode #ff0033: 4.53 on surface (was 3.76) */
+    --ui-accent-hover: #cc0027; /* white on it 5.84 */
+    --ui-accent-soft: rgba(230, 0, 46, 0.08);
+    --ui-success: #15803d; /* 4.76 on surface (was #22c55e, 2.16) */
+    --ui-warning: #b45309; /* 4.77 on surface (was #f59e0b, 2.04) */
+    --ui-danger: #b91c1c; /* 6.15 on surface (was #ef4444, 3.57) */
   }
+}
+
+/* Explicit choice wins over the OS (same specificity as the
+ * media-query rule, later in the file, so it takes over once
+ * JS sets the attribute). */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ui-bg: #ffffff;
+  --ui-surface: #f9f9f9;
+  --ui-surface-hover: #f0f0f0;
+  --ui-border: #e5e5e5;
+  --ui-border-strong: #cccccc;
+  --ui-text: #0f0f0f;
+  --ui-text-secondary: #606060;
+  --ui-text-muted: #6b6b6b;
+  --ui-accent: #e6002e;
+  --ui-accent-hover: #cc0027;
+  --ui-accent-soft: rgba(230, 0, 46, 0.08);
+  --ui-success: #15803d;
+  --ui-warning: #b45309;
+  --ui-danger: #b91c1c;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ui-bg: #0f0f0f;
+  --ui-surface: #181818;
+  --ui-surface-hover: #212121;
+  --ui-border: #2a2a2a;
+  --ui-border-strong: #3d3d3d;
+  --ui-text: #f1f1f1;
+  --ui-text-secondary: #aaaaaa;
+  --ui-text-muted: #9a9a9a;
+  --ui-accent: #ff0033;
+  --ui-accent-hover: #e6002e;
+  --ui-accent-soft: rgba(255, 0, 51, 0.12);
+  --ui-success: #22c55e;
+  --ui-warning: #f59e0b;
+  --ui-danger: #ef4444;
 }
 
 * {
