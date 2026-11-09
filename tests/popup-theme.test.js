@@ -92,7 +92,7 @@ test('channel Shorts tab: selector, CSS rule, toggle copy and health metadata', 
   const root = path.join(__dirname, '..');
   const selectors = require('../shared/selectors');
   assert.equal(selectors.SELECTORS.channelShortsTab, "yt-tab-shape[tab-title='Shorts']");
-  assert.equal(Object.keys(selectors.SELECTORS).length, 31);
+  assert.equal(Object.keys(selectors.SELECTORS).length, 33); // 31 in v1.14 + playProgress + scrubberButton (v1.15 player accent)
   const css = fs.readFileSync(
     path.join(root, 'content', 'modules', 'layout', 'layout.css'),
     'utf8'
