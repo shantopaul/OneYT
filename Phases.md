@@ -979,8 +979,21 @@ checklist, version, docs.
   105+. **Browser verification still open** — the live
   DOM is the proof (`tests/manual-checklist.md`
   Phase 20).
-**Status 2026-11-09:** started on branch
-`feature/css-templates` (from `main` `c3732a3`).
+**Status 2026-11-09:** code complete on branch
+`feature/css-templates` (8 part-by-part commits on top
+of `main` `c3732a3`, pushed after completion).
+`npm test` 193/193 pass (183 baseline + 10 new),
+lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.12.0.zip`
+(runtime files only). **Done:** `d04d19d` start
+(PRD PL-20 + plan), `085fa1d` engine
+(`shared/cssTemplates.js`, 6 templates), `3188d99`
+dashboard wiring (tool-box in Appearance + script
+pin 20 → 21), `3918be9` tests (10 new),
+`9743fd8` checklist, `ac588cc` fix — prettier
+format, `c0e7e05` version 1.12.0, docs (this commit).
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 20).
 
 ## Future (v1.1+, not in scope now)
 
