@@ -32,6 +32,7 @@
     // (prefers-color-scheme); 'dark'/'light' force one.
     ui: {
       dashboardTheme: 'system', // system | dark | light
+      onboarded: false, // true once the welcome setup is finished or skipped (Phase 17)
     },
 
     modules: {
