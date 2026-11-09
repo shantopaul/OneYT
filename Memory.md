@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · Phase 20 — Custom CSS Templates (v1.12) ✅ (merged) · Phase 21 — Saved Themes + Export/Share (v1.13) ✅ (merged) · **Phase 22 — Advanced Layout Editor (v1.14) 🔄 in progress** |
-| **Version** | 1.13.0 in `main` |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · Phase 20 — Custom CSS Templates (v1.12) ✅ (merged) · Phase 21 — Saved Themes + Export/Share (v1.13) ✅ (merged) · Phase 22 — Advanced Layout Editor (v1.14) ✅ code complete (branch, merge next) |
+| **Version** | 1.13.0 in `main`; 1.14.0 code complete on branch `feature/layout-editor` |
 | **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `1077140` (Phases 1–12 + 14–16 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`, Phase 15 merge `69a9471`, Phase 16 merge `1077140`) |
 | **Code written** | Phases 1–12 + 14–16 + YouTube domains: all modules + dashboard (10 sections, 106 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + presets / profiles + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | Phase 22 — Advanced Layout Editor (v1.14), branch `feature/layout-editor` |
+| **Currently working on** | — (Phase 22 code complete; merge to `main` next, per the standing rule) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
-| **Last verified** | 2026-11-09 — `npm test` 203/203 pass on `main` after the Phase 21 merge, `npm run lint` clean, `npm run format` clean, manifest valid, `npm run package` builds a clean `oneyt-1.13.0.zip` |
+| **Last verified** | 2026-11-09 — `npm test` 214/214 pass on branch `feature/layout-editor` @ `6e0f71f`, `npm run lint` clean, `npm run format` clean, manifest valid (1.14.0), `npm run package` builds a clean `oneyt-1.14.0.zip` |
 
 ---
 
@@ -829,6 +829,58 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   of `tests/manual-checklist.md`. Phase 21 is
   code-complete, not browser-verified.
 - **Merged to `main` 2026-11-09** (merge `03b6120`, per the standing rule: feature complete → merge to main). Verified on `main` after the merge: `npm test` 203/203 pass, lint + format clean, manifest valid, `npm run package` builds a clean `oneyt-1.13.0.zip`. Follow-up docs commit records the merge in Phases.md + Memory.md.
+
+### 2026-11-09 — Phase 22: Advanced Layout Editor DONE (code, branch only)
+
+- Branch `feature/layout-editor` from `main` (`1324f15`).
+  **9 part-by-part commits, pushed only when Phase 22 was
+  fully complete** (same rule — no intermediate push, no
+  merge to `main`).
+- Built: new additive setting `layout.homeMaxWidth`
+  (0 = YouTube default, px, 0–2560) — the layout module
+  sets class `oneyt-home-max-width` + variable
+  `--oneyt-home-max-width` in `applyHome()` (cleared on
+  watch/other pages and in `cleanup()`), and `layout.css`
+  caps + centres `ytd-rich-grid-renderer` under that
+  class (the ultrawide fix). No new selector key —
+  the rule reuses the existing `ytd-rich-grid-renderer`
+  element, so the selector count stays 31. Pure engine
+  `shared/layoutPresets.js` — three built-in layout
+  presets as partial overrides (Compact 5 cols / 8 px
+  gap / no cap, Balanced 4 cols / 16 px / 1600 px,
+  Spacious 3 cols / 24 px / 1280 px) +
+  `getLayoutPreset` / `applyLayoutPreset` /
+  `layoutPreviewSummary`; dashboard tool-box in the
+  Layout section (`renderLayoutEditorTools` in
+  `options.js`, mirroring `renderProfilesTools`) — one
+  row per preset with an Apply button, plus a live
+  preview (mini grid drawn from the current values:
+  columns · gap · max-width). Applying a preset
+  changes only the five layout numbers.
+- One honest repair inside the phase: an edit meant to
+  append a test instead replaced the whole
+  hideLiveShelf/hideMixesShelf/hideNewsShelf test with
+  its header line — caught by reading the `git diff`
+  before committing, restored verbatim, and the new
+  test appended after it. Final diff verified clean.
+- Verification here: `npm test` **214/214 pass** (203
+  baseline + 11 new: 10 engine + 1 module), `npm run
+  lint` clean, `npm run format` clean (one fix commit
+  for a Prettier reflow), manifest valid, `npm run
+  package` builds a clean `oneyt-1.14.0.zip` (runtime
+  files only). Script-count pin in
+  `tests/dashboard.test.js` went 22 → 23 for
+  `shared/layoutPresets.js`. The dashboard coverage
+  test passes with the new `layout.homeMaxWidth`
+  number control.
+- **Not verified here (needs Chrome on Shanto's PC):**
+  the editor tool-box, the preview and live apply on
+  a real YouTube page (esp. the centred feed on a
+  wide monitor). All listed in the new Phase 22 section
+  of `tests/manual-checklist.md`. Phase 22 is
+  code-complete, not browser-verified.
+- **Merge to `main` next** (per the standing rule:
+  feature complete → merge to main).
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

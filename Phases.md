@@ -1112,8 +1112,22 @@ wiring, tests, checklist, version, docs.
   untouched). **Browser verification still open** —
   the live page is the proof
   (`tests/manual-checklist.md` Phase 22).
-**Status 2026-11-09:** started on branch
-`feature/layout-editor` (from `main` `1324f15`).
+**Status 2026-11-09:** code complete on branch
+`feature/layout-editor` (9 part-by-part commits on top
+of `main` `1324f15`, pushed after completion).
+`npm test` 214/214 pass (203 baseline + 11 new),
+lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.14.0.zip`
+(runtime files only). **Done:** `7fd7cd3` start
+(PRD PL-22 + plan), `2780ad6` setting + engine
+(`layout.homeMaxWidth` + `shared/layoutPresets.js`),
+`d6258a7` module (class/var + centred grid CSS),
+`7b3a6ae` dashboard wiring (editor tool-box +
+script pin 22 → 23), `33490a3` tests (11 new),
+`0185156` checklist, `b9e009f` fix — prettier
+format, `6e0f71f` version 1.14.0, docs (this commit).
+**Browser verification still open** — the live page
+is the proof (`tests/manual-checklist.md` Phase 22).
 
 ## Future (v1.1+, not in scope now)
 
