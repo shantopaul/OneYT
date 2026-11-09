@@ -1,0 +1,35 @@
+/* OneYT — content/styles/base.css
+ *
+ * Injected on youtube.com via manifest.json. Contains ONLY the
+ * CSS variable tokens and the scoping class. No YouTube overrides
+ * live here — each module owns its own rules in its own style
+ * tag (Architecture.md §6.1), added in Phase 2+.
+ *
+ * Every rule OneYT injects is scoped under `html.oneyt-enabled`,
+ * so disabling the extension switches all of it off in one step.
+ * No gradients, no glassmorphism (Design.md §2.6).
+ */
+
+html.oneyt-enabled {
+  --oneyt-bg: #0f0f0f;
+  --oneyt-surface: #212121;
+  --oneyt-surface-hover: #2e2e2e;
+  --oneyt-border: #2a2a2a;
+  --oneyt-text: #f1f1f1;
+  --oneyt-text-secondary: #aaaaaa;
+  --oneyt-accent: #ff0033;
+  --oneyt-card-bg: #181818;
+  --oneyt-button-bg: #272727;
+  --oneyt-button-hover: #3d3d3d;
+  --oneyt-radius: 12px;
+  --oneyt-radius-sm: 8px;
+  --oneyt-radius-lg: 16px;
+  --oneyt-spacing: 16px;
+  --oneyt-sidebar-width: 402px;
+  --oneyt-sidebar-max-height: calc(100vh - 100px);
+  --oneyt-scrollbar-width: 8px;
+  --oneyt-player-max-width: 1280px;
+  --oneyt-font-family: inherit;
+  --oneyt-font-size: inherit;
+  --oneyt-line-height: inherit;
+}
