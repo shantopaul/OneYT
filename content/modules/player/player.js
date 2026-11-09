@@ -10,6 +10,11 @@
  *   height on #primary (padding-top) so the title/comments do
  *   not jump up underneath it.
  * - Appearance: border radius, border, shadow, spacing.
+ * - Default theater (Phase 14): when player.defaultTheater
+ *   is on, the theater button is clicked once per video so
+ *   every video opens in theater mode. See enableTheater()
+ *   — the click-once rule is what keeps a manual exit from
+ *   being undone by the theater observer's re-apply.
  *
  * Guards (hard rules):
  * - Fullscreen (document.fullscreenElement): ALL player classes
@@ -91,6 +96,7 @@
     var dom = deps.dom;
     var logger = deps.logger || { debug: function () {}, error: function () {} };
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
+    var loc = deps.location || (typeof location !== 'undefined' ? location : null);
 
     var lastSettings = null;
     var lastPage = null;
@@ -100,6 +106,13 @@
     var miniObserver = null;
     var miniObserved = false;
     var miniPresent = false;
+    // Default theater (Phase 14): the URL the theater button
+    // was already clicked for, and the URL a waitFor is
+    // pending for. A new video URL differs from both, so
+    // navigation resets them; cleanup() (disable/destroy)
+    // forgets the video entirely.
+    var theaterClickedUrl = null;
+    var theaterPendingUrl = null;
 
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -129,6 +142,62 @@
     function isTheater() {
       var flexy = dom ? dom.query('watchFlexy') : null;
       return !!(flexy && flexy.hasAttribute && flexy.hasAttribute('theater'));
+    }
+
+    function currentUrl() {
+      return loc && typeof loc.href === 'string' ? loc.href : '';
+    }
+
+    // Default theater (Phase 14): click the theater button
+    // once for this video. Never click when already in
+    // theater, and never click twice for the same URL — the
+    // theater observer re-applies when the user exits
+    // theater, and a second click there would trap them in
+    // theater. The flag is set synchronously BEFORE the
+    // click, so a re-apply racing the click cannot double it.
+    function enableTheater(url) {
+      if (isFullscreen() || isTheater()) return;
+      var btn = dom ? dom.query('theaterButton') : null;
+      if (btn && typeof btn.click === 'function') {
+        theaterClickedUrl = url;
+        theaterPendingUrl = null;
+        btn.click();
+        return;
+      }
+      // Button not in the DOM yet — wait for it once (the
+      // dom-manager waitFor resolves null after 10 s and
+      // never rejects). Click only if still the same video,
+      // still opted in, still on a watch page, and still not
+      // in theater: the user may have navigated away while
+      // waiting, and that must not click on the new page.
+      if (theaterPendingUrl !== url && dom && dom.waitFor) {
+        theaterPendingUrl = url;
+        dom
+          .waitFor('theaterButton')
+          .then(function () {
+            theaterPendingUrl = null;
+            if (
+              lastSettings &&
+              lastSettings.player &&
+              lastSettings.player.defaultTheater === true &&
+              lastPage === 'watch' &&
+              !isFullscreen() &&
+              !isTheater()
+            ) {
+              var now = currentUrl();
+              if (now !== '' && now === url && now !== theaterClickedUrl) {
+                var b = dom ? dom.query('theaterButton') : null;
+                if (b && typeof b.click === 'function') {
+                  theaterClickedUrl = now;
+                  b.click();
+                }
+              }
+            }
+          })
+          .catch(function () {
+            theaterPendingUrl = null;
+          });
+      }
     }
 
     function playerContainer() {
@@ -198,6 +267,10 @@
         miniObserver = null;
         miniObserved = false;
       }
+      // Default theater forgets the video on disable/destroy:
+      // a later enable() starts the click-once tracking fresh.
+      theaterClickedUrl = null;
+      theaterPendingUrl = null;
     }
 
     // True when the user configured anything for the mini-player.
@@ -289,6 +362,8 @@
     }
 
     function apply(settings, page) {
+      var prevDefaultTheater =
+        lastSettings && lastSettings.player ? lastSettings.player.defaultTheater : false;
       lastSettings = settings;
       lastPage = page;
       if (!settings || !settings.player) return;
@@ -361,6 +436,23 @@
       setClass('oneyt-player-hide-like-count', pl.hideLikeCount === true);
       setClass('oneyt-player-hide-view-count', pl.hideViewCount === true);
       setClass('oneyt-player-hide-subscriber-count', pl.hideSubscriberCount === true);
+
+      // --- Default theater (Phase 14) ---
+      // Click at most once per video: a fresh video URL, or
+      // the setting just turned on mid-video — an explicit
+      // re-assertion, and it still sets the flag, so later
+      // re-applies for this video (including the theater
+      // observer's, when the user exits theater manually)
+      // do nothing. Turning the setting off never exits
+      // theater: there is no click on that path at all.
+      if (pl.defaultTheater === true && !theater) {
+        var url = currentUrl();
+        var freshVideo = url !== '' && url !== theaterClickedUrl;
+        var justEnabled = prevDefaultTheater !== true;
+        if (freshVideo || justEnabled) {
+          enableTheater(url);
+        }
+      }
 
       if (!theater && (position === 'fixed' || position === 'absolute')) {
         var el = playerContainer();
