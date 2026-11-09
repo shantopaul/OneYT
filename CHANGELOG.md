@@ -2,7 +2,22 @@
 
 All notable changes, newest first. Version numbers follow the
 phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
-1.0.0 (Phase 7 public release).
+1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts).
+
+## 1.1.0 — 2026-11-09 (Block Shorts, Phase 8)
+
+- **Block Shorts everywhere** (`layout.blockShorts`, off by
+  default): one master toggle in the Layout section. Hides
+  Shorts shelves on every page (home/watch + search/
+  subscriptions), removes Shorts from the guide and
+  mini-guide, hides Shorts video cards in grids and search
+  results, and opens `/shorts/VIDEOID` links as normal
+  `/watch?v=VIDEOID` videos instead.
+- The three older per-page Shorts toggles (Hide Shorts on
+  Home / Watch, Hide Shorts from guide) are unchanged —
+  Block Shorts adds the full block on top of them.
+- Live verification of the new selectors and the redirect on
+  a real YouTube page is still open (browser check).
 
 ## 1.0.0 — 2026-11-09 (public release)
 
