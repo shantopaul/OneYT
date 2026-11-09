@@ -137,6 +137,7 @@ and must work flawlessly before anything else ships.
 | PL-06 | Theater mode enhancements | Works with YouTube theater toggle |
 | PL-07 | Fullscreen safety | All positioning disabled / neutralised in fullscreen |
 | PL-08 | Sticky player (optional) | Player stays visible while scrolling page |
+| PL-09 | Hide endscreen cards | Toggle; the video suggestions shown at the end of a video are hidden; live apply, works in theater too |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.

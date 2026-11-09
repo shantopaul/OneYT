@@ -384,5 +384,15 @@ Accessibility (6.9) — live confirmation:
 - [ ] Shortcut capture: press Tab while capturing — focus
       moves to the next control, nothing binds
 
+Phase 10 — Hide endscreen cards (browser):
+- [ ] Open a video, turn on Player → Hide endscreen cards —
+      `<html>` gains `oneyt-player-hide-endscreen`
+- [ ] Seek to the last seconds / let the video end — no
+      endscreen video suggestions appear (`.ytp-endscreen-content`
+      hidden); the video itself and the controls are untouched
+- [ ] Same in theater mode — endscreen stays hidden
+- [ ] Toggle it off — the endscreen cards return at the next
+      video end (class removed, nothing else changed)
+
 Notes / failures:
 - _…_

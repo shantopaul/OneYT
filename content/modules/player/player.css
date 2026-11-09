@@ -85,6 +85,16 @@ html.oneyt-enabled.oneyt-player-styled #primary #player {
   margin-bottom: var(--oneyt-player-spacing, 0px);
 }
 
+/* --- Endscreen (Phase 10) ---
+ * Hides the video suggestions shown at the end of a video.
+ * Class-only hiding, like the focus module: removing the
+ * class restores the endscreen exactly. Works in theater
+ * too (the class is set in the theater-safe section of
+ * apply()). Verify live — YouTube renames DOM elements. */
+html.oneyt-enabled.oneyt-player-hide-endscreen #movie_player .ytp-endscreen-content {
+  display: none;
+}
+
 /* --- Mini-player (Phase 4) ---
  * Only when the user configures it; with nothing configured no
  * rule applies and the native mini-player (open/close/drag) is

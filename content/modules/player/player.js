@@ -65,6 +65,7 @@
     'oneyt-player-fixed',
     'oneyt-player-absolute',
     'oneyt-player-styled',
+    'oneyt-player-hide-endscreen',
   ];
   var POSITIONS = ['default', 'sticky', 'fixed', 'absolute'];
   var MINI_VARS = [
@@ -353,6 +354,7 @@
 
       // --- Appearance (safe in theater too) ---
       setClass('oneyt-player-styled', true);
+      setClass('oneyt-player-hide-endscreen', pl.hideEndscreen === true);
 
       if (!theater && (position === 'fixed' || position === 'absolute')) {
         var el = playerContainer();

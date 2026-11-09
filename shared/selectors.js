@@ -53,6 +53,10 @@
     // --- Mini-player (Phase 4) ---
     miniPlayer: 'ytd-miniplayer', // Appears only while mini-player is open
 
+    // --- Player endscreen (Phase 10) ---
+    // The video suggestions shown at the end of a video.
+    endscreenContent: '.ytp-endscreen-content',
+
     // --- Focus Mode targets (Phase 4) ---
     chat: '#chat', // Live chat container on watch pages
     actions: '#actions', // Like/share/download row under the player

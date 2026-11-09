@@ -412,7 +412,8 @@ dashboard search bar optimised, position AND functionality.
 
 **Status 2026-11-09:** code complete on branch
 `feature/dashboard-theme` (10 part-by-part commits on top of
-`main` `c04274e`, pushed after completion, nothing merged).
+`main` `c04274e`, pushed after completion). **Merged by
+Shanto as PR #11 → `main` `7b70b80`.**
 `npm test` 132/132 pass, lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.2.0.zip`.
 Delivered: new setting `ui.dashboardTheme` (default System,
@@ -442,6 +443,34 @@ count past 8, clear button, ARIA combobox semantics.
 **Browser verification still open** — the theme and the
 search need a real dashboard page on Shanto's PC. The popup
 stays dark-only for now (follow-up).
+
+## Phase 10 — Hide Endscreen Cards (v1.3) ⏳ IN PROGRESS (2026-11-09)
+
+**Goal:** one toggle that hides the video suggestions shown
+at the end of a video (the endscreen cards), so a video ends
+cleanly instead of offering the next watch.
+
+**Deliverable:** v1.3.0.
+
+**Status 2026-11-09:** code complete on branch
+`feature/hide-endscreen` (8 part-by-part commits on top of
+`main` `7b70b80`, pushed after completion, nothing merged).
+`npm test` 134/134 pass, lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.3.0.zip`.
+Delivered: new setting `player.hideEndscreen` (default off,
+additive); selector `endscreenContent:
+'.ytp-endscreen-content'` in `shared/selectors.js` (count
+21 → 22); player module sets `oneyt-player-hide-endscreen`
+on `<html>` in the theater-safe appearance section and its
+CSS hides the endscreen container with a plain
+`display: none` (class-only hiding, like the focus module —
+removing the class restores the endscreen exactly); Player
+section toggle after Player spacing; module tests (on/off,
+theater, fullscreen, non-watch) + manual checklist item.
+**Browser verification still open** — the selector needs a
+real video end on Shanto's PC (it is the well-known YouTube
+endscreen hook, but YouTube renames DOM elements, so the
+live check is the proof).
 
 ## Future (v1.1+, not in scope now)
 

@@ -172,6 +172,29 @@ test('player: theater skips sizing/position but keeps appearance', () => {
   assert.equal(doc._root._classes.has('oneyt-player-styled'), true);
 });
 
+test('player: hideEndscreen sets the class on watch, in theater too', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { hideEndscreen: true } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-endscreen'), true);
+  mod.apply(settingsWith({ player: { hideEndscreen: false } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-endscreen'), false);
+  const theater = playerSetup({ theater: true });
+  theater.mod.apply(settingsWith({ player: { hideEndscreen: true } }), 'watch');
+  assert.equal(theater.doc._root._classes.has('oneyt-player-hide-endscreen'), true);
+});
+
+test('player: hideEndscreen is cleared off watch pages and in fullscreen', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { hideEndscreen: true } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-endscreen'), true);
+  mod.apply(settingsWith({ player: { hideEndscreen: true } }), 'home');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-endscreen'), false);
+  mod.apply(settingsWith({ player: { hideEndscreen: true } }), 'watch');
+  doc.fullscreenElement = createFakeElement();
+  mod.apply(settingsWith({ player: { hideEndscreen: true } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-endscreen'), false);
+});
+
 test('player: fullscreen removes all classes; disable restores everything', () => {
   const { doc, mod } = playerSetup();
   mod.apply(settingsWith({ player: { customWidth: 800, position: 'sticky' } }), 'watch');

@@ -57,6 +57,7 @@
       shadow: 'none', // CSS box-shadow or "none"
       spacing: 0, // px around player
       sticky: false,
+      hideEndscreen: false, // hide the video suggestions shown at the end of a video
       miniPlayer: {
         size: 0, // px width, 0 = YouTube default
         position: 'default', // default | bottom-right | bottom-left | top-right | top-left
