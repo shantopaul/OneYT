@@ -309,6 +309,25 @@ test('layout: hide comments + watch spacing on watch; cleanup elsewhere', () => 
   assert.equal(doc._root._classes.size, 0);
 });
 
+test('layout: hideTopicChips sets the class on home only', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  mod.apply(settingsWith({ layout: { hideTopicChips: true } }), 'home');
+  assert.equal(doc._root._classes.has('oneyt-hide-topic-chips'), true);
+  // Off again restores the bar — class-only hiding.
+  mod.apply(settingsWith({ layout: { hideTopicChips: false } }), 'home');
+  assert.equal(doc._root._classes.has('oneyt-hide-topic-chips'), false);
+  // Leaving home clears the class: watch and search never hide it.
+  mod.apply(settingsWith({ layout: { hideTopicChips: true } }), 'home');
+  mod.apply(settingsWith({ layout: { hideTopicChips: true } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-hide-topic-chips'), false);
+  mod.apply(settingsWith({ layout: { hideTopicChips: true } }), 'home');
+  mod.apply(settingsWith({ layout: { hideTopicChips: true } }), 'search');
+  assert.equal(doc._root._classes.has('oneyt-hide-topic-chips'), false);
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+});
+
 // ---------- Registration / manager integration ----------
 
 test('all three Phase 2 modules register and run through the manager', () => {
