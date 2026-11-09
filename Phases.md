@@ -1045,8 +1045,21 @@ checklist, version, docs.
   theme itself never syncs. **Browser verification
   still open** — the live page is the proof
   (`tests/manual-checklist.md` Phase 21).
-**Status 2026-11-09:** started on branch
-`feature/saved-themes` (from `main` `81201fb`).
+**Status 2026-11-09:** code complete on branch
+`feature/saved-themes` (8 part-by-part commits on top
+of `main` `81201fb`, pushed after completion).
+`npm test` 203/203 pass (193 baseline + 10 new),
+lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.13.0.zip`
+(runtime files only). **Done:** `1b244ff` start
+(PRD PL-21 + plan), `5d602ae` engine
+(`shared/savedThemes.js` + `oneyt.themes.v1` key),
+`8c7bc5a` dashboard wiring (tool-box in Appearance +
+script pin 21 → 22), `3be68b3` tests (10 new),
+`a3ba3e9` checklist, `dd483a6` fix — prettier
+format, `5f6ad2a` version 1.13.0, docs (this commit).
+**Browser verification still open** — the live page
+is the proof (`tests/manual-checklist.md` Phase 21).
 
 ## Future (v1.1+, not in scope now)
 
