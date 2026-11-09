@@ -40,6 +40,22 @@
     reelShelf: 'ytd-reel-shelf-renderer',
     richGrid: 'ytd-rich-grid-renderer',
 
+    // --- Home shelves (Phase 15) ---
+    // Shelves are matched by their title attribute — the
+    // [title*="…" i] pattern comes from a HideYouTubeShorts
+    // userscript (independent of OneYT). Titles are English
+    // UI text: a non-English YouTube UI may use different
+    // titles, and YouTube may rename them — the live check
+    // on Shanto's PC is the proof. Mixes on home are
+    // individual grid items, not a shelf: the mix hook is
+    // the radio link (start_radio=1), from uBlock filter
+    // lists — the mixesShelf key covers a Mixes shelf if
+    // one ever renders.
+    liveShelf: 'ytd-rich-shelf-renderer[title*="Live now" i]',
+    mixesShelf: 'ytd-rich-shelf-renderer[title*="Mixes" i]',
+    mixesItem: 'ytd-rich-item-renderer:has(a[href*="start_radio=1"])',
+    newsShelf: 'ytd-rich-shelf-renderer[title*="News" i]',
+
     // --- Navigation (Phase 4) ---
     guide: '#guide',
     masthead: '#masthead',

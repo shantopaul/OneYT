@@ -28,7 +28,7 @@ test('selectors: required watch selectors exist', () => {
     assert.equal(typeof SELECTORS[key], 'string');
     assert.ok(SELECTORS[key].length > 0);
   });
-  assert.equal(Object.keys(SELECTORS).length, 25); // +endscreenContent (v1.3) + likeCountText, viewCountText, subscriberCount (v1.4 hide counts)
+  assert.equal(Object.keys(SELECTORS).length, 29); // +liveShelf, mixesShelf, mixesItem, newsShelf (v1.7 hide shelves)
 });
 
 test('selectors: every key is used — by name in JS or raw value in CSS', () => {
