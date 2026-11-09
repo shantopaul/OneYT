@@ -545,6 +545,6 @@ mid-phase.)
 | AD-03 | All selectors in `shared/selectors.js` only | 2026-11-09 | Decided (planning) |
 | AD-04 | One `<style>` tag per module, removed on disable | 2026-11-09 | Decided (planning) |
 | AD-05 | Themes = CSS variable sets only | 2026-11-09 | Decided (planning) |
-| AD-06 | ES-module loading strategy for content scripts | — | **Open — decide in Phase 1** |
+| AD-06 | ES-module loading strategy for content scripts | 2026-11-09 | **Decided (Phase 1): classic scripts, no bundler.** Content scripts load in dependency order via `manifest.json` `content_scripts.js`, sharing one global namespace `window.OneYT`. Shared files use a UMD-style guard (`globalThis.OneYT` in the browser, `module.exports` in Node) so unit tests run without a build step. No ES `import`/`export` in content scripts, no dynamic `import()`, no `web_accessible_resources` needed. Revisit only if the file count forces a bundler. |
 | AD-07 | Focus Mode scope: global setting, per-tab toggle | — | **Open — decide in Phase 4** |
 | AD-08 | Sync scope (which keys sync) | — | **Open — decide in Phase 5** |

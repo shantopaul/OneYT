@@ -1,0 +1,14 @@
+# Dependencies / tooling
+node_modules/
+package-lock.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Release artefacts (built zips, not source)
+*.zip
+dist/
+build/
