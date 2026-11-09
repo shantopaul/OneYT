@@ -92,6 +92,18 @@
         keywords: ['home', 'thumbnail', 'size'],
       },
       {
+        key: 'layout.homeMaxWidth',
+        type: 'number',
+        label: 'Homepage max width',
+        description:
+          'Cap the homepage feed width in pixels and centre it — the ultrawide fix. 0 = YouTube default (full width).',
+        min: 0,
+        max: 2560,
+        step: 1,
+        unit: 'px',
+        keywords: ['home', 'max', 'width', 'ultrawide', 'centre', 'center'],
+      },
+      {
         key: 'layout.hideComments',
         type: 'toggle',
         label: 'Hide comments',
