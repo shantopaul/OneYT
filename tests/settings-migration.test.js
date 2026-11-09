@@ -87,3 +87,30 @@ test('settings-manager load/save round-trip with a fake storage area', async () 
   await sm2.load();
   assert.equal(sm2.getPath('sidebar.customWidth'), 500);
 });
+
+test('migration repairs a null settings section with the defaults', () => {
+  const m = defaults.migrateSettings({ player: null, layout: null });
+  assert.deepEqual(m.player, defaults.DEFAULT_SETTINGS.player);
+  assert.deepEqual(m.layout, defaults.DEFAULT_SETTINGS.layout);
+  assert.equal(m.enabled, true);
+});
+
+test('migration repairs non-boolean values for nullable keys', () => {
+  const m = defaults.migrateSettings({ playback: { autoplay: 'yes', captions: 42 } });
+  assert.equal(m.playback.autoplay, null);
+  assert.equal(m.playback.captions, null);
+});
+
+test('migration keeps null for nullable keys', () => {
+  const m = defaults.migrateSettings({ playback: { autoplay: null, captions: null } });
+  assert.equal(m.playback.autoplay, null);
+  assert.equal(m.playback.captions, null);
+});
+
+test('a preset applies onto a repaired null section', () => {
+  const profiles = require('../shared/profiles');
+  const repaired = defaults.migrateSettings({ player: null });
+  const next = profiles.applyPreset(repaired, 'cinema', defaults);
+  assert.equal(next.player.defaultTheater, true);
+  assert.equal(next.player.maxWidth, 0);
+});

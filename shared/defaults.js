@@ -197,12 +197,13 @@
   }
 
   // Deep-merge `stored` onto a fresh copy of the defaults.
-  // Stored values win when their type matches the default's type
-  // (null in the stored value is kept only when the default is
-  // also null, or the key is a known nullable key — autoplay /
-  // captions / defaultQuality handled by the type check below:
-  // typeof null is "object", so null only survives where the
-  // default is null).
+  // Stored values win when their type matches the default's type.
+  // `null` is never a valid section/object value: a stored null
+  // for an object-typed default is corrupt and replaced by the
+  // default (a stored `{player: null}` used to wipe the whole
+  // section). Nullable leaves (autoplay / captions: boolean |
+  // null) accept null or a boolean only — any other primitive
+  // (e.g. "yes" from a hand-edited import) is corrupt too.
   function deepMerge(defaults, stored) {
     var out = deepClone(defaults);
     if (!isPlainObject(stored)) return out;
@@ -220,13 +221,14 @@
       } else if (Array.isArray(defaultValue) && Array.isArray(storedValue)) {
         out[key] = deepClone(storedValue);
       } else if (defaultValue === null) {
-        // Nullable key (e.g. autoplay / captions: boolean | null).
-        // Accept null or any primitive; reject objects/arrays.
+        // Nullable key (autoplay / captions: boolean | null).
+        // Accept null or a boolean only; any other primitive
+        // or object is corrupt and replaced by the default.
         out[key] =
-          storedValue === null || typeof storedValue !== 'object'
+          storedValue === null || typeof storedValue === 'boolean'
             ? deepClone(storedValue)
             : defaultValue;
-      } else if (typeof storedValue === typeof defaultValue) {
+      } else if (storedValue !== null && typeof storedValue === typeof defaultValue) {
         out[key] = deepClone(storedValue);
       }
       // Type mismatch: keep the default (corrupt key repaired).
