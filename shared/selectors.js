@@ -62,6 +62,16 @@
     mixesItem: "ytd-rich-item-renderer:has(a[href*='start_radio=1'])",
     newsShelf: "ytd-rich-shelf-renderer[title*='News' i]",
 
+    // --- Channel Shorts tab (Phase 19) ---
+    // The "Shorts" tab on a channel page. The
+    // tab-title="Shorts" hook comes from three
+    // independent lists (the gijsdev uBlock Hide YouTube
+    // Shorts list, the HideYouTubeShorts userscript, and
+    // the Youtube Clear View list). English UI text: a
+    // non-English YouTube UI may use a different title,
+    // same caveat as the Phase 15 shelf titles.
+    channelShortsTab: "yt-tab-shape[tab-title='Shorts']",
+
     // --- Navigation (Phase 4) ---
     guide: '#guide',
     masthead: '#masthead',

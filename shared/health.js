@@ -78,6 +78,11 @@
     mixesShelf: { pages: ['home'], feature: 'Mixes shelf', presence: 'sometimes' },
     mixesItem: { pages: ['home'], feature: 'Mixes items', presence: 'sometimes' },
     newsShelf: { pages: ['home'], feature: 'News shelf', presence: 'sometimes' },
+    channelShortsTab: {
+      pages: ['channel'],
+      feature: 'Shorts tab (channel)',
+      presence: 'sometimes',
+    },
     guide: {
       pages: ['home', 'watch', 'search', 'subscriptions'],
       feature: 'Guide (sidebar menu)',
