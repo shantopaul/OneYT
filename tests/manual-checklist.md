@@ -607,3 +607,18 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 21 — Saved Themes + Export/Share (v1.13) — live in Chrome
+
+- [ ] Dashboard → Appearance: a "Save current theme" box (name input + Save theme button), a "Your saved themes (0/10)" list, and an "Import a shared theme" box
+- [ ] Set Theme → Midnight, Accent → a red of your choice, then save as "My Night": the list shows "My Night — Base: midnight · 1 custom colour."
+- [ ] Change the theme back to Default (colours cleared): open a watch page — YouTube is back to default. Apply "My Night": the page turns midnight + red again immediately, no reload
+- [ ] Apply "My Night" again from the list: nothing else changes (layout, player, sidebar settings untouched — check a layout toggle you set earlier is still as it was)
+- [ ] Export "My Night": a file `oneyt-theme-my-night.json` downloads — open it: it has `oneytTheme: 1`, the name, `theme: "midnight"` and the colours
+- [ ] Delete "My Night", then import the exported file (paste its text into the import box → Validate & preview → Add theme): the preview names it correctly and it appears in the list
+- [ ] Import the same file again: rejected with "already exists". Import a hand-edited file with a wrong `theme` value: rejected with "unknown base theme". Import plain text: rejected with "Not valid JSON"
+- [ ] Rename "My Night" to "Dark": rejected (built-in name). Rename it to "Night Red": the list shows the new name, and Apply still works
+- [ ] Save 10 themes, then save an 11th: rejected with "delete one first"
+
+Notes / failures:
+- _…_
