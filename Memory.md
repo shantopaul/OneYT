@@ -18,10 +18,10 @@
 | **Date** | 2026-11-09 |
 | **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · **Phase 3 — Appearance ✅ code complete, pushed to branch** (browser check still open) |
 | **Version** | 0.1.0 (foundation + core layout + appearance, no dashboard yet) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d6d2df1` (Phase 1 + Phase 2 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`); branch `feature/appearance` pushed 2026-11-09, **not merged** |
-| **Code written** | Phase 1 + Phase 2 + Phase 3: sidebar, player, layout, appearance, typography modules + themes + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 3 code done; waiting for browser check + Phase 4 go-ahead) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–3 sections); Phase 4 start decision |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d49ac19` (Phases 1–3 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`); branch `feature/Productivity` in progress |
+| **Code written** | Phases 1–3: sidebar, player, layout, appearance, typography modules + themes + tests (see "What Has Been Completed") |
+| **Currently working on** | Phase 4 — Playback & Productivity (branch `feature/Productivity`) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–3 sections) |
 | **Last verified** | 2026-11-09 — `npm test` 68/68 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
