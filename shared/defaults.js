@@ -87,6 +87,9 @@
       blockShorts: false, // v1.1: hide Shorts everywhere + open /shorts/ links as normal videos
       hideShortsHome: false,
       hideShortsWatch: false,
+      hideLiveShelf: false, // hide the "Live now" shelf on the home feed
+      hideMixesShelf: false, // hide Mixes on the home feed (shelf + individual mix cards)
+      hideNewsShelf: false, // hide the "Breaking news" shelf on the home feed
       homeColumns: 0, // 0 = default
       cardSpacing: 0, // px, 0 = default
       thumbnailSize: 0, // px width, 0 = default
