@@ -221,12 +221,30 @@ UI), caption appearance beyond font size.
 
 ---
 
-## Phase 5 — Settings Dashboard
+## Phase 5 — Settings Dashboard ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** the complete settings interface — popup, dashboard,
 search, import/export.
 
 **Deliverable:** complete customisation interface, v0.5.0.
+
+**Status 2026-11-09:** code complete on branch `feature/Settings`
+(11 part-by-part commits on top of `main` `33d9e08`, pushed after
+completion, nothing merged). `npm test` 93/93 pass, lint + format
+clean, manifest valid, no polling/network. AD-08 decided (sync
+scope: opt-in; everything except `appearance.customCSS`; remembered
+playback never syncs; implementation in Phase 6). 9 dashboard
+sections, 96 controls — unit-tested to cover every leaf setting
+in the defaults tree (except `schemaVersion`). Dashboard writes go
+straight to storage, so open YouTube tabs apply changes live.
+Final popup: master switch, page status (activeTab permission,
+URL only), Focus/scroll/player quick toggles, theme selector,
+dashboard opener. **Browser verification still open** — the live
+dashboard, search jump, import file picker, popup on a real tab
+and live-apply need Chrome on Shanto's PC
+(`tests/manual-checklist.md` Phase 5 section). Sync
+implementation itself is Phase 6 work (AD-08 scope decided
+here); no sync toggle ships in Phase 5 (no dead controls).
 
 ### Tasks
 
