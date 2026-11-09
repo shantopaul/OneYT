@@ -46,6 +46,13 @@
     // writes it.
     HEALTH_STORAGE_KEY: 'oneyt.health.v1',
 
+    // Saved themes live under their own key in
+    // chrome.storage.local (Phase 21). Local only, never
+    // synced: a saved theme is a theme-only snapshot
+    // (base preset + custom colours). Export/share is
+    // the sharing path, not sync.
+    SAVED_THEMES_STORAGE_KEY: 'oneyt.themes.v1',
+
     // Debounce intervals (ms) — see Rules.md: no storage spam
     // from sliders, no layout thrash from resize.
     DEBOUNCE: {
