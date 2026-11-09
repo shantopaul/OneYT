@@ -127,9 +127,48 @@
     return { valid: errors.length === 0, errors: errors };
   }
 
+  // Speed presets (playback.speedPresets): numbers in 0.25..4,
+  // sorted ascending, duplicates removed. Returns
+  // { valid, errors[], cleaned[] } — cleaned is always the usable
+  // list (empty when nothing survives), so callers never have to
+  // guess. 1x is always kept: an empty cleaned list still plays
+  // at normal speed, the presets just offer nothing extra.
+  var MIN_SPEED = 0.25;
+  var MAX_SPEED = 4;
+
+  function validateSpeedPresets(list) {
+    var errors = [];
+    if (!Array.isArray(list)) {
+      return { valid: false, errors: ['Speed presets must be a list.'], cleaned: [] };
+    }
+    var cleaned = [];
+    list.forEach(function (value) {
+      if (typeof value !== 'number' || !isFinite(value)) {
+        errors.push('Speed preset "' + value + '" is not a number and was dropped.');
+      } else if (value < MIN_SPEED || value > MAX_SPEED) {
+        errors.push(
+          'Speed preset ' +
+            value +
+            'x is out of range (' +
+            MIN_SPEED +
+            'x-' +
+            MAX_SPEED +
+            'x) and was dropped.'
+        );
+      } else if (cleaned.indexOf(value) === -1) {
+        cleaned.push(value);
+      }
+    });
+    cleaned.sort(function (a, b) {
+      return a - b;
+    });
+    return { valid: errors.length === 0, errors: errors, cleaned: cleaned };
+  }
+
   var api = {
     validateSettings: validateSettings,
     validateCustomCSS: validateCustomCSS,
+    validateSpeedPresets: validateSpeedPresets,
   };
 
   var ns = (globalThis.OneYT = globalThis.OneYT || {});
