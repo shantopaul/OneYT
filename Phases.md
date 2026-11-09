@@ -1113,7 +1113,7 @@ wiring, tests, checklist, version, docs.
   the live page is the proof
   (`tests/manual-checklist.md` Phase 22).
 **Status 2026-11-09:** code complete on branch
-`feature/layout-editor` (9 part-by-part commits on top
+`feature/layout-editor` (10 part-by-part commits on top
 of `main` `1324f15`, pushed after completion) and
 **merged to `main` — merge `e581692`, `main` now
 `e581692`** (per the standing rule: feature complete →
@@ -1132,7 +1132,7 @@ format, `6e0f71f` version 1.14.0, docs (this commit).
 **Browser verification still open** — the live page
 is the proof (`tests/manual-checklist.md` Phase 22).
 
-## Phase 23 — Player Accent Color (v1.15) ⬜ IN PROGRESS (2026-11-09)
+## Phase 23 — Player Accent Color (v1.15) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** the red progress bar is YouTube's colour, not the
 user's. One colour setting recolours the played portion
@@ -1176,6 +1176,22 @@ to trust); if YouTube renames `.ytp-play-progress` /
 nothing and the Health section reports it; the accent
 is independent of the appearance theme accent — it
 recolours the player only, not the page.
+**Status 2026-11-09:** code complete on branch
+`feature/player-accent-color` (10 part-by-part commits on top
+of `main` `cd49ebb`, pushed after completion).
+`npm test` 217/217 pass (214 baseline + 3 new), lint +
+format clean, manifest valid, `npm run package` builds
+a clean `oneyt-1.15.0.zip` (runtime files only).
+**Done:** `b8f948f` start (PRD PL-23 + plan),
+`eacebf8` setting (`player.accentColor`), `8e7763f`
+selectors (count 31 → 33) + health metadata,
+`8ae49c7` player module + CSS, `a48f1ec` dashboard
+picker, `bbd9191` tests (3 new), `3a6bd88` fix —
+second selector-count pin in `tests/popup-theme.test.js`
+(the tests commit landed 216/217), `9eee4d1`
+checklist, `d5f7a65` version 1.15.0, docs (this commit).
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 23).
 
 ## Future (v1.1+, not in scope now)
 
