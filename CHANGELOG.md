@@ -13,7 +13,24 @@ news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.11.0 (Phase 19 popup theme + channel Shorts tab),
 1.12.0 (Phase 20 custom CSS templates),
 1.13.0 (Phase 21 saved themes + export/share),
-1.14.0 (Phase 22 advanced layout editor).
+1.14.0 (Phase 22 advanced layout editor),
+1.15.0 (Phase 23 player accent color).
+
+## 1.15.0 — 2026-11-09 (Player Accent Color, Phase 23)
+
+- One colour setting `player.accentColor` recolours the
+  played portion of the progress bar (`.ytp-play-progress`)
+  and the scrubber knob (`.ytp-scrubber-button`).
+  Empty = YouTube's default red; Clear restores it.
+- Player-section colour picker (the existing picker +
+  text + Clear control) after "Player spacing".
+  Live apply, works in theater too, cleared in
+  fullscreen like every player class.
+- An invalid hex (e.g. from a hand-edited import) is
+  ignored — the player keeps YouTube red.
+- The buffered portion is deliberately untouched, so
+  played vs buffered stays readable. The volume slider
+  is out of scope (its fill hook has only one source).
 
 ## 1.14.0 — 2026-11-09 (Advanced Layout Editor, Phase 22)
 
