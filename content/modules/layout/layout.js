@@ -1,14 +1,25 @@
 /* OneYT — content/modules/layout/layout.js
  *
- * Layout module, part 1 (Phase 2 — watch page only).
- * Homepage / search / subscriptions layout arrives in Phase 3.
+ * Layout module: watch page (Phase 2) + homepage (Phase 3).
  *
  * Watch page:
  * - Hide comments (layout.hideComments) — hides #comments.
  * - Watch spacing (layout.watchSpacing, px) — gap between the
  *   player and the area below it (#below).
+ * - Hide Shorts shelf (layout.hideShortsWatch).
  *
- * Both are class + variable toggles; disabling removes them.
+ * Homepage:
+ * - Grid columns (layout.homeColumns, 0 = YouTube default) —
+ *   sets --ytd-rich-grid-items-per-row through a variable.
+ * - Card spacing (layout.cardSpacing, px, 0 = default) —
+ *   sets --ytd-rich-grid-item-margin through a variable.
+ * - Thumbnail size (layout.thumbnailSize, px width, 0 = default).
+ * - Hide Shorts shelf (layout.hideShortsHome).
+ *
+ * All are class + variable toggles; disabling removes them.
+ * The grid variables are YouTube's own — if YouTube renames
+ * them, the rule silently does nothing instead of breaking
+ * the page (same graceful-degradation idea as AD-10).
  * Fullscreen does not need a guard here: #comments is not
  * visible in fullscreen, and the spacing has no effect there.
  */
@@ -44,19 +55,60 @@
       setClass('oneyt-hide-comments', false);
       setClass('oneyt-watch-spaced', false);
       setVar('--oneyt-watch-spacing', null);
+      setClass('oneyt-hide-shorts-watch', false);
+      setClass('oneyt-home-columns', false);
+      setClass('oneyt-card-spaced', false);
+      setClass('oneyt-thumb-sized', false);
+      setClass('oneyt-hide-shorts-home', false);
+      setVar('--oneyt-home-columns', null);
+      setVar('--oneyt-card-spacing', null);
+      setVar('--oneyt-thumb-width', null);
     }
 
-    function apply(settings, page) {
-      if (!settings || !settings.layout) return;
-      if (page !== 'watch') {
-        cleanup();
-        return;
-      }
-      var layout = settings.layout;
+    function applyWatch(layout) {
       setClass('oneyt-hide-comments', layout.hideComments === true);
       var spaced = layout.watchSpacing && layout.watchSpacing > 0;
       setClass('oneyt-watch-spaced', !!spaced);
       setVar('--oneyt-watch-spacing', spaced ? layout.watchSpacing + 'px' : null);
+      setClass('oneyt-hide-shorts-watch', layout.hideShortsWatch === true);
+    }
+
+    function applyHome(layout) {
+      var columns = layout.homeColumns && layout.homeColumns >= 1 && layout.homeColumns <= 12;
+      setClass('oneyt-home-columns', !!columns);
+      setVar('--oneyt-home-columns', columns ? String(layout.homeColumns) : null);
+      var spaced = layout.cardSpacing && layout.cardSpacing > 0;
+      setClass('oneyt-card-spaced', !!spaced);
+      setVar('--oneyt-card-spacing', spaced ? layout.cardSpacing + 'px' : null);
+      var sized = layout.thumbnailSize && layout.thumbnailSize >= 120;
+      setClass('oneyt-thumb-sized', !!sized);
+      setVar('--oneyt-thumb-width', sized ? layout.thumbnailSize + 'px' : null);
+      setClass('oneyt-hide-shorts-home', layout.hideShortsHome === true);
+    }
+
+    function apply(settings, page) {
+      if (!settings || !settings.layout) return;
+      var layout = settings.layout;
+      if (page === 'watch') {
+        applyWatch(layout);
+        // Home rules must not linger after a watch -> home -> watch
+        // hop: clear the home side, keep the watch side.
+        setClass('oneyt-home-columns', false);
+        setClass('oneyt-card-spaced', false);
+        setClass('oneyt-thumb-sized', false);
+        setClass('oneyt-hide-shorts-home', false);
+        setVar('--oneyt-home-columns', null);
+        setVar('--oneyt-card-spacing', null);
+        setVar('--oneyt-thumb-width', null);
+      } else if (page === 'home') {
+        applyHome(layout);
+        setClass('oneyt-hide-comments', false);
+        setClass('oneyt-watch-spaced', false);
+        setVar('--oneyt-watch-spacing', null);
+        setClass('oneyt-hide-shorts-watch', false);
+      } else {
+        cleanup();
+      }
     }
 
     return {
