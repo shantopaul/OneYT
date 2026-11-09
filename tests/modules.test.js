@@ -516,6 +516,28 @@ test('layout: hideLiveShelf / hideMixesShelf / hideNewsShelf set the classes on 
   assert.equal(doc._root._classes.size, 0);
 });
 
+test('layout: homeMaxWidth sets the class + variable on home only', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  mod.apply(settingsWith({ layout: { homeMaxWidth: 1600 } }), 'home');
+  assert.equal(doc._root._classes.has('oneyt-home-max-width'), true);
+  assert.equal(doc._root._vars.get('--oneyt-home-max-width'), '1600px');
+  // 0 means YouTube default — no class, no variable.
+  mod.apply(settingsWith({ layout: { homeMaxWidth: 0 } }), 'home');
+  assert.equal(doc._root._classes.has('oneyt-home-max-width'), false);
+  assert.equal(doc._root._vars.has('--oneyt-home-max-width'), false);
+  // Leaving home clears it: watch and search never cap the grid.
+  mod.apply(settingsWith({ layout: { homeMaxWidth: 1600 } }), 'home');
+  mod.apply(settingsWith({ layout: { homeMaxWidth: 1600 } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-home-max-width'), false);
+  assert.equal(doc._root._vars.has('--oneyt-home-max-width'), false);
+  mod.apply(settingsWith({ layout: { homeMaxWidth: 1600 } }), 'home');
+  mod.apply(settingsWith({ layout: { homeMaxWidth: 1600 } }), 'search');
+  assert.equal(doc._root._classes.has('oneyt-home-max-width'), false);
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+});
+
 // ---------- Registration / manager integration ----------
 
 test('all three Phase 2 modules register and run through the manager', () => {
