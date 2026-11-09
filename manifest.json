@@ -35,6 +35,7 @@
         "content/modules/playback/playback.js",
         "content/modules/focus/focus.js",
         "content/modules/recommendations/recommendations.js",
+        "content/modules/keyboard/keyboard.js",
         "content/core/app.js",
         "content/index.js"
       ],

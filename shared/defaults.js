@@ -125,14 +125,17 @@
 
     keyboard: {
       shortcuts: {
-        toggleFocus: '',
-        toggleSidebar: '',
-        togglePlayerPosition: '',
-        speedUp: '',
-        speedDown: '',
-        resetSpeed: '',
-        toggleTheater: '',
-      }, // "" = unbound; defaults assigned in Phase 4
+        // Shift+ combos: plain letters are YouTube-native keys
+        // (f = fullscreen, t = theater, ...), so defaults use
+        // Shift to avoid conflicts. "" = unbound.
+        toggleFocus: 'Shift+F',
+        toggleSidebar: 'Shift+S',
+        togglePlayerPosition: 'Shift+P',
+        speedUp: 'Shift+>',
+        speedDown: 'Shift+<',
+        resetSpeed: 'Shift+R',
+        toggleTheater: 'Shift+T',
+      },
     },
   };
 

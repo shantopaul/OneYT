@@ -88,6 +88,20 @@
         ns.modules.recommendations.createRecommendationsModule({ logger: logger })
       );
     }
+    if (ns.modules && ns.modules.keyboard) {
+      moduleManager.register(
+        ns.modules.keyboard.createKeyboardModule({
+          dom: domManager,
+          logger: logger,
+          settingsManager: settingsManager,
+          actions: {
+            toggleFocus: function () {
+              if (focusModule) focusModule.toggleTab();
+            },
+          },
+        })
+      );
+    }
 
     var app = ns.app.createApp({
       logger: logger,
