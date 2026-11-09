@@ -565,3 +565,16 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 18 — Selector Health Check (v1.10) — live on real YouTube pages
+
+- [ ] Dashboard → Health, before opening YouTube: "No health data yet"
+- [ ] Open a watch page, wait 3 s, open the dashboard → Health: status "All checked features are working", watch page checked time shown, Video player / Theater mode button / Like count rows "Working"
+- [ ] Open the home page, wait 3 s, dashboard → Health: home page checked time shown, Topic chips bar / Home feed grid "Working"; Live / Mixes / News shelf rows "Working" if YouTube showed them, "Not seen on this visit" if it did not
+- [ ] Navigate watch → home → watch (SPA, no reload): the checked times update for each page, no errors in the console
+- [ ] "Check again" re-reads the record (the times refresh); the dashboard never opens a YouTube tab itself
+- [ ] Turn the extension off in the popup: no new health record is written (the checked time stays where it was); turn it back on and visit YouTube: the check runs again
+- [ ] Deliberately break one selector to prove the warning works (e.g. in DevTools console on a watch page, confirm `document.querySelector('#segmented-like-button .yt-spec-button-shape-next__button-text-content')` exists; then temporarily rename the key's value in `shared/selectors.js`, reload the extension, open a watch page): Health shows "Some features are not working" and the Like count row "Not working" — and the Like button still works (nothing was auto-disabled). Restore the selector afterwards.
+
+Notes / failures:
+- _…_
