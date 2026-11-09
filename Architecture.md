@@ -2,7 +2,7 @@
 
 > **Product:** OneYT — All-in-One YouTube Customizer
 > **Version:** v1.0 — 2026-11-09
-> **Status:** Planning — no code written yet
+> **Status:** v1.0.0 — all phases complete (Phases 0–7 merged to `main`, 2026-11-09); browser verification + store submission still open
 > **Companion docs:** `PRD.md` (what), `Rules.md` (how / how not),
 > `Phases.md` (when), `Design.md` (look), `Memory.md` (progress)
 
@@ -120,7 +120,7 @@ no duplicate listeners, no duplicate wrappers.
 {
   "manifest_version": 3,
   "name": "OneYT — All-in-One YouTube Customizer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Your YouTube. Your Layout. Your Rules. Customise player, layout, sidebar, themes, playback and focus — privately, locally.",
   "permissions": ["storage"],
   "host_permissions": ["https://www.youtube.com/*"],

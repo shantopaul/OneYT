@@ -2,7 +2,7 @@
 
 > **Product:** OneYT — All-in-One YouTube Customizer
 > **Version:** v1.0 — 2026-11-09
-> **Status:** Planning — no code written yet
+> **Status:** v1.0.0 — all phases complete (Phases 0–7 merged to `main`, 2026-11-09); browser verification + store submission still open
 > **Principle:** minimal, dark-first, engineering-focused — the same
 > brand language as Shanto's portfolio (no excessive gradients,
 > no glassmorphism, no fake statistics, no generic stock imagery).

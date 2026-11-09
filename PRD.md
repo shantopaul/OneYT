@@ -3,7 +3,7 @@
 > **Product:** OneYT — All-in-One YouTube Customizer
 > **Type:** Browser Extension (Manifest V3)
 > **Version:** PRD v1.0 — 2026-11-09
-> **Status:** Planning — no code written yet
+> **Status:** v1.0.0 — all phases complete (Phases 0–7 merged to `main`, 2026-11-09); browser verification + store submission still open
 > **Owner:** Shanto Paul
 > **Tagline:** "Your YouTube. Your Layout. Your Rules."
 
