@@ -108,8 +108,7 @@
         })
         .then(function (stored) {
           var migrated = defaultsApi.migrateSettings(stored);
-          var changed =
-            seeded || stored === undefined || !deepEqual(stored, migrated);
+          var changed = seeded || stored === undefined || !deepEqual(stored, migrated);
           current = migrated;
           loaded = true;
           if (changed) {

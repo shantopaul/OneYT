@@ -70,12 +70,13 @@
         // both gave a 300px guide with hidden titles. A compact
         // guide is always 72px.
         var wide =
-          nav.compact !== true &&
-          typeof nav.guideWidth === 'number' &&
-          nav.guideWidth >= 72;
+          nav.compact !== true && typeof nav.guideWidth === 'number' && nav.guideWidth >= 72;
         setClass(el, 'oneyt-nav-wide', wide);
-        if (wide) el.style.setProperty('--oneyt-guide-width', clampNum(nav.guideWidth, 72, 400) + 'px');
-        else el.style.removeProperty('--oneyt-guide-width');
+        if (wide) {
+          el.style.setProperty('--oneyt-guide-width', clampNum(nav.guideWidth, 72, 400) + 'px');
+        } else {
+          el.style.removeProperty('--oneyt-guide-width');
+        }
       },
       disable: function () {
         cleanup();

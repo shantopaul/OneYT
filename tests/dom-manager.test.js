@@ -27,8 +27,8 @@ function fakeEl(matches, children) {
 
 test('dom-manager: waitFor watches inside the given root, not the whole document', async () => {
   const observed = [];
-  const RealObserver = global.MutationObserver;
-  global.MutationObserver = class {
+  const RealObserver = globalThis.MutationObserver;
+  globalThis.MutationObserver = class {
     constructor(cb) {
       this.cb = cb;
       observed.push(this);
@@ -58,7 +58,7 @@ test('dom-manager: waitFor watches inside the given root, not the whole document
     observed[0].cb();
     assert.equal(await found, target);
   } finally {
-    if (RealObserver === undefined) delete global.MutationObserver;
-    else global.MutationObserver = RealObserver;
+    if (RealObserver === undefined) delete globalThis.MutationObserver;
+    else globalThis.MutationObserver = RealObserver;
   }
 });

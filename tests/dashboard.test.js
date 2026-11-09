@@ -361,8 +361,9 @@ test('dashboard: deletes confirm, loads fail independently, import size is bytes
     'themes read fails independently'
   );
   // B13: import size is measured in bytes, not UTF-16 units.
-  assert.ok(src.includes('new TextEncoder().encode(text).length'), 'byte length measured');
-  assert.ok(!src.includes("text.length > maxBytes"), 'no UTF-16 length check remains');
+  assert.ok(src.includes('utf8ByteLength(text)'), 'byte length measured via helper');
+  assert.ok(src.includes('new globalThis.TextEncoder().encode(text).length'), 'UTF-8 encoder used');
+  assert.ok(!src.includes('text.length > maxBytes'), 'no UTF-16 length check remains');
   assert.ok(src.includes("' bytes, max '"), 'message reports bytes');
 });
 

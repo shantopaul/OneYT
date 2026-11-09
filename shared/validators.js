@@ -66,9 +66,7 @@
     for (var key in data) {
       if (!Object.prototype.hasOwnProperty.call(data, key)) continue;
       if (!(key in expected)) {
-        warnings.push(
-          'Unknown setting "' + key + '" is not a OneYT setting yet — kept as-is.'
-        );
+        warnings.push('Unknown setting "' + key + '" is not a OneYT setting yet — kept as-is.');
         continue;
       }
       if (typeOf(data[key]) !== expected[key]) {

@@ -108,10 +108,7 @@ test('a11y: dark primary buttons use the AA-passing accent, and save errors are 
     assert.ok(css.includes('background: #e6002e;'), cssPath + ' primary must be #e6002e');
     assert.ok(css.includes('background: #cc0027;'), cssPath + ' primary hover must be #cc0027');
   }
-  const optionsCss = fs.readFileSync(
-    path.join(__dirname, '..', 'options', 'options.css'),
-    'utf8'
-  );
+  const optionsCss = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
   assert.ok(
     optionsCss.includes('.saved-indicator.error'),
     'save-failure text must have an error style'

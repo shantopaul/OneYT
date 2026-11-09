@@ -621,10 +621,7 @@ test('base.css must not define the "0 = default" width variables', () => {
   // sidebar to 402px) — the documented promise would be a lie.
   const fs = require('node:fs');
   const path = require('node:path');
-  const text = fs.readFileSync(
-    path.join(__dirname, '..', 'content', 'styles', 'base.css'),
-    'utf8'
-  );
+  const text = fs.readFileSync(path.join(__dirname, '..', 'content', 'styles', 'base.css'), 'utf8');
   assert.equal(text.includes('--oneyt-player-max-width:'), false);
   assert.equal(text.includes('--oneyt-sidebar-width:'), false);
 });
@@ -748,14 +745,13 @@ test('sidebar: numeric values are clamped, invalid maxHeight falls back', () => 
   assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), '50vh');
 });
 
-test('player: a stale theater waiter never clears a newer video\'s waiter', async () => {
+test("player: a stale theater waiter never clears a newer video's waiter", async () => {
   const doc = createFakeDocument();
   const flexy = createFakeElement();
   const container = createFakeElement({
     rect: { width: 800, height: 450, left: 100, top: 60 },
   });
   const moviePlayer = createFakeElement();
-  const theaterBtn = createFakeElement();
   const state = { btn: null, resolvers: [] };
   const dom = {
     query: (key) => {

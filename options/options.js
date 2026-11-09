@@ -960,7 +960,7 @@
         var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
         // text.length counts UTF-16 units, not bytes: a file
         // of 200k emoji is ~400k bytes. Measure real bytes.
-        var byteLength = new TextEncoder().encode(text).length;
+        var byteLength = utf8ByteLength(text);
         if (byteLength > maxBytes) {
           importMsg.textContent =
             'Import is too large (' + byteLength + ' bytes, max ' + maxBytes + ' bytes).';
@@ -1145,13 +1145,13 @@
           text: 'Apply ' + preset.name,
         });
         applyBtn.addEventListener('click', function () {
-          replaceState(profilesApi.applyPreset(state, preset.id, defaultsApi)).then(function (
-            saved
-          ) {
-            refreshValues();
-            if (saved) profilesNotice = 'Applied preset "' + preset.name + '".';
-            renderSection(currentSection);
-          });
+          replaceState(profilesApi.applyPreset(state, preset.id, defaultsApi)).then(
+            function (saved) {
+              refreshValues();
+              if (saved) profilesNotice = 'Applied preset "' + preset.name + '".';
+              renderSection(currentSection);
+            }
+          );
         });
         row.appendChild(applyBtn);
         presetBox.appendChild(row);
@@ -1223,16 +1223,16 @@
           text: 'Apply',
         });
         applyBtn.addEventListener('click', function () {
-          replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(function (
-            saved
-          ) {
-            refreshValues();
-            if (saved) {
-              profilesNotice =
-                'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+          replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(
+            function (saved) {
+              refreshValues();
+              if (saved) {
+                profilesNotice =
+                  'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+              }
+              renderSection(currentSection);
             }
-            renderSection(currentSection);
-          });
+          );
         });
         var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
         renameBtn.addEventListener('click', function () {
@@ -1586,7 +1586,7 @@
         var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
         // text.length counts UTF-16 units, not bytes: measure
         // real bytes (see the settings import above).
-        var byteLength = new TextEncoder().encode(text).length;
+        var byteLength = utf8ByteLength(text);
         if (byteLength > maxBytes) {
           importMsg.textContent =
             'Import is too large (' + byteLength + ' bytes, max ' + maxBytes + ' bytes).';
@@ -1905,7 +1905,13 @@
       };
       if (cssTemplatesApi && cssTemplatesApi.CSS_TEMPLATES) {
         cssTemplatesApi.CSS_TEMPLATES.forEach(function (t) {
-          add('appearance', 'Appearance', 'CSS template: ' + t.name, t.description || '', 'css template');
+          add(
+            'appearance',
+            'Appearance',
+            'CSS template: ' + t.name,
+            t.description || '',
+            'css template'
+          );
         });
       }
       if (layoutPresetsApi && layoutPresetsApi.LAYOUT_PRESETS) {
@@ -2147,11 +2153,7 @@
             // re-render the open section if it shows them.
             // The handler used to ignore both keys, so an
             // open Profiles/Appearance section went stale.
-            if (
-              changes &&
-              changes[PROFILES_KEY] &&
-              changes[PROFILES_KEY].newValue !== undefined
-            ) {
+            if (changes && changes[PROFILES_KEY] && changes[PROFILES_KEY].newValue !== undefined) {
               profiles = profilesApi
                 ? profilesApi.validateProfiles(changes[PROFILES_KEY].newValue, defaultsApi)
                 : [];
@@ -2194,6 +2196,17 @@
         return state;
       },
     };
+  }
+
+  // Byte length of a string (UTF-8): text.length counts
+  // UTF-16 units, so a file of 200k emoji is ~400k bytes.
+  // globalThis.TextEncoder keeps ESLint's no-undef happy
+  // (TextEncoder is not in its globals list).
+  function utf8ByteLength(text) {
+    if (typeof globalThis !== 'undefined' && typeof globalThis.TextEncoder === 'function') {
+      return new globalThis.TextEncoder().encode(text).length;
+    }
+    return String(text).length;
   }
 
   // Clamps numeric settings to the min/max of the matching

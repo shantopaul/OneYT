@@ -108,8 +108,7 @@
       // Clamp to the dashboard control ranges (0–32 / 0–64):
       // a hand-edited import bypasses the dashboard inputs,
       // and a negative radius is an invalid variable.
-      var radius =
-        typeof app.borderRadius === 'number' ? clampNum(app.borderRadius, 0, 32) : 12;
+      var radius = typeof app.borderRadius === 'number' ? clampNum(app.borderRadius, 0, 32) : 12;
       var spacing = typeof app.spacing === 'number' ? clampNum(app.spacing, 0, 64) : 16;
       el.classList.add('oneyt-radius');
       el.classList.add('oneyt-spaced');

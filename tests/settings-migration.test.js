@@ -121,9 +121,11 @@ test('settings-manager load does not persist when only key order differs', async
   // "changed" and rewrite storage on every load.
   const full = defaults.cloneDefaults();
   const reversed = {};
-  Object.keys(full).reverse().forEach((k) => {
-    reversed[k] = full[k];
-  });
+  Object.keys(full)
+    .reverse()
+    .forEach((k) => {
+      reversed[k] = full[k];
+    });
   let sets = 0;
   const storage = {
     get: () => Promise.resolve(reversed),
