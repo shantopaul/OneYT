@@ -65,7 +65,9 @@ test('security: no network calls, eval, or innerHTML in extension code', () => {
 test('security: manifest permissions and hosts are minimal', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifest.json'), 'utf8'));
   assert.deepEqual([...manifest.permissions].sort(), ['activeTab', 'storage']);
-  assert.deepEqual(manifest.host_permissions, ['https://www.youtube.com/*']);
+  // All YouTube hosts, still YouTube-only: every *.youtube.com
+  // subdomain plus the bare domain — no other host, no http.
+  assert.deepEqual(manifest.host_permissions, ['https://*.youtube.com/*', 'https://youtube.com/*']);
   assert.equal(manifest.web_accessible_resources, undefined);
   assert.equal(manifest.content_security_policy, undefined);
 });
