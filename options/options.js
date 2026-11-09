@@ -757,6 +757,12 @@
         }
         var diff = diffSettings(state, result.cleaned);
         pendingImport = result.cleaned;
+        if (result.warnings && result.warnings.length > 0) {
+          previewEl.appendChild(
+            el(doc, 'p', { class: 'control-warning', text: 'Warnings: ' + result.warnings.join(' ') })
+          );
+          previewEl.lastChild.style.display = 'block';
+        }
         if (diff.length === 0) {
           previewEl.textContent = 'No changes — the file matches your current settings.';
         } else {
