@@ -141,6 +141,7 @@ and must work flawlessly before anything else ships.
 | PL-10 | Hide like count | Toggle; the number next to the Like button is hidden, the button stays clickable; live apply |
 | PL-11 | Hide view count | Toggle; the "X views" line on the watch page is hidden; live apply |
 | PL-12 | Hide subscriber count | Toggle; the "X subscribers" next to the channel name is hidden, the Subscribe button stays; live apply |
+| PL-14 | Default theater mode | Toggle; every video opens in theater mode automatically; watch page only |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.

@@ -517,8 +517,50 @@ merged as PR #12) and this phase takes PL-10–12; v1.4.0
 follows because 1.3.0 is in `main` now. Ambient mode was
 redirected mid-work: branch `feature/disable-ambient-mode`
 exists (no commits yet) with the research done —
-`#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 12
-when resumed.
+`#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 13
+when resumed (renumbered: Phase 12 is hide topic chips,
+Phase 14 is default theater).
+
+## Phase 14 — Default Theater Mode (v1.6) ⏳ IN PROGRESS (2026-11-09)
+
+**Goal:** every video opens in theater mode automatically
+— no click on the theater button, no "t" key, the wide
+player is just the default.
+
+**Deliverable:** v1.6.0.
+
+**Plan (part-by-part, push only when complete):** one new
+setting `player.defaultTheater` (default off, additive);
+the player module clicks the existing `theaterButton`
+selector (`#movie_player .ytp-size-button`, already in
+`shared/selectors.js` — no new selector, no new CSS, no
+new permission) at most **once per video**, tracked by
+`location.href` (URL change resets it); if the user exits
+theater manually, no re-click on that video; turning the
+setting on mid-video enters theater immediately; turning
+it off never exits theater. If the button is late, the
+existing `dom.waitFor('theaterButton')` (10 s, resolves
+null, never rejects) is used, and the click happens only
+if still on the same video and still not in theater. The
+click-once flag is set synchronously before the click.
+The existing apply() guards stay: off-watch and
+fullscreen skip everything. No cookie route — deliberately
+out of scope (clicking the real button is the documented
+YouTube behaviour, a cookie would be a hidden side
+channel). Dashboard toggle in the Player section; module
+tests + manual checklist item. **Browser verification
+still open** — the player may flash at default size
+briefly before the click lands; slow loads (button
+timing) and watch → watch SPA navigation need a real
+watch page on Shanto's PC. If YouTube ever removes
+`.ytp-size-button`, the feature silently does nothing and
+the page does not break.
+Numbering note: this phase takes Phase 14 because Phase
+12 is hide topic chips (unmerged branch
+`feature/hide-topic-chips`) and Phase 13 is disable
+ambient mode (parked, branch `feature/disable-ambient-mode`
+with no commits). v1.6.0 assumes 1.5.0 merges first;
+renumber at rebase if the order flips.
 
 ## Future (v1.1+, not in scope now)
 
