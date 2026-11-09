@@ -16,11 +16,11 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · **Phase 10 — Hide Endscreen Cards (v1.3) in progress** |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (code complete, branch `feature/hide-endscreen` — not merged yet) |
 | **Version** | 1.2.0 in `main`; 1.3.0 in progress (hide endscreen cards) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `7b70b80` (Phases 1–9 + YouTube domains merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`); branch `feature/hide-endscreen` in progress |
-| **Code written** | Phases 1–9 + YouTube domains: all modules + dashboard (9 sections, 98 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | Phase 10 — Hide Endscreen Cards (branch `feature/hide-endscreen`) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `7b70b80` (Phases 1–9 + YouTube domains merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`); branch `feature/hide-endscreen` complete, not merged |
+| **Code written** | Phases 1–10 + YouTube domains: all modules + dashboard (9 sections, 99 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + 5 audit docs + release packaging (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 10 complete; waiting for browser check + Shanto's merge) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
