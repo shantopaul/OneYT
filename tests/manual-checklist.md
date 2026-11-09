@@ -317,3 +317,72 @@ Popup:
 
 Notes / failures:
 - _…_
+
+---
+
+# Phase 6 Manual Checklist (browser) — Optimisation & Testing
+
+Load the `feature/Optimisation` branch unpacked (version
+0.9.0, release candidate). These are the items no Node test
+can check — they need a real browser. Tick only after
+verifying in the browser.
+
+Cross-browser (6.2) — run the full checklist on each:
+- [ ] Chrome: full checklist (Phases 1–5) passes, no console errors
+- [ ] Edge: full checklist passes, no console errors
+- [ ] Brave: full checklist passes, no console errors
+
+Viewports (6.3):
+- [ ] 1024 px: sidebar + player usable, no overlap
+- [ ] 1280 px: same
+- [ ] 1440 px: same
+- [ ] 1920 px: same
+- [ ] Ultrawide (2560+): same; player max-width respected
+
+SPA navigation (6.4) — live confirmation of the Node test:
+- [ ] 20 navigations (watch → home → watch → search …) +
+      back/forward: no console errors, no duplicate style
+      tags in DevTools, no visual glitches
+- [ ] No duplicate listeners: toggle a module off/on 10× —
+      it still works exactly once per action
+
+Fullscreen + theater (6.5):
+- [ ] Fullscreen a video: all OneYT player classes drop,
+      video fills the screen; exit: everything restores
+- [ ] Theater mode: player sizing/position suspends, restores
+      on exit
+
+Sync (AD-08, Phase 6 feature) — needs two Chrome profiles
+signed into the same Google account:
+- [ ] Turn sync on in Advanced (dashboard) on browser A —
+      change the theme; browser B (same account, sync on)
+      picks it up within a minute
+- [ ] Set a Custom CSS on browser A — browser B does NOT
+      get it (local-only)
+- [ ] Change remembered speed on browser A — browser B
+      does NOT get it (per-device)
+- [ ] Turn sync off on browser A — browser B keeps its
+      current settings (no wipe)
+- [ ] Fresh profile, sync on, no local settings — settings
+      seed from sync on first load
+
+Selectors (6.7) — live YouTube DOM:
+- [ ] Every Phase 2 checklist selector still matches
+      (`#primary #player`, `#movie_player` fallback, guide
+      `:has()` selectors, Shorts shelf, mini-player element)
+
+Memory (6.1) — live confirmation:
+- [ ] Chrome task manager: memory does not grow after
+      toggling modules on/off 10× and 20 SPA navigations
+
+Accessibility (6.9) — live confirmation:
+- [ ] Tab through the whole dashboard: every control
+      reachable, focus ring visible on each, no traps
+- [ ] Tab through the popup: same
+- [ ] Screen reader (or keyboard-only) walkthrough of the
+      dashboard: labels read correctly
+- [ ] Shortcut capture: press Tab while capturing — focus
+      moves to the next control, nothing binds
+
+Notes / failures:
+- _…_

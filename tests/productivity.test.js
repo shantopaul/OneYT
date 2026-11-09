@@ -161,6 +161,12 @@ test('keyboard: parsing, duplicates, native conflicts', () => {
   });
   assert.equal(keyboardApi.normalizeShortcut(''), null);
   assert.equal(keyboardApi.normalizeShortcut('Ctrl+Foo+Bar'), null);
+  // Tab and Escape are browser navigation keys, not bindable
+  // shortcuts (Phase 6 bug bash: an imported 'Tab' would have
+  // been bound and swallowed focus movement on every page).
+  assert.equal(keyboardApi.normalizeShortcut('Tab'), null);
+  assert.equal(keyboardApi.normalizeShortcut('Shift+Tab'), null);
+  assert.equal(keyboardApi.normalizeShortcut('Escape'), null);
   assert.deepEqual(
     keyboardApi.findDuplicateShortcuts({ toggleFocus: 'Shift+F', toggleSidebar: 'Shift+F' }),
     [{ shortcut: 'Shift+F', actions: ['toggleFocus', 'toggleSidebar'] }]

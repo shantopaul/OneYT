@@ -67,11 +67,23 @@
     }
 
     function load() {
+      var seeded = false;
       return storage
         .get(STORAGE_KEY)
         .then(function (stored) {
+          if (stored !== undefined) return stored;
+          // First run on this device: seed from sync (AD-08) when
+          // another device already synced settings.
+          if (typeof storage.getFromSync !== 'function') return undefined;
+          return storage.getFromSync(STORAGE_KEY).then(function (synced) {
+            if (synced !== undefined) seeded = true;
+            return synced;
+          });
+        })
+        .then(function (stored) {
           var migrated = defaultsApi.migrateSettings(stored);
-          var changed = stored === undefined || JSON.stringify(stored) !== JSON.stringify(migrated);
+          var changed =
+            seeded || stored === undefined || JSON.stringify(stored) !== JSON.stringify(migrated);
           current = migrated;
           loaded = true;
           if (changed) {
@@ -131,13 +143,31 @@
       };
     }
 
-    // Watch for changes made in another context (popup/dashboard).
+    // Watch for changes made in another context (popup/dashboard)
+    // or on another device (sync area, AD-08).
     function watchExternalChanges() {
       if (unsubscribeStorage) return;
       unsubscribeStorage = storage.onChanged(function (changes, areaName) {
-        if (areaName !== 'local') return;
+        if (areaName !== 'local' && areaName !== 'sync') return;
         var change = changes && changes[STORAGE_KEY];
         if (!change || !change.newValue) return;
+        if (areaName === 'sync') {
+          // Merge: the synced copy wins, except customCSS which
+          // is local-only — the local value is kept. Identical
+          // merges are skipped, so a mirror write back to sync
+          // cannot loop (mirror -> sync event -> same merge).
+          var merged = defaultsApi.migrateSettings(change.newValue);
+          var localCSS = current && current.appearance ? current.appearance.customCSS || '' : '';
+          if (!merged.appearance) merged.appearance = {};
+          merged.appearance.customCSS = localCSS;
+          if (JSON.stringify(merged) === JSON.stringify(current)) return;
+          current = merged;
+          storage.set({ [STORAGE_KEY]: defaultsApi.deepClone(current) }).catch(function (err) {
+            logger.error('settings: failed to save merged sync settings', err);
+          });
+          notify();
+          return;
+        }
         current = defaultsApi.migrateSettings(change.newValue);
         notify();
       });

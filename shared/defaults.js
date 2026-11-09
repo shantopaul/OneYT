@@ -23,6 +23,10 @@
     schemaVersion: 1,
     enabled: true,
 
+    sync: {
+      enabled: false, // opt-in (AD-08): mirror settings to chrome.storage.sync
+    },
+
     modules: {
       player: true,
       layout: true,

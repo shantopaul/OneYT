@@ -97,6 +97,14 @@
       else return null;
     }
     if (!out.key) return null;
+    // Tab and Escape are browser navigation keys, not bindable
+    // shortcuts. Binding Tab would swallow focus movement on
+    // every YouTube page (keyboard trap); binding Escape would
+    // swallow the key users press to get out of things. Found
+    // in the Phase 6 bug bash: an imported 'Tab' shortcut parsed
+    // fine and would have been bound.
+    var lowKey = out.key.toLowerCase();
+    if (lowKey === 'tab' || lowKey === 'escape' || lowKey === 'esc') return null;
     return out;
   }
 

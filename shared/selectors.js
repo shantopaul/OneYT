@@ -28,8 +28,11 @@
     comments: '#comments', // Comments section root
 
     // --- Recommendations (Phase 2/4) ---
+    // Note: these keys are used by module CSS (which cannot read
+    // this map), not by dom.query — the registry documents the
+    // canonical strings; tests/selectors.test.js enforces that
+    // every key's value appears somewhere in the extension.
     sidebarItems: '#secondary ytd-compact-video-renderer',
-    sidebarSection: '#secondary ytd-item-section-renderer',
 
     // --- Home / Shorts (Phase 3) ---
     shortsShelf: 'ytd-rich-shelf-renderer[is-shorts]',

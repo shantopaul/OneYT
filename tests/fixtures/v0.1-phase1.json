@@ -1,0 +1,54 @@
+{
+  "appearance": {
+    "borderRadius": 12,
+    "colors": {},
+    "customCSS": "",
+    "customCSSEnabled": false,
+    "spacing": 16,
+    "theme": "dark"
+  },
+  "enabled": true,
+  "layout": {
+    "cardSpacing": 0,
+    "hideComments": false,
+    "hideShortsHome": true,
+    "hideShortsWatch": false,
+    "homeColumns": 0,
+    "thumbnailSize": 0
+  },
+  "modules": {
+    "appearance": true,
+    "focus": true,
+    "keyboard": true,
+    "layout": true,
+    "navigation": true,
+    "playback": true,
+    "player": true,
+    "recommendations": true,
+    "sidebar": true,
+    "typography": true
+  },
+  "player": {
+    "alignment": "center",
+    "border": "none",
+    "borderRadius": 12,
+    "customWidth": 1000,
+    "maxWidth": 1280,
+    "position": "default",
+    "shadow": "none",
+    "spacing": 0,
+    "sticky": false
+  },
+  "schemaVersion": 1,
+  "sidebar": {
+    "customWidth": 500,
+    "independentScroll": true,
+    "keepPlayerVisible": true,
+    "maxHeight": "calc(100vh - 100px)",
+    "playerOffset": 0,
+    "scrollSensitivity": 1,
+    "scrollbarVisible": true,
+    "scrollbarWidth": 8,
+    "smoothScroll": true
+  }
+}

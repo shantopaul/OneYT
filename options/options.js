@@ -583,15 +583,18 @@
       });
       var capturing = false;
       var onKey = function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key === 'Escape') {
+        // Escape cancels; Tab cancels too and must keep moving
+        // focus — binding 'Tab' as a shortcut would trap keyboard
+        // users in the field (Phase 6 accessibility pass).
+        if (event.key === 'Escape' || event.key === 'Tab') {
           capturing = false;
           input.value = getPath(state, control.key) || '';
           input.classList.remove('capturing');
           doc.removeEventListener('keydown', onKey, true);
           return;
         }
+        event.preventDefault();
+        event.stopPropagation();
         if (['Control', 'Shift', 'Alt', 'Meta'].indexOf(event.key) !== -1) return;
         var parts = [];
         if (event.ctrlKey) parts.push('Ctrl');
@@ -750,6 +753,13 @@
         previewEl.textContent = '';
         applyBtn.style.display = 'none';
         pendingImport = null;
+        var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
+        if (text.length > maxBytes) {
+          importMsg.textContent =
+            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+          importMsg.style.display = 'block';
+          return;
+        }
         var data;
         try {
           data = JSON.parse(text);
@@ -764,6 +774,18 @@
           importMsg.textContent = 'Import rejected: ' + errors.join(' ');
           importMsg.style.display = 'block';
           return;
+        }
+        // Imports bypass the dashboard's own number inputs, so
+        // clamp numeric values to the controls' min/max here
+        // (Phase 6 bug bash) and report the repairs in the preview.
+        var clamped = clampSettingsToControls(result.cleaned, sections);
+        result.cleaned = clamped.settings;
+        if (clamped.clamped.length > 0) {
+          result.warnings = (result.warnings || []).concat(
+            clamped.clamped.map(function (c) {
+              return c.key + ' was out of range (' + c.from + ') and was clamped to ' + c.to + '.';
+            })
+          );
         }
         var diff = diffSettings(state, result.cleaned);
         pendingImport = result.cleaned;
@@ -1011,9 +1033,43 @@
     };
   }
 
+  // Clamps numeric settings to the min/max of the matching
+  // dashboard controls (number/range types). The dashboard's
+  // own inputs already clamp on commit, but an import bypasses
+  // them — a hand-edited file could otherwise store
+  // player.customWidth 99999 or captionFontSize 999. Returns
+  // { settings (a clone), clamped: [{ key, from, to }] }.
+  // Non-numeric values are left alone for migration to repair.
+  function clampSettingsToControls(settings, sections) {
+    var copy = JSON.parse(JSON.stringify(settings || {}));
+    var clamped = [];
+    (sections || []).forEach(function (section) {
+      (section.controls || []).forEach(function (control) {
+        if (
+          (control.type !== 'number' && control.type !== 'range') ||
+          control.min === undefined ||
+          control.max === undefined
+        ) {
+          return;
+        }
+        var value = getPath(copy, control.key);
+        if (typeof value !== 'number' || !isFinite(value)) return;
+        var next = value;
+        if (value < control.min) next = control.min;
+        if (value > control.max) next = control.max;
+        if (next !== value) {
+          setPath(copy, control.key, next);
+          clamped.push({ key: control.key, from: value, to: next });
+        }
+      });
+    });
+    return { settings: copy, clamped: clamped };
+  }
+
   var api = {
     getPath: getPath,
     setPath: setPath,
+    clampSettingsToControls: clampSettingsToControls,
     diffSettings: diffSettings,
     formatValue: formatValue,
     resolveSelectOptions: resolveSelectOptions,

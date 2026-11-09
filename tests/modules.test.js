@@ -33,6 +33,27 @@ test('sidebar: watch + independent scroll sets classes and vars', () => {
   assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), 'calc(100vh - 100px)');
 });
 
+test('sidebar: wheel sensitivity is clamped to 0.5–3 at apply time', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  // Stored 99 (e.g. from a hand-edited import) must not multiply
+  // wheel deltas by 99 — it clamps to 3.
+  mod.apply(settingsWith({ sidebar: { scrollSensitivity: 99 } }), 'watch');
+  secondary.scrollTop = 0;
+  secondary.dispatch('wheel', { deltaY: 10, preventDefault: () => {} });
+  assert.equal(secondary.scrollTop, 30);
+  // And a tiny value clamps up to 0.5.
+  mod.apply(settingsWith({ sidebar: { scrollSensitivity: 0.01 } }), 'watch');
+  secondary.scrollTop = 0;
+  secondary.dispatch('wheel', { deltaY: 10, preventDefault: () => {} });
+  assert.equal(secondary.scrollTop, 5);
+});
+
 test('sidebar: customWidth 0 removes the width var; non-watch removes classes', () => {
   const doc = createFakeDocument();
   const mod = createSidebarModule({

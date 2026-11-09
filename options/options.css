@@ -13,7 +13,7 @@
   --ui-border-strong: #3d3d3d;
   --ui-text: #f1f1f1;
   --ui-text-secondary: #aaaaaa;
-  --ui-text-muted: #717171;
+  --ui-text-muted: #9a9a9a; /* AA 4.5+ on bg/surface (was #717171, 3.9 — Phase 6 a11y) */
   --ui-accent: #ff0033;
   --ui-accent-hover: #e6002e;
   --ui-accent-soft: rgba(255, 0, 51, 0.12);
@@ -33,7 +33,7 @@
     --ui-border-strong: #cccccc;
     --ui-text: #0f0f0f;
     --ui-text-secondary: #606060;
-    --ui-text-muted: #909090;
+    --ui-text-muted: #6b6b6b; /* AA 4.5+ on white (was #909090, 3.2 — Phase 6 a11y) */
     --ui-accent-soft: rgba(255, 0, 51, 0.08);
   }
 }
@@ -100,7 +100,8 @@ body {
 }
 
 .options-search:focus {
-  outline: none;
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
   border-color: var(--ui-accent);
 }
 
@@ -263,8 +264,19 @@ body {
 }
 
 .control-input:focus {
-  outline: none;
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
   border-color: var(--ui-accent);
+}
+
+/* Keyboard users need a visible focus ring on every control
+ * (Phase 6 accessibility pass). */
+.btn:focus-visible,
+.nav-item:focus-visible,
+.search-result:focus-visible,
+.options-search:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
 }
 
 .control-input[type='checkbox'] {

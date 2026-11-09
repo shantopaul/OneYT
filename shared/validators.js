@@ -112,6 +112,23 @@
     if (/javascript\s*:/i.test(css)) {
       errors.push('Custom CSS must not contain javascript: URLs.');
     }
+    // url() is the remaining remote-load vector in CSS (images,
+    // fonts, @font-face src). Only data: URLs are allowed — they
+    // cannot fetch anything. Found in the Phase 6 security review:
+    // the old validator blocked @import but not url(https://…),
+    // which would have fetched a remote resource (and could act
+    // as a tracking pixel) when the CSS was applied.
+    var urlPattern = /url\(\s*(['"]?)([^)'"]*)\1\s*\)/gi;
+    var urlMatch;
+    while ((urlMatch = urlPattern.exec(css)) !== null) {
+      var target = (urlMatch[2] || '').trim().toLowerCase();
+      if (target.indexOf('data:') !== 0) {
+        errors.push(
+          'Custom CSS must not load remote resources with url() (only data: URLs are allowed).'
+        );
+        break;
+      }
+    }
     var depth = 0;
     var parenDepth = 0;
     for (var i = 0; i < css.length; i++) {

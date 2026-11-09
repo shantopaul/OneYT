@@ -196,6 +196,24 @@
       }
     }
 
+    // True when the user configured anything for the mini-player.
+    // With all defaults there is nothing to apply when it opens,
+    // so no observer is needed at all (Phase 6 perf audit: the
+    // document-subtree observer used to run on every page even
+    // with nothing configured).
+    function miniConfigured(mini) {
+      return (
+        (typeof mini.size === 'number' && mini.size > 0) ||
+        (typeof mini.position === 'string' &&
+          mini.position !== 'default' &&
+          mini.position !== '') ||
+        (typeof mini.borderRadius === 'number' && mini.borderRadius > 0) ||
+        (typeof mini.shadow === 'string' && mini.shadow !== 'none' && mini.shadow !== '') ||
+        (typeof mini.offsetX === 'number' && mini.offsetX !== 0) ||
+        (typeof mini.offsetY === 'number' && mini.offsetY !== 0)
+      );
+    }
+
     // The mini-player opens without any navigation event, so a
     // scoped observer watches for it. The callback only
     // re-applies when the mini-player's presence actually
@@ -222,12 +240,19 @@
       }
       var mini = (pl && pl.miniPlayer) || {};
       var el = dom ? dom.query('miniPlayer') : null;
+      var configured = miniConfigured(mini);
+      if (!configured && miniObserver) {
+        // Config removed: the observer has nothing to watch for.
+        miniObserver.disconnect();
+        miniObserver = null;
+        miniObserved = false;
+      }
       if (!el) {
-        observeMini();
+        if (configured) observeMini();
         return;
       }
       miniPresent = true;
-      observeMini();
+      if (configured) observeMini();
       var sized = typeof mini.size === 'number' && mini.size > 0;
       setClass('oneyt-miniplayer-sized', sized);
       setVar('--oneyt-miniplayer-width', sized ? mini.size + 'px' : null);
