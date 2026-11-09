@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OneYT</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="header">
+    <span class="logo">OneYT</span>
+    <span class="status" id="status">Loading…</span>
+  </header>
+
+  <main>
+    <label class="row" for="enabled-toggle">
+      <span class="row-text">
+        <span class="row-label">Extension enabled</span>
+        <span class="row-desc">Turn all OneYT customisation on or off.</span>
+      </span>
+      <span class="switch">
+        <input type="checkbox" id="enabled-toggle">
+        <span class="slider"></span>
+      </span>
+    </label>
+
+    <p class="hint" id="page-hint">Open a YouTube page to see OneYT at work.</p>
+
+    <button class="btn btn-secondary" id="open-dashboard" disabled title="Full settings dashboard arrives in Phase 5">
+      Open Full Dashboard (Phase 5)
+    </button>
+  </main>
+
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/defaults.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
