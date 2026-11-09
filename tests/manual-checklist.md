@@ -652,3 +652,17 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 24 — Custom Font (v1.16) — live in Chrome
+
+- [ ] Dashboard → Appearance: a "Custom font" text box sits right after "Font family" — empty by default
+- [ ] Type a font that is installed on this device (e.g. a font you know is installed): open a watch page — video titles, the description and comments use it immediately, no reload
+- [ ] Clear the box: titles go back to the Font family select (or YouTube default when that is empty too)
+- [ ] Set Font family to Georgia, then type a custom name: the custom font wins — titles use the custom font, not Georgia
+- [ ] Type a name of a font that is NOT installed: titles fall back to a plain sans-serif (no error, no broken page)
+- [ ] Type `red; } body { color: red` as the custom font: the titles stay Georgia (or YouTube default) — the injected text never reaches the page, and nothing else on the page changes
+- [ ] The player, captions and the guide/navigation are untouched — only titles, descriptions and comments change
+- [ ] Save a Profile with a custom font set, change the font, then apply the profile: the custom font comes back (Profiles snapshot it); a saved theme does not carry it (saved themes are theme-only)
+
+Notes / failures:
+- _…_

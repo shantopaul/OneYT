@@ -131,6 +131,40 @@
     monospace: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   };
 
+  // Custom font names (Phase 24): a font installed on this
+  // device, typed by name. Valid names are 1-64 chars after
+  // trimming, start with a letter or digit, and contain only
+  // letters, digits, spaces, hyphens and underscores — no
+  // quotes, commas, semicolons, braces or parens, so a stored
+  // name can never break out of the quoted family it is
+  // placed in. Returns the trimmed name, or '' when invalid.
+  function cleanCustomFontName(value) {
+    if (typeof value !== 'string') return '';
+    var name = value.trim();
+    if (name.length === 0 || name.length > 64) return '';
+    if (!/^[A-Za-z0-9][A-Za-z0-9 _-]*$/.test(name)) return '';
+    return name;
+  }
+
+  function isValidCustomFontName(value) {
+    return cleanCustomFontName(value) !== '';
+  }
+
+  // Resolve the font stack the typography module applies.
+  // A valid custom name wins over the Font family select and
+  // resolves to the quoted name + a sans-serif fallback (the
+  // browser falls back when the device lacks the font).
+  // Otherwise the FONT_STACKS entry for fontFamily, or null
+  // when neither resolves (YouTube default).
+  function resolveFontFamily(fontFamily, customFont) {
+    var custom = cleanCustomFontName(customFont);
+    if (custom) return '"' + custom + '", sans-serif';
+    if (typeof fontFamily === 'string' && fontFamily && FONT_STACKS[fontFamily]) {
+      return FONT_STACKS[fontFamily];
+    }
+    return null;
+  }
+
   function isValidHex(value) {
     return typeof value === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value);
   }
@@ -213,6 +247,8 @@
     CUSTOM_COLOR_KEYS: CUSTOM_COLOR_KEYS,
     FONT_STACKS: FONT_STACKS,
     isValidHex: isValidHex,
+    isValidCustomFontName: isValidCustomFontName,
+    resolveFontFamily: resolveFontFamily,
     resolveThemeVars: resolveThemeVars,
     contrastRatio: contrastRatio,
     textContrastOk: textContrastOk,

@@ -107,6 +107,7 @@
       colors: {},
       typography: {
         fontFamily: '',
+        customFont: '', // any font installed on this device, by name; wins over fontFamily when valid (Phase 24)
         fontSize: 0, // 0 = YouTube default
         fontWeight: 0, // 0 = YouTube default
         lineHeight: 0, // 0 = YouTube default

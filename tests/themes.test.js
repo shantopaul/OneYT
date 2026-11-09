@@ -66,3 +66,21 @@ test('themes: font stacks — known families map, unknown is undefined', () => {
   assert.match(themes.FONT_STACKS.monospace, /monospace/);
   assert.equal(themes.FONT_STACKS.ComicSans, undefined);
 });
+
+test('themes: custom font names — valid names resolve, invalid fall back', () => {
+  assert.equal(themes.resolveFontFamily('Georgia', 'Hind Siliguri'), '"Hind Siliguri", sans-serif');
+  assert.equal(
+    themes.resolveFontFamily('', '  Noto Sans Bengali  '),
+    '"Noto Sans Bengali", sans-serif'
+  );
+  assert.match(themes.resolveFontFamily('Georgia', ''), /Georgia/);
+  assert.match(themes.resolveFontFamily('Georgia', 'a,b'), /Georgia/);
+  assert.match(themes.resolveFontFamily('Georgia', 'red; } body {'), /Georgia/);
+  assert.equal(themes.resolveFontFamily('Nope', 'a,b'), null);
+  assert.equal(themes.resolveFontFamily('', ''), null);
+  assert.equal(themes.isValidCustomFontName('JetBrains Mono'), true);
+  assert.equal(themes.isValidCustomFontName(''), false);
+  assert.equal(themes.isValidCustomFontName('a/b'), false);
+  assert.equal(themes.isValidCustomFontName('x'.repeat(65)), false);
+  assert.equal(themes.isValidCustomFontName(42), false);
+});
