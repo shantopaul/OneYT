@@ -46,6 +46,14 @@
       shadow: 'none', // CSS box-shadow or "none"
       spacing: 0, // px around player
       sticky: false,
+      miniPlayer: {
+        size: 0, // px width, 0 = YouTube default
+        position: 'default', // default | bottom-right | bottom-left | top-right | top-left
+        borderRadius: 0, // px, 0 = YouTube default
+        shadow: 'none', // CSS box-shadow or "none"
+        offsetX: 0, // px from the chosen corner
+        offsetY: 0, // px from the chosen corner
+      },
     },
 
     sidebar: {

@@ -31,6 +31,14 @@
  * It is verified only by the browser checklist
  * (tests/manual-checklist.md) — if YouTube changes that
  * structure, the module degrades to default positioning.
+ *
+ * Mini-player (Phase 4): size / position / radius / shadow /
+ * offsets for ytd-miniplayer. It is page-independent — the
+ * mini-player survives navigation — so it is applied on every
+ * page, not just watch. A scoped MutationObserver watches for
+ * it appearing (opening the mini-player fires no navigation
+ * event). When nothing is configured, no rule applies and the
+ * native mini-player (open/close/drag) is completely untouched.
  */
 (function () {
   'use strict';
@@ -59,6 +67,21 @@
     'oneyt-player-styled',
   ];
   var POSITIONS = ['default', 'sticky', 'fixed', 'absolute'];
+  var MINI_VARS = [
+    '--oneyt-miniplayer-width',
+    '--oneyt-miniplayer-radius',
+    '--oneyt-miniplayer-shadow',
+    '--oneyt-miniplayer-offset-x',
+    '--oneyt-miniplayer-offset-y',
+  ];
+  var MINI_CLASSES = [
+    'oneyt-miniplayer-sized',
+    'oneyt-miniplayer-pos-bottom-left',
+    'oneyt-miniplayer-pos-top-right',
+    'oneyt-miniplayer-pos-top-left',
+    'oneyt-miniplayer-styled',
+  ];
+  var MINI_POSITIONS = ['default', 'bottom-right', 'bottom-left', 'top-right', 'top-left'];
 
   function createPlayerModule(deps) {
     var dom = deps.dom;
@@ -70,6 +93,9 @@
     var waitPending = false;
     var theaterObserver = null;
     var theaterObserved = false;
+    var miniObserver = null;
+    var miniObserved = false;
+    var miniPresent = false;
 
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -140,6 +166,16 @@
       theaterObserver.observe(flexy, { attributes: true, attributeFilter: ['theater'] });
     }
 
+    function cleanupMini() {
+      MINI_CLASSES.forEach(function (name) {
+        setClass(name, false);
+      });
+      MINI_VARS.forEach(function (name) {
+        setVar(name, null);
+      });
+      miniPresent = false;
+    }
+
     function cleanup() {
       CLASSES.forEach(function (name) {
         setClass(name, false);
@@ -147,11 +183,80 @@
       VARS.forEach(function (name) {
         setVar(name, null);
       });
+      cleanupMini();
       if (theaterObserver) {
         theaterObserver.disconnect();
         theaterObserver = null;
         theaterObserved = false;
       }
+      if (miniObserver) {
+        miniObserver.disconnect();
+        miniObserver = null;
+        miniObserved = false;
+      }
+    }
+
+    // The mini-player opens without any navigation event, so a
+    // scoped observer watches for it. The callback only
+    // re-applies when the mini-player's presence actually
+    // changes — YouTube mutates the DOM constantly, and every
+    // mutation must not trigger a re-apply.
+    function observeMini() {
+      if (miniObserved || typeof MutationObserver === 'undefined') return;
+      var root = rootEl();
+      if (!root || !dom) return;
+      miniObserved = true;
+      miniObserver = new MutationObserver(function () {
+        var present = !!dom.query('miniPlayer');
+        if (present !== miniPresent && lastSettings) {
+          apply(lastSettings, lastPage);
+        }
+      });
+      miniObserver.observe(root, { childList: true, subtree: true });
+    }
+
+    function applyMiniPlayer(pl, fullscreen) {
+      if (fullscreen) {
+        cleanupMini();
+        return;
+      }
+      var mini = (pl && pl.miniPlayer) || {};
+      var el = dom ? dom.query('miniPlayer') : null;
+      if (!el) {
+        observeMini();
+        return;
+      }
+      miniPresent = true;
+      observeMini();
+      var sized = typeof mini.size === 'number' && mini.size > 0;
+      setClass('oneyt-miniplayer-sized', sized);
+      setVar('--oneyt-miniplayer-width', sized ? mini.size + 'px' : null);
+      var position = MINI_POSITIONS.indexOf(mini.position) !== -1 ? mini.position : 'default';
+      setClass('oneyt-miniplayer-pos-bottom-left', position === 'bottom-left');
+      setClass('oneyt-miniplayer-pos-top-right', position === 'top-right');
+      setClass('oneyt-miniplayer-pos-top-left', position === 'top-left');
+      setVar(
+        '--oneyt-miniplayer-offset-x',
+        typeof mini.offsetX === 'number' && mini.offsetX !== 0 ? mini.offsetX + 'px' : null
+      );
+      setVar(
+        '--oneyt-miniplayer-offset-y',
+        typeof mini.offsetY === 'number' && mini.offsetY !== 0 ? mini.offsetY + 'px' : null
+      );
+      var styled =
+        (typeof mini.borderRadius === 'number' && mini.borderRadius > 0) ||
+        (typeof mini.shadow === 'string' && mini.shadow !== 'none' && mini.shadow !== '');
+      setClass('oneyt-miniplayer-styled', styled);
+      setVar(
+        '--oneyt-miniplayer-radius',
+        typeof mini.borderRadius === 'number' && mini.borderRadius > 0
+          ? mini.borderRadius + 'px'
+          : null
+      );
+      setVar(
+        '--oneyt-miniplayer-shadow',
+        typeof mini.shadow === 'string' && mini.shadow !== 'none' ? mini.shadow : null
+      );
     }
 
     function apply(settings, page) {
@@ -163,8 +268,26 @@
       var fullscreen = isFullscreen();
       var theater = isWatch && !fullscreen ? isTheater() : false;
 
+      // Mini-player is page-independent: it survives navigation,
+      // so it is applied even on non-watch pages.
+      applyMiniPlayer(pl, fullscreen);
+
       if (!isWatch || fullscreen) {
-        cleanup();
+        CLASSES.forEach(function (name) {
+          setClass(name, false);
+        });
+        VARS.forEach(function (name) {
+          setVar(name, null);
+        });
+        // The theater observer belongs to the watch page only;
+        // leaving it attached after navigation would watch a
+        // detached node. (The mini-player observer stays: the
+        // mini-player itself survives navigation.)
+        if (theaterObserver) {
+          theaterObserver.disconnect();
+          theaterObserver = null;
+          theaterObserved = false;
+        }
         return;
       }
 
@@ -236,6 +359,7 @@
       id: 'player',
       init: function () {
         observeTheater();
+        observeMini();
       },
       apply: apply,
       update: apply,

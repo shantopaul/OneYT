@@ -84,3 +84,39 @@ html.oneyt-enabled.oneyt-player-styled #movie_player {
 html.oneyt-enabled.oneyt-player-styled #primary #player {
   margin-bottom: var(--oneyt-player-spacing, 0px);
 }
+
+/* --- Mini-player (Phase 4) ---
+ * Only when the user configures it; with nothing configured no
+ * rule applies and the native mini-player (open/close/drag) is
+ * untouched. Verify live. */
+
+html.oneyt-enabled.oneyt-miniplayer-sized ytd-miniplayer {
+  width: var(--oneyt-miniplayer-width);
+}
+
+html.oneyt-enabled.oneyt-miniplayer-pos-bottom-left ytd-miniplayer {
+  left: var(--oneyt-miniplayer-offset-x, 16px);
+  right: auto;
+  bottom: var(--oneyt-miniplayer-offset-y, 16px);
+  top: auto;
+}
+
+html.oneyt-enabled.oneyt-miniplayer-pos-top-right ytd-miniplayer {
+  right: var(--oneyt-miniplayer-offset-x, 16px);
+  left: auto;
+  top: var(--oneyt-miniplayer-offset-y, 16px);
+  bottom: auto;
+}
+
+html.oneyt-enabled.oneyt-miniplayer-pos-top-left ytd-miniplayer {
+  left: var(--oneyt-miniplayer-offset-x, 16px);
+  right: auto;
+  top: var(--oneyt-miniplayer-offset-y, 16px);
+  bottom: auto;
+}
+
+html.oneyt-enabled.oneyt-miniplayer-styled ytd-miniplayer {
+  border-radius: var(--oneyt-miniplayer-radius, 0px);
+  box-shadow: var(--oneyt-miniplayer-shadow, none);
+  overflow: hidden;
+}
