@@ -70,13 +70,6 @@
         keywords: ['sidebar', 'scroll', 'sensitivity', 'wheel'],
       },
       {
-        key: 'sidebar.keepPlayerVisible',
-        type: 'toggle',
-        label: 'Keep player visible',
-        description: 'Keep the player in view while scrolling recommendations.',
-        keywords: ['sidebar', 'player', 'visible'],
-      },
-      {
         key: 'sidebar.playerOffset',
         type: 'number',
         label: 'Player offset',

@@ -158,7 +158,6 @@
         },
         sidebar: {
           independentScroll: true,
-          keepPlayerVisible: true,
         },
       },
     },

@@ -82,7 +82,6 @@
       scrollbarWidth: 8, // px
       smoothScroll: true,
       scrollSensitivity: 1, // multiplier
-      keepPlayerVisible: true,
       playerOffset: 0, // px
     },
 

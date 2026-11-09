@@ -54,7 +54,6 @@ test('profiles: Cinema preset opens theater on a full-width player', () => {
   assert.equal(next.player.defaultTheater, true);
   assert.equal(next.player.maxWidth, 0);
   assert.equal(next.player.customWidth, 0);
-  assert.equal(next.sidebar.keepPlayerVisible, true);
   assert.equal(next.sidebar.independentScroll, true);
 });
 
