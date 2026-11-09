@@ -10,7 +10,20 @@ default theater), 1.7.0 (Phase 15 hide live / mixes /
 news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.9.0 (Phase 17 onboarding),
 1.10.0 (Phase 18 selector health check),
-1.11.0 (Phase 19 popup theme + channel Shorts tab).
+1.11.0 (Phase 19 popup theme + channel Shorts tab),
+1.12.0 (Phase 20 custom CSS templates).
+
+## 1.12.0 — 2026-11-09 (Custom CSS Templates, Phase 20)
+
+- Six ready-made CSS templates in the Appearance
+  section (hide duration badges, fade watched videos,
+  hide video badges, hide home metadata, hide voice
+  search, hide channel banner). One click appends a
+  template to the Custom CSS box and turns custom CSS
+  on; applying the same template twice does nothing.
+  No new setting.
+- To remove a template, delete its block from the
+  Custom CSS box.
 
 ## 1.11.0 — 2026-11-09 (Popup Theme + Channel-Page Shorts Tab, Phase 19)
 

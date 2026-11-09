@@ -925,6 +925,76 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 18 is the health check (merged). v1.11.0 is
 unambiguous: 1.10.0 is in `main` now.
 
+## Phase 20 — Custom CSS Templates (v1.12) 🔄 IN PROGRESS (2026-11-09)
+
+(PRD PL-20 + plan), engine, dashboard wiring, tests,
+checklist, version, docs.
+- Pure engine `shared/cssTemplates.js`: 6 ready-made
+  templates as data (`id`, `name`, `description`, `css`)
+  + pure helpers `getCssTemplate` / `listCssTemplates` /
+  `applyCssTemplate`. Applying appends the template CSS
+  to the current Custom CSS text under a marker comment
+  (`/* OneYT template: <id> */`) — so applying the same
+  template twice is a no-op — and returns the new text;
+  unknown ids return the text unchanged. No new setting:
+  templates write into `appearance.customCSS` and turn
+  `appearance.customCSSEnabled` on, so the existing
+  appearance module applies them through the validated
+  custom-CSS path (no content-script change, no new
+  permission, no new selector in `selectors.js` — the
+  template CSS is user-CSS-shaped data, and the selector
+  audit scans `content/` only).
+- The 6 templates (each does something no setting does):
+  hide duration badges
+  (`ytd-thumbnail-overlay-time-status-renderer`), fade
+  watched videos (`:has` +
+  `ytd-thumbnail-overlay-resume-playback-renderer` on
+  rich + compact items), hide video badges
+  (`ytd-badge-supported-renderer` — "New" / "LIVE" /
+  "4K"), hide home metadata (`#metadata-line` under
+  rich items — views + age), hide voice search
+  (`ytd-masthead #voice-search-button` — sourced from
+  3+ independent userstyles + a uBlock filter list),
+  hide channel banner (`.banner-visible-area` —
+  sourced from the YouTube Custom UI Cleaner
+  userstyle). Every template passes
+  `validators.validateCustomCSS` (asserted in tests).
+- Dashboard: Appearance section tool-box
+  (`renderCssTemplateTools` in `options.js`, mirroring
+  `renderProfilesTools` — `el()` only, no innerHTML):
+  one row per template (name + description + Apply
+  button, showing "Applied" when its marker is already
+  in the Custom CSS text). Apply saves, refreshes the
+  Custom CSS textarea in place, and re-renders with a
+  notice. `options.html` gains `shared/cssTemplates.js`
+  (script count 20 → 21, pin updated in
+  `tests/dashboard.test.js`).
+- Removal is manual in v1: delete the template block
+  from the Custom CSS box. No per-template remove
+  button — the marker comment makes the block easy to
+  find. **Honest limits:** template selectors are
+  YouTube DOM hooks — if YouTube renames one, that
+  template silently does nothing (same caveat as the
+  other CSS-based features); `:has()` needs Chrome
+  105+. **Browser verification still open** — the live
+  DOM is the proof (`tests/manual-checklist.md`
+  Phase 20).
+**Status 2026-11-09:** code complete on branch
+`feature/css-templates` (8 part-by-part commits on top
+of `main` `c3732a3`, pushed after completion).
+`npm test` 193/193 pass (183 baseline + 10 new),
+lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.12.0.zip`
+(runtime files only). **Done:** `d04d19d` start
+(PRD PL-20 + plan), `085fa1d` engine
+(`shared/cssTemplates.js`, 6 templates), `3188d99`
+dashboard wiring (tool-box in Appearance + script
+pin 20 → 21), `3918be9` tests (10 new),
+`9743fd8` checklist, `ac588cc` fix — prettier
+format, `c0e7e05` version 1.12.0, docs (this commit).
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 20).
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
@@ -932,7 +1002,6 @@ unambiguous: 1.10.0 is in `main` now.
 - Multiple saved themes + community theme sharing (exportable presets)
 - Advanced layout editor
 - Optional cloud sync / cross-device backup (opt-in, explicit)
-- Custom CSS templates library
 - More player controls (per user demand)
 
 **Rule:** a future feature enters the plan only by updating
