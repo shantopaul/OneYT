@@ -70,7 +70,7 @@
           finish(null);
         }, timeout);
         var observer = new MutationObserver(function () {
-          var el = query(keyOrSelector);
+          var el = query(keyOrSelector, root && root !== doc ? root : undefined);
           if (el) finish(el);
         });
         function finish(value) {
