@@ -67,15 +67,27 @@
     comments: { pages: ['watch'], feature: 'Comments section', presence: 'always' },
     sidebarItems: { pages: ['watch'], feature: 'Recommendations sidebar', presence: 'always' },
     shortsShelf: { pages: ['home'], feature: 'Shorts shelf (home)', presence: 'sometimes' },
-    reelShelf: { pages: ['home', 'search', 'subscriptions'], feature: 'Shorts shelf', presence: 'sometimes' },
+    reelShelf: {
+      pages: ['home', 'search', 'subscriptions'],
+      feature: 'Shorts shelf',
+      presence: 'sometimes',
+    },
     richGrid: { pages: ['home'], feature: 'Home feed grid', presence: 'always' },
     topicChips: { pages: ['home'], feature: 'Topic chips bar', presence: 'always' },
     liveShelf: { pages: ['home'], feature: 'Live shelf', presence: 'sometimes' },
     mixesShelf: { pages: ['home'], feature: 'Mixes shelf', presence: 'sometimes' },
     mixesItem: { pages: ['home'], feature: 'Mixes items', presence: 'sometimes' },
     newsShelf: { pages: ['home'], feature: 'News shelf', presence: 'sometimes' },
-    guide: { pages: ['home', 'watch', 'search', 'subscriptions'], feature: 'Guide (sidebar menu)', presence: 'always' },
-    masthead: { pages: ['home', 'watch', 'search', 'subscriptions'], feature: 'Masthead (top bar)', presence: 'always' },
+    guide: {
+      pages: ['home', 'watch', 'search', 'subscriptions'],
+      feature: 'Guide (sidebar menu)',
+      presence: 'always',
+    },
+    masthead: {
+      pages: ['home', 'watch', 'search', 'subscriptions'],
+      feature: 'Masthead (top bar)',
+      presence: 'always',
+    },
     video: { pages: ['watch'], feature: 'Video element', presence: 'always' },
     theaterButton: { pages: ['watch'], feature: 'Theater mode button', presence: 'always' },
     autonavToggle: { pages: ['watch'], feature: 'Autoplay toggle', presence: 'always' },
@@ -116,7 +128,7 @@
       var found = false;
       try {
         found = exists(key) === true;
-      } catch (err) {
+      } catch {
         found = false;
       }
       results[key] = found ? 'ok' : 'missing';
