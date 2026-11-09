@@ -838,6 +838,61 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 17 is onboarding (merged). v1.10.0 is
 unambiguous: 1.9.0 is in `main` now.
 
+## Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ⏳ IN PROGRESS (2026-11-09)
+
+**Goal:** the two small follow-ups that still make the
+extension look unfinished from the outside — the popup
+is dark-only while the dashboard has had a theme since
+Phase 9, and Block Shorts leaves the Shorts tab sitting
+on channel pages.
+
+**Deliverable:** v1.11.0.
+
+**Plan (part-by-part, push only when complete):**
+- **Popup theme:** the popup follows `ui.dashboardTheme`
+  (the same setting the dashboard uses — System / Dark /
+  Light), applied live when it changes. `popup.css`
+  moves to the dashboard's token structure (`:root`
+  dark tokens + `[data-theme='light']` block + the
+  `prefers-color-scheme` pre-JS fallback, same measured
+  light tokens as Phase 9); `popup.js` gains a local
+  pure `resolvePopupTheme` (same 4-line logic as the
+  dashboard's `resolveDashboardTheme` and the
+  onboarding page's copy — the codebase already accepts
+  this duplication rather than a shared export) and sets
+  `data-theme` on `<html>` in `render()` plus a
+  `matchMedia` listener while the setting is 'system'.
+  No new setting, no new control — the dashboard's
+  theme select already covers it.
+- **Channel Shorts tab:** tied to `layout.blockShorts`
+  (no new setting — Block Shorts means no Shorts
+  anywhere). One selector key `channelShortsTab:
+  'yt-tab-shape[tab-title="Shorts"]'` in
+  `shared/selectors.js` (sourced from three
+  independent lists: the gijsdev uBlock Hide YouTube
+  Shorts list, the HideYouTubeShorts userscript, and
+  the Youtube Clear View list — all three use the
+  `tab-title="Shorts"` hook) + one rule in
+  `layout.css` under the existing `oneyt-block-shorts`
+  class (already set on every page type, including
+  channel, so no module change). The Block Shorts
+  toggle description gains the channel tab. Health
+  metadata: pages `['channel']`, presence `sometimes`
+  (not every channel has a Shorts tab). **Honest
+  limit:** `tab-title` is English UI text — a
+  non-English YouTube UI may use a different title,
+  same caveat as the Phase 15 shelf titles.
+- Module tests for the popup theme function + the CSS
+  tokens + the new selector wiring + manual checklist
+  item. **Browser verification still open** — the live
+  DOM is the proof (`tests/manual-checklist.md`
+  Phase 19).
+Numbering note: this phase takes Phase 19 because
+Phase 13 is disable ambient mode (parked, branch
+`feature/disable-ambient-mode` with no commits) and
+Phase 18 is the health check (merged). v1.11.0 is
+unambiguous: 1.10.0 is in `main` now.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
