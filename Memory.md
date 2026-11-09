@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 — Planning ✅ done, pushed · **Phase 1 — Foundation ⬜ not started** |
-| **Version** | Planning v1.0 (no code, no release) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5e608e1`, verified on remote 2026-11-09 |
-| **Code written** | None. Repo contains planning docs only (7 files, 1,995 lines). |
-| **Currently working on** | — (nothing — waiting for user to approve Phase 1 start) |
-| **Blocked on** | Phase 1 start decision (D-02 below) |
-| **Last verified** | 2026-11-09 — remote HEAD `5e608e1` confirmed via `git ls-remote` + GitHub API |
+| **Phase** | Phase 0 ✅ done · **Phase 1 — Foundation ✅ code complete, pushed to branch** (browser check still open) |
+| **Version** | 0.1.0 (extension shell, no features yet) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `a52cd3e`; branch `feature/foundation` pushed 2026-11-09, **never merged to `main`** |
+| **Code written** | Phase 1: 15 JS files + manifest + base.css + popup + tests (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 1 code done; waiting for browser check + Phase 2 go-ahead) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md`); Phase 2 start decision |
+| **Last verified** | 2026-11-09 — `npm test` 38/38 pass, `npm run lint` clean, `npm run format` clean, manifest valid, no polling/network (grep) |
 
 ---
 
@@ -55,6 +55,42 @@
   `main`, verified remote HEAD = `5e608e1` (private repo,
   default branch `main`).
 
+### 2026-11-09 — Phase 1: Foundation DONE (code, branch only)
+
+- Branch `feature/foundation` from `main` (`a52cd3e`).
+  **22 part-by-part commits, pushed only when Phase 1 was fully
+  complete** (per Shanto's instruction — no intermediate push,
+  no merge to `main`).
+- Built: `manifest.json` (MV3, `storage` only, youtube.com only),
+  `shared/` (constants, defaults schema v1 + pure migration,
+  selectors, storage wrapper, validators), `content/core/`
+  (logger, event-bus, dom-manager, settings-manager,
+  page-detector, module-manager, app, index), `content/styles/base.css`,
+  `background/service-worker.js` (seed defaults + message relay),
+  minimal `popup/` (master toggle + status), ESLint + Prettier
+  configs, `package.json` (+ lockfile), 38 unit tests
+  (`node:test`, no extra deps), `tests/manual-checklist.md`.
+- **AD-06 decided:** classic scripts, one `OneYT` global,
+  manifest load order — no bundler, no ES modules in content
+  scripts. Recorded in `Architecture.md`.
+- Verification here: `npm test` **38/38 pass**, `npm run lint`
+  clean, `npm run format` clean, every JS file `node --check`
+  clean, manifest JSON valid, grep: no `setInterval` / `fetch` /
+  `eval` in extension code. Migration, page detection (12 cases),
+  module failure isolation and app wiring all verified live in
+  Node with fakes.
+- **Fix found during verification:** manifest declared
+  `options_page` but the dashboard does not exist until Phase 5 —
+  removed the key (commit `315cb44`); it returns in Phase 5.
+- **Not verified here (needs Chrome on Shanto's PC):** loading
+  unpacked, real YouTube page detection / SPA navigation, master
+  toggle in the browser, console errors on Home/Watch/Search,
+  live selector check. All listed in
+  `tests/manual-checklist.md` — Phase 1 is code-complete, not
+  browser-verified.
+- Icons are placeholders (original dark+red play mark, PIL);
+  final art in Phase 7.
+
 ---
 
 ## Decisions Made
@@ -70,6 +106,8 @@
 | 2026-11-09 | No backend, no account, no telemetry, no data leaves device (v1) | `PRD.md` §8, `Rules.md` §2.4 |
 | 2026-11-09 | Flagship feature = independent sidebar scroll + stationary player | `PRD.md` §4.2 |
 | 2026-11-09 | Player `position: absolute` supported as a user option | `PRD.md` §4.1, `Architecture.md` §6.3 |
+| 2026-11-09 | AD-06: content scripts = classic scripts, one `OneYT` global, manifest load order; no bundler, no ES modules | `Architecture.md` AD-06 |
+| 2026-11-09 | Phase 1 commits part-by-part (one commit per file/feature), push branch only when Phase 1 fully complete, never merge to `main` | User instruction 2026-11-09; `Memory.md` log |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -77,7 +115,8 @@
 | # | Question | Options / recommendation | Status |
 |---|----------|--------------------------|--------|
 | D-01 | Create GitHub repo `shantopaul/OneYT` now, or later at Phase 1? | Recommend: create at Phase 1 start, `main` = stable | ✅ Done 2026-11-09 — user created the (private) repo; planning docs pushed as `5e608e1` on `main` |
-| D-02 | Start Phase 1 (Foundation) coding now? | Recommend: yes, after D-01 | ⬜ Awaiting user |
+| D-02 | Start Phase 1 (Foundation) coding now? | Recommend: yes, after D-01 | ✅ Done 2026-11-09 — user said "Phase 1 start", branch `feature/foundation`, part-by-part commits, push only when complete |
+| D-07 | Phase 2 start? | Recommend: after the Phase 1 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -87,18 +126,22 @@
 
 ## Current Phase Checklist
 
-**Phase 1 — Foundation** (copy from `Phases.md`; tick only after
-verifying in the browser):
+**Phase 1 — Foundation** (from `Phases.md`; ✅ = verified here in
+Node, ⬜ = needs Chrome on Shanto's PC — see
+`tests/manual-checklist.md`):
 
 - [ ] Extension loads unpacked in Chrome with zero errors
-- [ ] Activates on youtube.com only
-- [ ] Settings load, save, persist across restart
-- [ ] Old-schema settings migrate without overwriting user values
-- [ ] Page detection correct (home / watch / search / subs / channel / playlist)
+- [x] Activates on youtube.com only (manifest match + host guard unit-tested; browser check open)
+- [x] Settings load, save, persist across restart (unit-tested round-trip with fake storage; browser persistence open)
+- [x] Old-schema settings migrate without overwriting user values (unit-tested)
+- [x] Page detection correct (home / watch / search / subs / channel / playlist — 12 cases unit-tested)
 - [ ] SPA navigation re-detects (watch → watch, home → watch, back/forward)
-- [ ] Master toggle disables everything and restores YouTube exactly
+- [x] Master toggle disables everything and restores YouTube exactly (app test: `enabled: false` → no `oneyt-enabled` class; browser check open)
 - [ ] No console errors on Home / Watch / Search
-- [ ] No polling, no network requests
+- [x] No polling, no network requests (grep-verified: no `setInterval` / `fetch` / `eval` in extension code)
+
+**Phase 2 — Core Layout** (not started; awaiting user go-ahead):
+see `Phases.md` Phase 2 checklist.
 
 ---
 
@@ -151,6 +194,13 @@ verifying in the browser):
 - First commit `5e608e1` pushed to `main` and verified on remote
   (HEAD = `5e608e1`, 7 files, 1,995 lines). **No coding started.**
 - D-01 done. Waiting on user: Phase 1 start (D-02).
+
+### 2026-11-09 — Phase 1 pushed to branch `feature/foundation`
+- 22 part-by-part commits, pushed only after Phase 1 was fully
+  complete (per instruction). Branch verified on remote;
+  `main` untouched at `a52cd3e`, nothing merged.
+- Next: browser checklist on Shanto's PC
+  (`tests/manual-checklist.md`), then Phase 2 decision (D-07).
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
