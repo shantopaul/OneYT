@@ -383,3 +383,22 @@ test('dashboard: onChanged refreshes profiles, themes and the layout preview', (
     'open Layout section re-renders so the preview updates'
   );
 });
+
+test('dashboard: free-text CSS controls carry a cssProperty for probe validation', () => {
+  const player = require('../options/sections/player');
+  const sidebar = require('../options/sections/sidebar');
+  const byKey = {};
+  player.controls.concat(sidebar.controls).forEach(function (c) {
+    byKey[c.key] = c;
+  });
+  assert.equal(byKey['player.border'].cssProperty, 'border');
+  assert.equal(byKey['player.shadow'].cssProperty, 'boxShadow');
+  assert.equal(byKey['player.miniPlayer.shadow'].cssProperty, 'boxShadow');
+  assert.equal(byKey['sidebar.maxHeight'].cssProperty, 'maxHeight');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('probe.style[control.cssProperty] = value'), 'probe assignment exists');
+  assert.ok(
+    src.includes("showWarning(row, 'Not a valid CSS ' + control.cssProperty + ' value.');"),
+    'invalid CSS warns and reverts'
+  );
+});

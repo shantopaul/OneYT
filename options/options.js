@@ -611,9 +611,27 @@
         set: function (value) {
           input.value = value === undefined || value === null ? '' : String(value);
         },
-        bind: function () {
+        bind: function (row) {
           input.addEventListener('change', function () {
-            setValue(control.key, input.value, 0);
+            var value = input.value;
+            if (control.cssProperty) {
+              // Probe-validate free-text CSS against a dummy
+              // element: the browser's CSSOM rejects invalid
+              // values by leaving the property empty. An
+              // invalid value is warned about and reverted
+              // instead of being stored (the content side
+              // already drops it, but the dashboard used to
+              // save it silently).
+              var probe = doc.createElement('div');
+              probe.style[control.cssProperty] = value;
+              if (value.trim() !== '' && probe.style[control.cssProperty] === '') {
+                showWarning(row, 'Not a valid CSS ' + control.cssProperty + ' value.');
+                input.value = getPath(state, control.key) || '';
+                return;
+              }
+              showWarning(row, '');
+            }
+            setValue(control.key, value, 0);
           });
         },
       };

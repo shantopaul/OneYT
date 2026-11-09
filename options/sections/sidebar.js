@@ -32,6 +32,7 @@
         label: 'Sidebar max height',
         description: 'CSS height, e.g. calc(100vh - 100px).',
         placeholder: 'calc(100vh - 100px)',
+        cssProperty: 'maxHeight',
         keywords: ['sidebar', 'height', 'max'],
       },
       {
