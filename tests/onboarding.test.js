@@ -84,3 +84,13 @@ test('onboarding: the welcome page reuses the preset copy from profiles', () => 
   assert.equal(html.includes('data-theme="dark"'), true);
   assert.equal(html.includes('data-theme="light"'), true);
 });
+
+test('onboarding: preset ids come from the presets module when passed', () => {
+  const fakeProfiles = { BUILTIN_PRESETS: [{ id: 'focus' }, { id: 'new-one' }] };
+  assert.equal(onboarding.onboardingPresetId('new-one', fakeProfiles), 'new-one');
+  assert.equal(onboarding.onboardingPresetId('focus', fakeProfiles), 'focus');
+  // 'cinema' is not in this list, so it is treated as unknown.
+  assert.equal(onboarding.onboardingPresetId('cinema', fakeProfiles), null);
+  // Without the API the built-in list is the fallback.
+  assert.equal(onboarding.onboardingPresetId('cinema'), 'cinema');
+});

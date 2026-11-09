@@ -142,7 +142,7 @@
         if (!card) return;
         markChecked(presetCards, card);
         presetChoice = card.getAttribute('data-preset');
-        var presetId = onboardingApi.onboardingPresetId(presetChoice);
+        var presetId = onboardingApi.onboardingPresetId(presetChoice, profilesApi);
         if (presetId) {
           settings = profilesApi.applyPreset(settings, presetId, defaultsApi);
         }
