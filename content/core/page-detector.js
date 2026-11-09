@@ -30,7 +30,18 @@
       var href = url || (typeof location !== 'undefined' ? location.href : '');
       var path = '';
       try {
-        path = new URL(href, 'https://www.youtube.com').pathname;
+        var parsed = new URL(href, 'https://www.youtube.com');
+        // The content script only runs on youtube.com, but detect()
+        // must not classify other hosts as YouTube pages.
+        if (
+          parsed.hostname !== 'www.youtube.com' &&
+          parsed.hostname !== 'youtube.com' &&
+          parsed.hostname !== 'm.youtube.com' &&
+          parsed.hostname !== 'music.youtube.com'
+        ) {
+          return PAGE_TYPES.OTHER;
+        }
+        path = parsed.pathname;
       } catch (err) {
         return PAGE_TYPES.OTHER;
       }
