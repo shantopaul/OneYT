@@ -838,7 +838,7 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 17 is onboarding (merged). v1.10.0 is
 unambiguous: 1.9.0 is in `main` now.
 
-## Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ⏳ IN PROGRESS (2026-11-09)
+## Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** the two small follow-ups that still make the
 extension look unfinished from the outside — the popup
@@ -887,6 +887,35 @@ on channel pages.
   item. **Browser verification still open** — the live
   DOM is the proof (`tests/manual-checklist.md`
   Phase 19).
+**Status 2026-11-09:** code complete on branch
+`feature/popup-theme-shorts-tab` (10 part-by-part
+commits on top of `main` `d2bde2d`, pushed after
+completion). `npm test` 183/183 pass (179 baseline +
+4 new), lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.11.0.zip`
+(runtime files only). **Done:** `b3ea475` start
+(PRD PL-19 + plan), `dd9ba55` popup.css tokens +
+light block, `8699a3f` popup follows
+ui.dashboardTheme, `0c6d254` channel Shorts tab
+under Block Shorts + health metadata (selector
+count 30 → 31; the CSS quote trap — Prettier
+rewrites CSS attribute quotes to single, so the JS
+value uses single quotes inside), `7abe73e` tests
+(4 new) + a real engine fix found by them
+(summarizeHealth returned 'ok' for a sometimes-
+only record — now 'unknown'), `cc78d18` fix —
+test expectation follows the corrected rule (the
+previous commit landed 182/183: the fail line was
+not read before committing), `c2c3c31` fix —
+summarizeHealth takes `now` + the channel test
+uses a fresh record (the 1970 timestamp was
+dropped as 7-day stale, so the feature read
+'unchecked' instead of 'not-seen'; this commit
+was verified green before committing),
+`568eaed` checklist, `28d11d5` version 1.11.0,
+`7f9d096` docs. **Browser verification still open**
+— the live DOM is the proof
+(`tests/manual-checklist.md` Phase 19).
 Numbering note: this phase takes Phase 19 because
 Phase 13 is disable ambient mode (parked, branch
 `feature/disable-ambient-mode` with no commits) and
