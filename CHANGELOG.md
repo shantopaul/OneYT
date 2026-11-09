@@ -3,7 +3,19 @@
 All notable changes, newest first. Version numbers follow the
 phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts),
-1.2.0 (Phase 9 dashboard theme + search).
+1.2.0 (Phase 9 dashboard theme + search),
+1.3.0 (Phase 10 hide endscreen cards).
+
+## 1.3.0 — 2026-11-09 (Hide Endscreen Cards, Phase 10)
+
+- **Hide endscreen cards** (`player.hideEndscreen`, off by
+  default): one toggle in the Player section. Hides the video
+  suggestions shown at the end of a video, so it ends cleanly
+  instead of offering the next watch. Works in theater mode
+  too; the class is cleared in fullscreen and off watch pages
+  like every other player class.
+- Live verification of the endscreen selector on a real video
+  end is still open (browser check).
 
 ## 1.2.0 — 2026-11-09 (Dashboard Theme + Search, Phase 9)
 
