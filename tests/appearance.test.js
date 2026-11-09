@@ -184,6 +184,57 @@ test('typography: bad values are removed, never left stale', () => {
   assert.equal(doc._root._vars.size, 0);
 });
 
+test('typography: customFont wins over fontFamily, empty falls back to it', () => {
+  const doc = createFakeDocument();
+  const mod = createTypographyModule({ logger: quietLogger, document: doc, themes });
+  mod.apply(
+    settingsWith({
+      appearance: {
+        typography: { fontFamily: 'Georgia', customFont: 'Hind Siliguri' },
+      },
+    }),
+    'watch'
+  );
+  assert.equal(doc._root._vars.get('--oneyt-font-family'), '"Hind Siliguri", sans-serif');
+  // Empty custom falls back to the select.
+  mod.apply(
+    settingsWith({
+      appearance: {
+        typography: { fontFamily: 'Georgia', customFont: '' },
+      },
+    }),
+    'watch'
+  );
+  assert.match(doc._root._vars.get('--oneyt-font-family'), /Georgia/);
+});
+
+test('typography: invalid customFont falls back to fontFamily, never applies raw', () => {
+  const doc = createFakeDocument();
+  const mod = createTypographyModule({ logger: quietLogger, document: doc, themes });
+  mod.apply(
+    settingsWith({
+      appearance: {
+        typography: { fontFamily: 'Georgia', customFont: 'red; } body { color: red' },
+      },
+    }),
+    'watch'
+  );
+  // Falls back to Georgia — the injected text never reaches the page.
+  assert.match(doc._root._vars.get('--oneyt-font-family'), /Georgia/);
+  assert.equal(doc._root._vars.get('--oneyt-font-family').includes('red;'), false);
+  // Invalid custom + unknown family = YouTube default, nothing stale.
+  mod.apply(
+    settingsWith({
+      appearance: {
+        typography: { fontFamily: 'Nope', customFont: 'a,b' },
+      },
+    }),
+    'watch'
+  );
+  assert.equal(doc._root._classes.has('oneyt-typography'), false);
+  assert.equal(doc._root._vars.has('--oneyt-font-family'), false);
+});
+
 // ---------- Layout part 2 ----------
 
 test('layout part 2: home columns/spacing/thumbnail/Shorts on home', () => {
