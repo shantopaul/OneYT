@@ -1,0 +1,1 @@
+{"description":"OneYT — All-in-One YouTube Customizer (Manifest V3, vanilla JS)","devDependencies":{"eslint":"^9.0.0","prettier":"^3.0.0"},"name":"oneyt","private":true,"scripts":{"format":"prettier --check .","format:fix":"prettier --write .","lint":"eslint .","test":"node --test tests/"},"version":"0.1.0"}
