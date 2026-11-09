@@ -63,10 +63,11 @@
 
       // Clear every token + spec var first, so switching back to
       // 'default' (or a preset with fewer tokens) never leaves
-      // stale colours behind.
+      // stale colours behind. Not every token maps onto a
+      // --yt-spec-* variable (see YT_SPEC_VARS), so guard.
       for (var key in themes.TOKEN_VARS) {
         removeVar(el, themes.TOKEN_VARS[key]);
-        removeVar(el, themes.YT_SPEC_VARS[key]);
+        if (themes.YT_SPEC_VARS[key]) removeVar(el, themes.YT_SPEC_VARS[key]);
       }
 
       if (Object.keys(vars).length === 0) return;
@@ -128,7 +129,7 @@
         if (themes) {
           for (var key in themes.TOKEN_VARS) {
             removeVar(el, themes.TOKEN_VARS[key]);
-            removeVar(el, themes.YT_SPEC_VARS[key]);
+            if (themes.YT_SPEC_VARS[key]) removeVar(el, themes.YT_SPEC_VARS[key]);
           }
         }
         removeVar(el, '--oneyt-radius');
