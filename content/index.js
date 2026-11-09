@@ -45,6 +45,13 @@
     });
     var eventBus = ns.eventBus ? ns.eventBus.createEventBus(logger) : null;
 
+    // Register feature modules (each guards itself by page/settings).
+    if (ns.modules && ns.modules.sidebar) {
+      moduleManager.register(
+        ns.modules.sidebar.createSidebarModule({ dom: domManager, logger: logger })
+      );
+    }
+
     var app = ns.app.createApp({
       logger: logger,
       constants: ns.constants,
