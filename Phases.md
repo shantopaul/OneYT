@@ -1064,11 +1064,61 @@ format, `5f6ad2a` version 1.13.0, docs (this commit).
 **Browser verification still open** — the live page
 is the proof (`tests/manual-checklist.md` Phase 21).
 
+## Phase 22 — Advanced Layout Editor (v1.14) 🔄 IN PROGRESS (2026-11-09)
+
+(PRD PL-22 + plan), setting + engine, module, dashboard
+wiring, tests, checklist, version, docs.
+- New additive setting `layout.homeMaxWidth` (0 =
+  YouTube default, px, 0–2560): caps the home feed
+  grid width and centres it — the ultrawide fix. The
+  layout module sets class `oneyt-home-max-width` +
+  variable `--oneyt-home-max-width` in `applyHome()`
+  (cleared on watch/other pages and in `cleanup()`,
+  like the other home vars); `layout.css` centres
+  `ytd-rich-grid-renderer` under that class. No new
+  selector key — the rule reuses the existing
+  `ytd-rich-grid-renderer` element (selector count
+  stays 31). A dashboard number control covers the
+  setting (the coverage test requires every setting
+  to have a control).
+- Pure engine `shared/layoutPresets.js`: three
+  built-in layout presets as partial overrides over
+  the layout numbers — Compact (5 columns, 8 px gap,
+  8 px watch spacing, no max-width), Balanced
+  (4 columns, 16 px gap, 16 px watch spacing,
+  1600 px max-width), Spacious (3 columns, 24 px
+  gap, 32 px watch spacing, 1280 px max-width) —
+  plus `getLayoutPreset` / `applyLayoutPreset`
+  (unknown id → settings back unchanged, mirroring
+  `shared/profiles.js`). Applying a preset changes
+  only the layout numbers it names.
+- Dashboard: Layout-section tool-box
+  (`renderLayoutEditorTools` in `options.js`,
+  mirroring `renderProfilesTools` — `el()` only, no
+  innerHTML): one row per preset (name + what it
+  sets + Apply button) and a live preview — a mini
+  grid drawn from the current values (columns,
+  gap, max-width label), re-rendered whenever the
+  section renders, so applying a preset visibly
+  changes the preview. Fine-tuning stays in the
+  number controls above the tool-box.
+- No new permission, no new selector, no sync
+  change. **Honest limits:** the preview is a
+  diagram of the numbers, not a screenshot of
+  YouTube — the live page is the proof; a max-width
+  narrower than the viewport leaves empty space on
+  both sides of the feed by design; the presets set
+  only the five layout numbers (hiding toggles are
+  untouched). **Browser verification still open** —
+  the live page is the proof
+  (`tests/manual-checklist.md` Phase 22).
+**Status 2026-11-09:** started on branch
+`feature/layout-editor` (from `main` `1324f15`).
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
 - Channel-page Shorts tab hiding (follow-up to Block Shorts)
-- Advanced layout editor
 - Optional cloud sync / cross-device backup (opt-in, explicit)
 - More player controls (per user demand)
 
