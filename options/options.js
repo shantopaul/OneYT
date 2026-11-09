@@ -373,7 +373,14 @@
     }
 
     function getDefault(key) {
-      return getPath(defaultsApi.DEFAULT_SETTINGS, key);
+      var value = getPath(defaultsApi.DEFAULT_SETTINGS, key);
+      // appearance.colors.* has no per-colour default (the
+      // defaults object is {}); a per-setting Reset stored
+      // undefined and the button title showed
+      // 'Restore default: —'. Empty means "no override",
+      // which the colour control already renders as empty.
+      if (value === undefined && key.indexOf('appearance.colors.') === 0) return '';
+      return value;
     }
 
     function markSaved() {
@@ -511,7 +518,26 @@
       return {
         node: input,
         set: function (value) {
-          input.value = settingToSelect(control.source, value);
+          if (control.source === 'speedPresets') {
+            // The option list is built from the current
+            // presets: editing the preset list must refresh
+            // it, or the default-speed select keeps showing
+            // speeds that no longer exist.
+            input.textContent = '';
+            resolveSelectOptions(control.source, state, apis).forEach(function (opt) {
+              input.appendChild(el(doc, 'option', { value: String(opt.value), text: opt.label }));
+            });
+          }
+          var v = value;
+          if (control.source === 'themes') {
+            // An unknown stored theme (hand-edited import)
+            // used to leave the select blank: fall back to
+            // 'default' (appearance rendering already falls
+            // back the same way).
+            var names = (apis.themes && apis.themes.THEME_NAMES) || ['default'];
+            if (names.indexOf(String(value)) === -1) v = 'default';
+          }
+          input.value = settingToSelect(control.source, v);
         },
         bind: function () {
           input.addEventListener('change', function () {
@@ -780,6 +806,12 @@
         bind: function () {
           input.addEventListener('focus', function () {
             input.value = '';
+          });
+          input.addEventListener('blur', function () {
+            // Focus without capturing (keyboard tab-through)
+            // blanked the field with no restore: put the
+            // stored shortcut back.
+            if (!capturing) input.value = getPath(state, control.key) || '';
           });
           input.addEventListener('click', function () {
             if (capturing) return;

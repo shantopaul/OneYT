@@ -323,3 +323,17 @@ test('dashboard: state-replacing actions go through replaceState (theme follows)
   assert.ok(src.includes('return false;'), 'saveNow resolves false on failure');
   assert.ok(src.includes('.then(function (saved)'), 'callers receive the boolean');
 });
+
+test('dashboard: control fixes — shortcut blur restore, colour reset, speed options, theme clamp', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  // B3: blur restores the stored shortcut when not capturing.
+  assert.ok(src.includes("input.addEventListener('blur', function () {"));
+  assert.ok(src.includes("if (!capturing) input.value = getPath(state, control.key) || '';"));
+  // B5: getDefault returns '' for appearance.colors.* (defaults are {}).
+  assert.ok(src.includes("key.indexOf('appearance.colors.') === 0"));
+  // B4: speedPresets options are rebuilt in set().
+  assert.ok(src.includes("if (control.source === 'speedPresets')"));
+  // B7: unknown theme falls back to 'default' in makeSelect set().
+  assert.ok(src.includes("if (control.source === 'themes')"));
+  assert.ok(src.includes("if (names.indexOf(String(value)) === -1) v = 'default';"));
+});

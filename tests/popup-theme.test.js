@@ -130,3 +130,11 @@ test('channel Shorts tab: selector, CSS rule, toggle copy and health metadata', 
     'not-seen'
   );
 });
+
+test('popup: unknown stored theme falls back to default in render', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'popup', 'popup.js'), 'utf8');
+  assert.ok(
+    src.includes("knownThemes.indexOf(storedTheme) !== -1 ? storedTheme : 'default'"),
+    'render must clamp an unknown stored theme to default'
+  );
+});

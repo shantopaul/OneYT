@@ -128,7 +128,12 @@
     focusEl.checked = !!(settings.productivity && settings.productivity.focusMode);
     scrollEl.checked = !!(settings.sidebar && settings.sidebar.independentScroll);
     playerEl.checked = !!(settings.modules && settings.modules.player);
-    themeEl.value = (settings.appearance && settings.appearance.theme) || 'default';
+    // An unknown stored theme (hand-edited import) used to
+    // leave the select blank: fall back to 'default'
+    // (appearance rendering already falls back the same way).
+    var storedTheme = (settings.appearance && settings.appearance.theme) || 'default';
+    var knownThemes = themes.THEME_NAMES || ['default'];
+    themeEl.value = knownThemes.indexOf(storedTheme) !== -1 ? storedTheme : 'default';
     statusEl.textContent = enabled ? 'Enabled' : 'Disabled';
     statusEl.classList.toggle('on', enabled);
     statusEl.classList.toggle('off', !enabled);
