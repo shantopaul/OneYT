@@ -119,7 +119,8 @@
     buttonHover: 'buttonHover',
   };
 
-  var THEME_NAMES = Object.keys(THEMES);
+  // 'custom' is a valid theme name too: dark base + user colours.
+  var THEME_NAMES = Object.keys(THEMES).concat(['custom']);
 
   // Font family allowlist -> CSS stacks (typography module).
   var FONT_STACKS = {
@@ -138,7 +139,8 @@
   // Unknown theme names fall back to 'default' (no overrides).
   // 'custom' starts from the dark preset, then applies user colours.
   function resolveThemeVars(themeName, customColors) {
-    var name = THEMES[themeName] !== undefined ? themeName : 'default';
+    var name =
+      themeName === 'custom' ? 'custom' : THEMES[themeName] !== undefined ? themeName : 'default';
     var base = name === 'custom' ? THEMES.dark : THEMES[name] || null;
     var vars = {};
     if (base) {
