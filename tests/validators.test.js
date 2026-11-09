@@ -50,3 +50,42 @@ test('validateCustomCSS rejects @import, HTML tags and javascript:', () => {
 test('validateCustomCSS rejects non-string input', () => {
   assert.equal(validators.validateCustomCSS(42).valid, false);
 });
+
+test('validateCustomCSS accepts braces inside strings and comments', () => {
+  assert.equal(validators.validateCustomCSS('a::after { content: "}"; }').valid, true);
+  assert.equal(validators.validateCustomCSS("a::after { content: '{'; }").valid, true);
+  assert.equal(validators.validateCustomCSS('/* } */ a { color: red; }').valid, true);
+  assert.equal(validators.validateCustomCSS('a { color: red; } /* (unclosed').valid, true);
+});
+
+test('validateCustomCSS still rejects really unbalanced braces', () => {
+  const r = validators.validateCustomCSS('a { color: red; ');
+  assert.equal(r.valid, false);
+  assert.ok(r.errors.some((e) => e.includes('braces')));
+});
+
+test('validateCustomCSS catches a quote smuggled into an unquoted url()', () => {
+  assert.equal(
+    validators.validateCustomCSS("a { background: url(https://evil.com/a'b); }").valid,
+    false
+  );
+  assert.equal(
+    validators.validateCustomCSS("a { background: url('https://evil.com/a'); }").valid,
+    false
+  );
+  assert.equal(
+    validators.validateCustomCSS('a { background: url("data:image/png;base64,AAA"); }').valid,
+    true
+  );
+  assert.equal(
+    validators.validateCustomCSS('a { background: url(data:image/png;base64,AAA); }').valid,
+    true
+  );
+});
+
+test('validateSettings says unknown keys are kept, not ignored', () => {
+  const r = validators.validateSettings({ enabled: true, nope: 1 }, defaults);
+  assert.equal(r.valid, true);
+  assert.ok(r.warnings.some((w) => w.includes('kept as-is')));
+  assert.deepEqual(r.cleaned.nope, 1);
+});
