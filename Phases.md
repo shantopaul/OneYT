@@ -412,7 +412,8 @@ dashboard search bar optimised, position AND functionality.
 
 **Status 2026-11-09:** code complete on branch
 `feature/dashboard-theme` (10 part-by-part commits on top of
-`main` `c04274e`, pushed after completion, nothing merged).
+`main` `c04274e`, pushed after completion). **Merged by
+Shanto as PR #11 → `main` `7b70b80`.**
 `npm test` 132/132 pass, lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.2.0.zip`.
 Delivered: new setting `ui.dashboardTheme` (default System,
@@ -442,6 +443,28 @@ count past 8, clear button, ARIA combobox semantics.
 **Browser verification still open** — the theme and the
 search need a real dashboard page on Shanto's PC. The popup
 stays dark-only for now (follow-up).
+
+## Phase 10 — Hide Endscreen Cards (v1.3) ⏳ IN PROGRESS (2026-11-09)
+
+**Goal:** one toggle that hides the video suggestions shown
+at the end of a video (the endscreen cards), so a video ends
+cleanly instead of offering the next watch.
+
+**Deliverable:** v1.3.0.
+
+**Plan (part-by-part, push only when complete):** new
+setting `player.hideEndscreen` (default off, additive);
+selector `endscreenContent: '.ytp-endscreen-content'` in
+`shared/selectors.js` (selector count 21 → 22); player
+module sets `oneyt-player-hide-endscreen` on `<html>` and
+its CSS hides the endscreen container (works in theater
+too; cleared in fullscreen / off watch pages like every
+player class); Player section toggle in the dashboard;
+module tests + manual checklist item. **Browser
+verification still open** — the selector needs a real
+video end on Shanto's PC (it is the well-known YouTube
+endscreen hook, but YouTube renames DOM elements, so the
+live check is the proof).
 
 ## Future (v1.1+, not in scope now)
 
