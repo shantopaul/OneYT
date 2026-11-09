@@ -486,6 +486,36 @@ test('layout: hideTopicChips sets the class on home only', () => {
   assert.equal(doc._root._classes.size, 0);
 });
 
+test('layout: hideLiveShelf / hideMixesShelf / hideNewsShelf set the classes on home only', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  const on = settingsWith({
+    layout: { hideLiveShelf: true, hideMixesShelf: true, hideNewsShelf: true },
+  });
+  mod.apply(on, 'home');
+  assert.equal(doc._root._classes.has('oneyt-hide-live-shelf'), true);
+  assert.equal(doc._root._classes.has('oneyt-hide-mixes-shelf'), true);
+  assert.equal(doc._root._classes.has('oneyt-hide-news-shelf'), true);
+  // Off again restores the rows — class-only hiding.
+  mod.apply(settingsWith({ layout: {} }), 'home');
+  assert.equal(doc._root._classes.has('oneyt-hide-live-shelf'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-mixes-shelf'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-news-shelf'), false);
+  // Leaving home clears the classes: watch and search never hide them.
+  mod.apply(on, 'home');
+  mod.apply(on, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-hide-live-shelf'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-mixes-shelf'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-news-shelf'), false);
+  mod.apply(on, 'home');
+  mod.apply(on, 'search');
+  assert.equal(doc._root._classes.has('oneyt-hide-live-shelf'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-mixes-shelf'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-news-shelf'), false);
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+});
+
 // ---------- Registration / manager integration ----------
 
 test('all three Phase 2 modules register and run through the manager', () => {

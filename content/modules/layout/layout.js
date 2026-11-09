@@ -17,6 +17,10 @@
  * - Hide Shorts shelf (layout.hideShortsHome).
  * - Hide topic chips bar (layout.hideTopicChips) — the topic
  *   filter row ("All", "Music", ...) at the top of the feed.
+ * - Hide Live / Mixes / News shelves (layout.hideLiveShelf,
+ *   layout.hideMixesShelf, layout.hideNewsShelf) — the
+ *   "Live now" shelf, Mixes, and the "Breaking news" shelf
+ *   on the home feed.
  *
  * Every page (v1.1 Block Shorts):
  * - Block Shorts (layout.blockShorts) — one class on <html>
@@ -92,6 +96,9 @@
       setClass('oneyt-thumb-sized', false);
       setClass('oneyt-hide-shorts-home', false);
       setClass('oneyt-hide-topic-chips', false);
+      setClass('oneyt-hide-live-shelf', false);
+      setClass('oneyt-hide-mixes-shelf', false);
+      setClass('oneyt-hide-news-shelf', false);
       setClass('oneyt-block-shorts', false);
       setVar('--oneyt-home-columns', null);
       setVar('--oneyt-card-spacing', null);
@@ -128,6 +135,9 @@
       setVar('--oneyt-thumb-width', sized ? layout.thumbnailSize + 'px' : null);
       setClass('oneyt-hide-shorts-home', layout.hideShortsHome === true);
       setClass('oneyt-hide-topic-chips', layout.hideTopicChips === true);
+      setClass('oneyt-hide-live-shelf', layout.hideLiveShelf === true);
+      setClass('oneyt-hide-mixes-shelf', layout.hideMixesShelf === true);
+      setClass('oneyt-hide-news-shelf', layout.hideNewsShelf === true);
     }
 
     function apply(settings, page) {
@@ -146,6 +156,9 @@
         setClass('oneyt-thumb-sized', false);
         setClass('oneyt-hide-shorts-home', false);
         setClass('oneyt-hide-topic-chips', false);
+        setClass('oneyt-hide-live-shelf', false);
+        setClass('oneyt-hide-mixes-shelf', false);
+        setClass('oneyt-hide-news-shelf', false);
         setVar('--oneyt-home-columns', null);
         setVar('--oneyt-card-spacing', null);
         setVar('--oneyt-thumb-width', null);

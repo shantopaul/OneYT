@@ -89,6 +89,9 @@
       hideShortsHome: false,
       hideShortsWatch: false,
       hideTopicChips: false, // hide the topic filter chips row on the home feed
+      hideLiveShelf: false, // hide the "Live now" shelf on the home feed
+      hideMixesShelf: false, // hide Mixes on the home feed (shelf + individual mix cards)
+      hideNewsShelf: false, // hide the "Breaking news" shelf on the home feed
       homeColumns: 0, // 0 = default
       cardSpacing: 0, // px, 0 = default
       thumbnailSize: 0, // px width, 0 = default

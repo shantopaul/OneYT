@@ -605,6 +605,67 @@ ambient mode (parked, branch `feature/disable-ambient-mode`
 with no commits). v1.6.0 assumed 1.5.0 merges first —
 it did.
 
+## Phase 15 — Hide Live / Mixes / News Shelves (v1.7) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** three separate toggles that hide the Live, Mixes,
+and News rows from the home feed — the same treatment the
+Shorts shelves already get (Phase 8 / hideShortsHome), but
+for the other shelf types. (The "— Shorts" in the user's
+directive is read as "like Shorts": Shorts hiding itself
+already exists and is not rebuilt here.)
+
+**Deliverable:** v1.7.0.
+
+**Plan (part-by-part, push only when complete):** three new
+settings `layout.hideLiveShelf` / `layout.hideMixesShelf` /
+`layout.hideNewsShelf` (all default off, additive); the
+layout module sets `oneyt-hide-live-shelf` /
+`oneyt-hide-mixes-shelf` / `oneyt-hide-news-shelf` on home
+pages only (cleared on watch/other pages, like the topic
+chips class); CSS hides the rows. Hooks, confirmed by a web
+search against independent userstyles/userscripts before
+coding (the `ytd-rich-shelf-renderer[title*="…" i]` pattern
+comes from a HideYouTubeShorts userscript; the
+`start_radio=1` mix hook from uBlock filter lists):
+- Live: `ytd-rich-shelf-renderer[title*="Live now" i]` —
+  the "Live now" shelf.
+- Mixes: `ytd-rich-shelf-renderer[title*="Mixes" i]` for a
+  Mixes shelf if one renders, plus
+  `ytd-rich-item-renderer:has(a[href*="start_radio=1"])`
+  for the individual mix cards (mixes on home are
+  individual grid items, not a shelf — the uBlock lists
+  target them this way).
+- News: `ytd-rich-shelf-renderer[title*="News" i]` — the
+  "Breaking news" shelf (also catches a plain "News" shelf).
+Selector count 25 → 29. No new permission, no JS
+observer — class-only hiding like the other shelf rules.
+Dashboard: three toggles in the Layout section; module
+tests + manual checklist item. **Done (8 commits):**
+`254d359` start (PRD PL-15 + plan, Memory.md corrected
+to Phase 11 merged as PR #13), `b2c1dea` settings,
+`1e7c51c` selectors (count 25 → 29), `76aff04` layout
+module + CSS (incl. the Prettier quote fix: CSS
+attribute quotes are single, so the selector values
+use single quotes inside), `488a8b0` dashboard toggles,
+`679efe6` tests (137/137) + checklist, `20bf400`
+version 1.7.0. **Browser verification still open** —
+the title attributes are the risky part: they are
+English UI text (a non-English YouTube UI may use
+different titles), and YouTube may rename the shelf
+titles; the live check on Shanto's PC is the proof, and
+the checklist asks for the real title from DevTools if a
+row does not hide. If a hidden shelf leaves an empty gap
+(the section wrapper `ytd-rich-section-renderer` stays),
+the fix is to hide the wrapper too.
+Numbering note: this phase takes Phase 15 because Phase
+12 is hide topic chips (unmerged branch
+`feature/hide-topic-chips`), Phase 13 is disable ambient
+mode (parked, branch `feature/disable-ambient-mode` with
+no commits), and Phase 14 is default theater (unmerged
+branch `feature/default-theater`). v1.7.0 assumes 1.5.0
+and 1.6.0 merge first; renumber at rebase if the order
+flips.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)

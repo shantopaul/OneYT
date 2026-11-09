@@ -39,6 +39,27 @@
         keywords: ['topic', 'chips', 'filter', 'home', 'hide'],
       },
       {
+        key: 'layout.hideLiveShelf',
+        type: 'toggle',
+        label: 'Hide Live shelf on Home',
+        description: 'Hide the "Live now" shelf on the homepage.',
+        keywords: ['live', 'shelf', 'hide', 'home'],
+      },
+      {
+        key: 'layout.hideMixesShelf',
+        type: 'toggle',
+        label: 'Hide Mixes on Home',
+        description: 'Hide Mixes on the homepage — the Mixes shelf and the individual mix cards.',
+        keywords: ['mixes', 'mix', 'hide', 'home'],
+      },
+      {
+        key: 'layout.hideNewsShelf',
+        type: 'toggle',
+        label: 'Hide News shelf on Home',
+        description: 'Hide the "Breaking news" shelf on the homepage.',
+        keywords: ['news', 'shelf', 'hide', 'home'],
+      },
+      {
         key: 'layout.homeColumns',
         type: 'number',
         label: 'Homepage columns',
