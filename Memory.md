@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · **Phase 20 — Custom CSS Templates (v1.12) ✅ (merged)** |
-| **Version** | 1.12.0 in `main` |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · Phase 20 — Custom CSS Templates (v1.12) ✅ (merged) · **Phase 21 — Saved Themes + Export/Share (v1.13) ✅ code complete (branch, merge next)** |
+| **Version** | 1.12.0 in `main`; 1.13.0 code complete on branch `feature/saved-themes` |
 | **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `1077140` (Phases 1–12 + 14–16 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`, Phase 15 merge `69a9471`, Phase 16 merge `1077140`) |
 | **Code written** | Phases 1–12 + 14–16 + YouTube domains: all modules + dashboard (10 sections, 106 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + presets / profiles + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 20 merged; browser check still open) |
+| **Currently working on** | — (Phase 21 code complete; merge to `main` next, per the standing rule) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
-| **Last verified** | 2026-11-09 — `npm test` 193/193 pass on `main` after the Phase 20 merge, `npm run lint` clean, `npm run format` clean, manifest valid, `npm run package` builds a clean `oneyt-1.12.0.zip` |
+| **Last verified** | 2026-11-09 — `npm test` 203/203 pass on branch `feature/saved-themes` @ `5f6ad2a`, `npm run lint` clean, `npm run format` clean, manifest valid (1.13.0), `npm run package` builds a clean `oneyt-1.13.0.zip` |
 
 ---
 
@@ -777,6 +777,59 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   of `tests/manual-checklist.md`. Phase 20 is
   code-complete, not browser-verified.
 - **Merged to `main` 2026-11-09** (merge `8af093d`, per the standing rule: feature complete → merge to main). Verified on `main` after the merge: `npm test` 193/193 pass, lint + format clean, manifest valid, `npm run package` builds a clean `oneyt-1.12.0.zip`. Follow-up docs commit records the merge in Phases.md + Memory.md.
+
+### 2026-11-09 — Phase 21: Saved Themes + Export/Share DONE (code, branch only)
+
+- Branch `feature/saved-themes` from `main` (`81201fb`).
+  **8 part-by-part commits, pushed only when Phase 21 was
+  fully complete** (same rule — no intermediate push, no
+  merge to `main`).
+- Built: `shared/savedThemes.js` (pure — a saved theme
+  is theme-only: `{ name, createdAt, theme, colors }`;
+  `createSavedTheme` / `applySavedTheme` /
+  `validateSavedThemeName` / `validateSavedThemes` /
+  `renameSavedTheme` / `deleteSavedTheme`, max 10,
+  names 1–40 chars, built-in theme names reserved,
+  corrupt entries never wipe settings; `exportSavedTheme`
+  → `{ oneytTheme: 1, name, theme, colors }` JSON +
+  `oneyt-theme-<slug>.json` filename;
+  `parseSavedThemeImport` rejects bad JSON, wrong
+  version marker, unknown base theme, unknown colour
+  keys, invalid hex and duplicate names);
+  `SAVED_THEMES_STORAGE_KEY` (`oneyt.themes.v1`, local
+  only, never synced) in `shared/constants.js`;
+  dashboard tool-box in the Appearance section
+  (`renderSavedThemeTools` in `options.js`, mirroring
+  `renderProfilesTools`) — save by name, per-theme
+  Apply / Export / Rename / Delete, import box (file
+  or pasted JSON → validate + preview → Add theme
+  only on confirm). Applying writes
+  `appearance.theme` + `appearance.colors` only.
+  No new setting, no content-script change, no new
+  permission, no new selector.
+- Two real bugs caught before committing, both by
+  reading the failure first: the engine referenced an
+  `ignoreName` parameter that the `validateSavedThemeName`
+  signature had dropped (smoke test threw
+  `ReferenceError` — fixed before the engine commit);
+  and one test expectation was wrong, not the engine
+  (a whitespace-padded duplicate name IS a duplicate
+  after trimming — the test was corrected, 202/203 →
+  203/203).
+- Verification here: `npm test` **203/203 pass** (193
+  baseline + 10 new), `npm run lint` clean, `npm run
+  format` clean (one fix commit for Prettier reflows),
+  manifest valid, `npm run package` builds a clean
+  `oneyt-1.13.0.zip` (runtime files only). Script-count
+  pin in `tests/dashboard.test.js` went 21 → 22 for
+  `shared/savedThemes.js`.
+- **Not verified here (needs Chrome on Shanto's PC):**
+  the saved-themes tool-box and live apply on a real
+  YouTube page. All listed in the new Phase 21 section
+  of `tests/manual-checklist.md`. Phase 21 is
+  code-complete, not browser-verified.
+- **Merge to `main` next** (per the standing rule:
+  feature complete → merge to main).
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

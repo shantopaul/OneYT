@@ -283,8 +283,9 @@ test('dashboard: manifest declares the options page and every script exists', ()
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
   // 16 scripts before Phase 16 + shared/profiles.js + sections/profiles.js
   // + shared/health.js + sections/health.js (Phase 18)
-  // + shared/cssTemplates.js (Phase 20).
-  assert.equal(scripts.length, 21);
+  // + shared/cssTemplates.js (Phase 20)
+  // + shared/savedThemes.js (Phase 21).
+  assert.equal(scripts.length, 22);
   scripts.forEach(function (src) {
     const resolved = path.normalize(path.join(__dirname, '..', 'options', src));
     assert.ok(fs.existsSync(resolved), 'missing script: ' + src);

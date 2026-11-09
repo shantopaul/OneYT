@@ -11,7 +11,21 @@ news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.9.0 (Phase 17 onboarding),
 1.10.0 (Phase 18 selector health check),
 1.11.0 (Phase 19 popup theme + channel Shorts tab),
-1.12.0 (Phase 20 custom CSS templates).
+1.12.0 (Phase 20 custom CSS templates),
+1.13.0 (Phase 21 saved themes + export/share).
+
+## 1.13.0 — 2026-11-09 (Saved Themes + Export/Share, Phase 21)
+
+- Save the current theme (base preset + custom
+  colours) under a name in the Appearance section and
+  apply it later in one click. Applying changes only
+  the theme and colours — nothing else. Up to 10
+  saved themes, rename/delete included.
+- Export a saved theme as `oneyt-theme-<name>.json`
+  and import a shared theme file — the import is
+  validated first and only added when you confirm.
+  Saved themes stay on this device; export/share is
+  the sharing path, not sync.
 
 ## 1.12.0 — 2026-11-09 (Custom CSS Templates, Phase 20)
 
