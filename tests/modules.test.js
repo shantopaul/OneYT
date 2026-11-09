@@ -140,6 +140,71 @@ function playerSetup(options) {
   return { doc, flexy, container, moviePlayer, mod };
 }
 
+// Default theater (Phase 14): a theater button with a click
+// spy, and a mutable location so tests can navigate to a new
+// video URL. The flexy starts without the theater attribute;
+// tests set/remove it to simulate YouTube entering/exiting
+// theater (the fake DOM has no MutationObserver, so the
+// theater observer never fires here — apply() is called
+// directly, which is exactly the re-apply path under test).
+function theaterSetup(options) {
+  const opts = options || {};
+  const doc = createFakeDocument();
+  const flexy = createFakeElement({ attrs: opts.theater ? { theater: '' } : {} });
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const clicks = [];
+  const theaterBtn = createFakeElement();
+  theaterBtn.click = () => clicks.push('click');
+  const loc = { href: opts.href || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' };
+  const mod = createPlayerModule({
+    dom: createFakeDom({
+      watchFlexy: flexy,
+      playerContainer: container,
+      player: moviePlayer,
+      theaterButton: theaterBtn,
+    }),
+    logger: quietLogger,
+    document: doc,
+    location: loc,
+  });
+  return { doc, flexy, loc, clicks, theaterBtn, mod };
+}
+
+// Late-button harness for the waitFor path: the theater
+// button starts absent; the test decides when it arrives
+// (state.btn) and when the wait resolves (state.resolveWait).
+function lateButtonSetup() {
+  const doc = createFakeDocument();
+  const flexy = createFakeElement();
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const clicks = [];
+  const theaterBtn = createFakeElement();
+  theaterBtn.click = () => clicks.push('click');
+  const state = { btn: null, resolveWait: null };
+  const dom = {
+    query: (key) => {
+      if (key === 'watchFlexy') return flexy;
+      if (key === 'playerContainer') return container;
+      if (key === 'player') return moviePlayer;
+      if (key === 'theaterButton') return state.btn;
+      return null;
+    },
+    waitFor: () =>
+      new Promise((resolve) => {
+        state.resolveWait = resolve;
+      }),
+  };
+  const loc = { href: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' };
+  const mod = createPlayerModule({ dom, logger: quietLogger, document: doc, location: loc });
+  return { doc, flexy, loc, clicks, theaterBtn, mod, state };
+}
+
 test('player: custom width + right alignment set classes and vars', () => {
   const { doc, mod } = playerSetup();
   mod.apply(settingsWith({ player: { customWidth: 800, alignment: 'right' } }), 'watch');
@@ -253,6 +318,99 @@ test('player: hide-count classes cleared off watch and in fullscreen', () => {
   doc.fullscreenElement = createFakeElement();
   mod.apply(on, 'watch');
   assert.equal(doc._root._classes.size, 0);
+});
+
+test('player: defaultTheater clicks once on fresh watch entry, never twice', () => {
+  const { flexy, mod, clicks } = theaterSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+  // YouTube enters theater after the click; re-applying
+  // (settings change, theater observer) must not click again.
+  flexy.setAttribute('theater', '');
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+});
+
+test('player: defaultTheater does not click when already in theater', () => {
+  const { mod, clicks } = theaterSetup({ theater: true });
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 0);
+});
+
+test('player: defaultTheater does not click off watch or in fullscreen', () => {
+  const { doc, mod, clicks } = theaterSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'home');
+  assert.equal(clicks.length, 0);
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'search');
+  assert.equal(clicks.length, 0);
+  doc.fullscreenElement = createFakeElement();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 0);
+});
+
+test('player: defaultTheater does not re-click after a manual exit', () => {
+  const { flexy, mod, clicks } = theaterSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+  // YouTube enters theater, then the user exits it manually.
+  flexy.setAttribute('theater', '');
+  flexy.removeAttribute('theater');
+  // The theater observer's re-apply must not click again.
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+});
+
+test('player: defaultTheater clicks again for a new video URL', () => {
+  const { loc, mod, clicks } = theaterSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+  // Same video again: no re-click.
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+  // New video (watch -> watch SPA navigation): clicks once more.
+  loc.href = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 2);
+});
+
+test('player: defaultTheater applies immediately when turned on mid-video; off never exits theater', () => {
+  const { flexy, mod, clicks } = theaterSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: false } }), 'watch');
+  assert.equal(clicks.length, 0);
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 1);
+  // Turning it off never exits theater: the attribute stays,
+  // and no click happens on that path.
+  flexy.setAttribute('theater', '');
+  mod.apply(settingsWith({ player: { defaultTheater: false } }), 'watch');
+  assert.equal(clicks.length, 1);
+  assert.equal(flexy.hasAttribute('theater'), true);
+});
+
+test('player: defaultTheater clicks the button when it arrives late', async () => {
+  const { loc, clicks, theaterBtn, mod, state } = lateButtonSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 0); // not there yet
+  assert.notEqual(state.resolveWait, null); // a wait is pending
+  state.btn = theaterBtn; // the button arrives
+  state.resolveWait();
+  await Promise.resolve(); // flush the waitFor .then
+  await Promise.resolve();
+  assert.equal(clicks.length, 1);
+  assert.equal(loc.href, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+});
+
+test('player: defaultTheater does not click a late button after navigating away', async () => {
+  const { loc, clicks, theaterBtn, mod, state } = lateButtonSetup();
+  mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
+  assert.equal(clicks.length, 0);
+  // The user navigates to another video before the button arrives.
+  loc.href = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
+  state.btn = theaterBtn;
+  state.resolveWait();
+  await Promise.resolve(); // flush the waitFor .then
+  await Promise.resolve();
+  assert.equal(clicks.length, 0);
 });
 
 // ---------- Layout ----------
