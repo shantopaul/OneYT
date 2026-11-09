@@ -276,6 +276,15 @@
     return out;
   }
 
+  // Pure: resolve the effective dashboard theme. 'dark'/'light'
+  // force one; anything else ('system' or a bad stored value)
+  // follows the OS (prefers-color-scheme).
+  function resolveDashboardTheme(setting, prefersDark) {
+    if (setting === 'dark') return 'dark';
+    if (setting === 'light') return 'light';
+    return prefersDark ? 'dark' : 'light';
+  }
+
   // Pure: what an ArrowDown/ArrowUp/Enter/Escape keypress means
   // for the search dropdown. Returns { action, index } where
   // action is 'move' | 'activate' | 'close' | 'clear' | 'none'.
@@ -376,7 +385,22 @@
 
     function setValue(key, value, delay) {
       setPath(state, key, value);
+      if (key === 'ui.dashboardTheme') applyDashboardTheme();
       saveSoon(delay);
+    }
+
+    function systemPrefersDark() {
+      if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    // Apply the dashboard theme as a data-theme attribute on
+    // <html>. CSS carries the tokens; the attribute is the one
+    // source of truth (the prefers-color-scheme media query in
+    // the CSS is only the pre-JS fallback).
+    function applyDashboardTheme() {
+      var theme = resolveDashboardTheme(getPath(state, 'ui.dashboardTheme'), systemPrefersDark());
+      if (doc.documentElement) doc.documentElement.setAttribute('data-theme', theme);
     }
 
     function refreshValues() {
@@ -1201,6 +1225,12 @@
       renderNav();
       bindSearch();
       return load().then(function () {
+        applyDashboardTheme();
+        if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+            if (getPath(state, 'ui.dashboardTheme') === 'system') applyDashboardTheme();
+          });
+        }
         renderSection(currentSection);
         if (storage.onChanged) {
           storage.onChanged(function (changes, areaName) {
@@ -1210,6 +1240,7 @@
             var next = defaultsApi.migrateSettings(change.newValue);
             if (JSON.stringify(next) === JSON.stringify(state)) return;
             state = next;
+            applyDashboardTheme();
             refreshValues();
           });
         }
@@ -1271,6 +1302,7 @@
     searchSettings: searchSettings,
     splitHighlight: splitHighlight,
     searchKeyAction: searchKeyAction,
+    resolveDashboardTheme: resolveDashboardTheme,
     createOptionsApp: createOptionsApp,
   };
 
