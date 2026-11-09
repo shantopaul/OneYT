@@ -1299,10 +1299,7 @@ round — only code reads and the Node suite. Full report:
 - **Not verified here:** the suspicions in
   `docs/CODE_CHECK.md` (S1–S6) still need a real
   browser; the manual checklists stay open on Shanto's PC.
-- **Merged to `main` 2026-11-10** (merge `<hash>`, per the
-  standing rule: feature complete → merge to main).
-  Follow-up docs commit records the merge in Phases.md +
-  Memory.md.
+- **Merged to `main` 2026-11-10** (merge `860f8ae`, per the standing rule: feature complete → merge to main). Verified on `main` after the merge: `npm test` 264/264 pass, lint + format clean, manifest valid, `npm run package` builds a clean `oneyt-1.16.1.zip`. Follow-up docs commit records the merge in Phases.md + Memory.md.
 
 ## Future (v1.1+, not in scope now)
 

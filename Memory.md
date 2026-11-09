@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · Phase 20 — Custom CSS Templates (v1.12) ✅ (merged) · Phase 21 — Saved Themes + Export/Share (v1.13) ✅ (merged) · **Phase 22 — Advanced Layout Editor (v1.14) ✅ (merged)** · **Phase 23 — Player Accent Color (v1.15) ✅ (merged)** · **Phase 24 — Custom Font (v1.16) ✅ (merged)** |
-| **Version** | 1.14.0 in `main` |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `1077140` (Phases 1–12 + 14–16 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`, Phase 15 merge `69a9471`, Phase 16 merge `1077140`) |
-| **Code written** | Phases 1–12 + 14–16 + YouTube domains: all modules + dashboard (10 sections, 106 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + presets / profiles + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 24 merged; browser check still open) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
-| **Last verified** | 2026-11-09 — `npm test` 220/220 pass on `main` after the Phase 24 merge, `npm run lint` clean, `npm run format` clean, manifest valid, `npm run package` builds a clean `oneyt-1.16.0.zip` |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (merged) · Phase 17 — Onboarding (v1.9) ✅ (merged) · Phase 18 — Selector Health Check (v1.10) ✅ (merged) · Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ (merged) · Phase 20 — Custom CSS Templates (v1.12) ✅ (merged) · Phase 21 — Saved Themes + Export/Share (v1.13) ✅ (merged) · **Phase 22 — Advanced Layout Editor (v1.14) ✅ (merged)** · **Phase 23 — Player Accent Color (v1.15) ✅ (merged)** · **Phase 24 — Custom Font (v1.16) ✅ (merged)** · **Code-check round 1 (v1.16.1) ✅ (merged)** |
+| **Version** | 1.16.1 in `main` |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `860f8ae` (Phases 1–12 + 14–16 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`, Phase 15 merge `69a9471`, Phase 16 merge `1077140`; Phases 17–24 merged directly to `main`, reaching `ad1c645` (v1.16.0); code-check round 1 merge `860f8ae` (v1.16.1)) |
+| **Code written** | Phases 1–12 + 14–24 + YouTube domains + code-check round 1: all modules + dashboard (11 sections, 110 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + presets / profiles + onboarding + selector health check + popup theme + channel Shorts tab + custom CSS templates + saved themes + export/share + advanced layout editor + player accent color + custom font + 45 code-check fixes + 8 audit docs + release packaging (see "What Has Been Completed") |
+| **Currently working on** | — (code-check round 1 merged; browser check still open) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phases 1–6, 8–12, 14–24 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
+| **Last verified** | 2026-11-10 — `npm test` 264/264 pass on `main` after the code-check round 1 merge, `npm run lint` clean, `npm run format` clean, manifest valid, `npm run package` builds a clean `oneyt-1.16.1.zip` |
 
 ---
 
@@ -981,6 +981,56 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   Phase 24 section of `tests/manual-checklist.md`.
   Phase 24 is code-complete, not browser-verified.
 - **Merged to `main` 2026-11-09** (merge `7c0f22d`, per the standing rule: feature complete → merge to main). Verified on `main` after the merge: `npm test` 220/220 pass, lint + format clean, manifest valid, `npm run package` builds a clean `oneyt-1.16.0.zip`. Follow-up docs commit records the merge in Phases.md + Memory.md.
+
+### 2026-11-10 — Code-check round 1 DONE + MERGED (v1.16.1)
+
+- Read-only code audit of every feature (3 parallel
+  reviewers: shared engines + docs, content modules,
+  dashboard + popup + onboarding + manifest + service
+  worker), then fixes for all 45 confirmed findings.
+  No real-browser testing in this round — code reads +
+  Node suite only (see `docs/CODE_CHECK.md` S1–S6).
+- Headline fixes: dead `sidebar.keepPlayerVisible`
+  toggle deleted (not wired); `deepMerge` null-section
+  + non-boolean nullable repairs; validator gaps (CSS
+  strings/comments, `url()` quote evasion, unknown-key
+  wording); one-token-per `--yt-spec-*` target; repair
+  shadowing; base.css width variables removed; mini-player
+  stale config; focus reset; keyboard repeat; apply-time
+  numeric clamps; compact-wins-over-wide; stale theater
+  waiter; starved health timer; settings-manager
+  deepEqual + echo notify; scoped `waitFor`; feed-page
+  detection; detached-video playback; dashboard batch
+  (theme after state replace, honest save reporting,
+  shortcut blur, colour reset, speed options, theme
+  clamp, delete confirms, independent load failures,
+  byte-size imports, CSS probe validation, onChanged
+  refresh, search tool-box items, AA primary buttons);
+  popup write cache; onboarding theme + error.
+- 3 small optimizations: sidebar wheel re-bind skip,
+  stale `inputsByKey` clear, dead validators include
+  removed. Checked, kept: unstyled class hooks,
+  copy-pasted `isPlainObject`, per-file repair loops,
+  local 4-line theme resolvers, no auto-disable.
+- Docs staleness fixed: README tests badge 121 → 264,
+  `package.json` 1.1.0 → 1.16.1, `Memory.md` table
+  (frozen at Phase 16), Future list (shipped Phase 19
+  items removed).
+- Two honest repairs inside the round: a wiring test
+  asserted no `state = cloneDefaults()` anywhere, but
+  `load()`'s catch legitimately falls back that way —
+  test corrected; a navigation test pinned the
+  compact+wide bug (300px guide with hidden titles) —
+  updated to assert compact wins.
+- Verification: `npm test` **264/264 pass** (220 baseline
+  + 44 new), `npm run lint` clean, `npm run format`
+  clean, manifest valid, `npm run package` builds a clean
+  `oneyt-1.16.1.zip` (runtime files only).
+- **Not verified here (needs Chrome on Shanto's PC):**
+  the S1–S6 suspicions in `docs/CODE_CHECK.md` and all
+  browser checklists (Phases 1–6, 8–12, 14–24). The
+  round is code-complete, not browser-verified.
+- **Merged to `main` 2026-11-10** (merge `860f8ae`, per the standing rule: feature complete → merge to main). Verified on `main` after the merge: `npm test` 264/264 pass, lint + format clean, manifest valid, `npm run package` builds a clean `oneyt-1.16.1.zip`. Follow-up docs commit records the merge in Phases.md + Memory.md.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
