@@ -700,7 +700,7 @@ Phase 13 is disable ambient mode (parked, branch
 `feature/disable-ambient-mode` with no commits). v1.8.0
 assumes 1.7.0 is in `main` — it is.
 
-## Phase 17 — Onboarding (v1.9) ✅ CODE COMPLETE (2026-11-09)
+## Phase 17 — Onboarding (v1.9) ✅ MERGED (2026-11-09)
 
 **Goal:** a new user understands OneYT in under a minute
 instead of opening a dashboard with 106 controls and
@@ -743,7 +743,9 @@ a real install); the checklist covers it plus the
 skip/finish/re-open paths.
 **Status 2026-11-09:** code complete on branch
 `feature/onboarding` (11 part-by-part commits on top of
-`main` `fa95f0b`, pushed after completion).
+`main` `fa95f0b`, pushed after completion) and **merged
+to `main` — merge `d70d0a9`, `main` now `d70d0a9`** (per
+the standing rule: feature complete → merge to main).
 `npm test` 170/170 pass (162 baseline + 8 new), lint +
 format clean, manifest valid, `npm run package` builds
 a clean `oneyt-1.9.0.zip` (runtime files only). **Done:**
