@@ -320,6 +320,52 @@ test('player: hide-count classes cleared off watch and in fullscreen', () => {
   assert.equal(doc._root._classes.size, 0);
 });
 
+test('player: accentColor sets the class + var on watch, in theater too', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { accentColor: '#00aaff' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-accent'), true);
+  assert.equal(doc._root._vars.get('--oneyt-player-accent'), '#00aaff');
+  // Clearing the colour restores YouTube red — no stale var.
+  mod.apply(settingsWith({ player: { accentColor: '' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-accent'), false);
+  assert.equal(doc._root._vars.has('--oneyt-player-accent'), false);
+  // Theater: colour is appearance, not layout, so it stays.
+  const theater = playerSetup({ theater: true });
+  theater.mod.apply(settingsWith({ player: { accentColor: '#00aaff' } }), 'watch');
+  assert.equal(theater.doc._root._classes.has('oneyt-player-accent'), true);
+  assert.equal(theater.doc._root._vars.get('--oneyt-player-accent'), '#00aaff');
+});
+
+test('player: accentColor is cleared off watch pages and in fullscreen', () => {
+  const { doc, mod } = playerSetup();
+  const on = settingsWith({ player: { accentColor: '#00aaff' } });
+  mod.apply(on, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-accent'), true);
+  mod.apply(on, 'home');
+  assert.equal(doc._root._classes.has('oneyt-player-accent'), false);
+  assert.equal(doc._root._vars.has('--oneyt-player-accent'), false);
+  mod.apply(on, 'watch');
+  doc.fullscreenElement = createFakeElement();
+  mod.apply(on, 'watch');
+  assert.equal(doc._root._classes.size, 0);
+  assert.equal(doc._root._vars.has('--oneyt-player-accent'), false);
+});
+
+test('player: invalid accentColor is treated as empty (YouTube red)', () => {
+  const { doc, mod } = playerSetup();
+  for (const bad of ['red', '#fff', '#gggggg', ' #00aaff ', 42]) {
+    mod.apply(settingsWith({ player: { accentColor: bad } }), 'watch');
+    assert.equal(doc._root._classes.has('oneyt-player-accent'), false, String(bad));
+    assert.equal(doc._root._vars.has('--oneyt-player-accent'), false, String(bad));
+  }
+  // A valid colour after a bad one applies, and disable clears it.
+  mod.apply(settingsWith({ player: { accentColor: '#00aaff' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-accent'), true);
+  mod.disable();
+  assert.equal(doc._root._classes.has('oneyt-player-accent'), false);
+  assert.equal(doc._root._vars.has('--oneyt-player-accent'), false);
+});
+
 test('player: defaultTheater clicks once on fresh watch entry, never twice', () => {
   const { flexy, mod, clicks } = theaterSetup();
   mod.apply(settingsWith({ player: { defaultTheater: true } }), 'watch');
