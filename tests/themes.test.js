@@ -68,10 +68,7 @@ test('themes: font stacks — known families map, unknown is undefined', () => {
 });
 
 test('themes: custom font names — valid names resolve, invalid fall back', () => {
-  assert.equal(
-    themes.resolveFontFamily('Georgia', 'Hind Siliguri'),
-    '"Hind Siliguri", sans-serif'
-  );
+  assert.equal(themes.resolveFontFamily('Georgia', 'Hind Siliguri'), '"Hind Siliguri", sans-serif');
   assert.equal(
     themes.resolveFontFamily('', '  Noto Sans Bengali  '),
     '"Noto Sans Bengali", sans-serif'
