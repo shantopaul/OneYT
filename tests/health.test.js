@@ -105,7 +105,7 @@ test('health: summarizeHealth — a missing always-selector is broken, a missing
   assert.equal(calm.features.find((f) => f.feature === 'Mixes shelf').status, 'not-seen');
 });
 
-test('health: module schedules one delayed check per apply, and re-apply resets the timer', async () => {
+test('health: module schedules one delayed check; same-page re-apply keeps the timer', async () => {
   const timers = [];
   let cleared = 0;
   const written = [];
@@ -135,7 +135,14 @@ test('health: module schedules one delayed check per apply, and re-apply resets 
   mod.apply({}, 'watch');
   assert.equal(timers.length, 1);
   assert.equal(timers[0].ms, CHECK_DELAY_MS);
+  // Same page again (resize, slider drag): the pending timer
+  // is kept, not restarted — otherwise continuous re-applies
+  // would starve the check forever.
   mod.apply({}, 'watch');
+  assert.equal(timers.length, 1);
+  assert.equal(cleared, 0);
+  // Navigation to another page reschedules for that page.
+  mod.apply({}, 'home');
   assert.equal(timers.length, 2);
   assert.equal(cleared, 1);
   await timers[1].fn();
@@ -144,9 +151,8 @@ test('health: module schedules one delayed check per apply, and re-apply resets 
   await Promise.resolve();
   assert.equal(written.length, 1);
   const record = written[0]['oneyt.health.v1'];
-  assert.equal(record.watch.checkedAt, 5000);
-  assert.equal(record.watch.results.player, 'ok');
-  assert.equal(record.watch.results.theaterButton, 'missing');
+  assert.equal(record.home.checkedAt, 5000);
+  assert.equal(record.home.results.topicChips, 'missing');
 });
 
 test('health: module skips pages with nothing to check and survives a failed write', async () => {
@@ -200,4 +206,16 @@ test('health: wiring — manifest, index, dashboard section and scripts', () => 
   assert.equal(section.id, 'health');
   assert.equal(section.title, 'Health');
   assert.deepEqual(section.controls, []);
+});
+
+test('health: validateHealthRecord drops unknown page types', () => {
+  const now = Date.now();
+  const clean = health.validateHealthRecord(
+    {
+      watch: { checkedAt: now, results: { player: 'ok' } },
+      nowhere: { checkedAt: now, results: { player: 'ok' } },
+    },
+    now
+  );
+  assert.deepEqual(clean, { watch: { checkedAt: now, results: { player: 'ok' } } });
 });

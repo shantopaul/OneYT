@@ -23,6 +23,16 @@
 
   var CUSTOM_CSS_TAG = 'oneyt-custom-css';
 
+  // Clamp a number to the dashboard control's range (see
+  // layout.js: a hand-edited import bypasses the dashboard
+  // inputs). Non-numbers pass through unchanged.
+  function clampNum(value, min, max) {
+    if (typeof value !== 'number' || !isFinite(value)) return value;
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+  }
+
   function createAppearanceModule(deps) {
     var dom = deps.dom;
     var logger = deps.logger || {
@@ -63,10 +73,11 @@
 
       // Clear every token + spec var first, so switching back to
       // 'default' (or a preset with fewer tokens) never leaves
-      // stale colours behind.
+      // stale colours behind. Not every token maps onto a
+      // --yt-spec-* variable (see YT_SPEC_VARS), so guard.
       for (var key in themes.TOKEN_VARS) {
         removeVar(el, themes.TOKEN_VARS[key]);
-        removeVar(el, themes.YT_SPEC_VARS[key]);
+        if (themes.YT_SPEC_VARS[key]) removeVar(el, themes.YT_SPEC_VARS[key]);
       }
 
       if (Object.keys(vars).length === 0) return;
@@ -94,8 +105,11 @@
 
     function applyRadiusSpacing(el, settings) {
       var app = settings.appearance || {};
-      var radius = typeof app.borderRadius === 'number' ? app.borderRadius : 12;
-      var spacing = typeof app.spacing === 'number' ? app.spacing : 16;
+      // Clamp to the dashboard control ranges (0–32 / 0–64):
+      // a hand-edited import bypasses the dashboard inputs,
+      // and a negative radius is an invalid variable.
+      var radius = typeof app.borderRadius === 'number' ? clampNum(app.borderRadius, 0, 32) : 12;
+      var spacing = typeof app.spacing === 'number' ? clampNum(app.spacing, 0, 64) : 16;
       el.classList.add('oneyt-radius');
       el.classList.add('oneyt-spaced');
       setVar(el, '--oneyt-radius', radius + 'px');
@@ -128,7 +142,7 @@
         if (themes) {
           for (var key in themes.TOKEN_VARS) {
             removeVar(el, themes.TOKEN_VARS[key]);
-            removeVar(el, themes.YT_SPEC_VARS[key]);
+            if (themes.YT_SPEC_VARS[key]) removeVar(el, themes.YT_SPEC_VARS[key]);
           }
         }
         removeVar(el, '--oneyt-radius');

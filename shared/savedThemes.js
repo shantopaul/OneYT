@@ -154,6 +154,17 @@
       if (name.length === 0 || name.length > MAX_SAVED_THEME_NAME_LENGTH) continue;
       var lower = name.toLowerCase();
       if (seen[lower]) continue;
+      // Create/rename reject built-in theme names — repair
+      // must too, or a hand-edited list could shadow one.
+      var builtins = (themesApi && themesApi.THEME_NAMES) || [];
+      var isBuiltin = false;
+      for (var k = 0; k < builtins.length; k++) {
+        if (String(builtins[k]).toLowerCase() === lower) {
+          isBuiltin = true;
+          break;
+        }
+      }
+      if (isBuiltin) continue;
       seen[lower] = true;
       out.push({
         name: name,

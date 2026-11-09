@@ -49,9 +49,12 @@
       if (path === '/watch') return PAGE_TYPES.WATCH;
       if (path === '/results') return PAGE_TYPES.SEARCH;
       if (path === '/playlist') return PAGE_TYPES.PLAYLIST;
-      if (path.indexOf('/shorts/') === 0) return PAGE_TYPES.SHORTS;
+      if (path.indexOf('/shorts/') === 0 || path === '/shorts') return PAGE_TYPES.SHORTS;
       if (path === '/feed/subscriptions') return PAGE_TYPES.SUBSCRIPTIONS;
-      if (path === '/' || path === '/feed/trending' || path.indexOf('/feed/') === 0) {
+      // The /feed/ catch-all used to send history, library and
+      // "you" to HOME, so home-only modules ran on those pages.
+      // Only the feed itself and trending are home.
+      if (path === '/' || path === '/feed/trending') {
         return PAGE_TYPES.HOME;
       }
       if (

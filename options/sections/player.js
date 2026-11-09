@@ -78,6 +78,7 @@
         label: 'Player border',
         description: 'CSS border shorthand, or "none".',
         placeholder: 'none',
+        cssProperty: 'border',
         keywords: ['player', 'border'],
       },
       {
@@ -86,6 +87,7 @@
         label: 'Player shadow',
         description: 'CSS box-shadow, or "none".',
         placeholder: 'none',
+        cssProperty: 'boxShadow',
         keywords: ['player', 'shadow'],
       },
       {
@@ -171,6 +173,7 @@
         label: 'Mini-player shadow',
         description: 'CSS box-shadow, or "none".',
         placeholder: 'none',
+        cssProperty: 'boxShadow',
         keywords: ['mini-player', 'shadow'],
       },
       {

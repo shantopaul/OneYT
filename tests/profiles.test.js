@@ -54,7 +54,6 @@ test('profiles: Cinema preset opens theater on a full-width player', () => {
   assert.equal(next.player.defaultTheater, true);
   assert.equal(next.player.maxWidth, 0);
   assert.equal(next.player.customWidth, 0);
-  assert.equal(next.sidebar.keepPlayerVisible, true);
   assert.equal(next.sidebar.independentScroll, true);
 });
 
@@ -196,4 +195,37 @@ test('profiles: deleteProfile removes by name, case-insensitively', () => {
     ['B']
   );
   assert.equal(profiles.deleteProfile(list, 'Missing', defaults).length, 2);
+});
+
+test('profiles: validateProfiles drops names that shadow built-in presets', () => {
+  const cleaned = profiles.validateProfiles(
+    [
+      { name: 'Focus', createdAt: 1, settings: {} },
+      { name: 'cinema', createdAt: 2, settings: {} },
+      { name: 'My setup', createdAt: 3, settings: {} },
+    ],
+    defaults
+  );
+  assert.deepEqual(
+    cleaned.map((p) => p.name),
+    ['My setup']
+  );
+});
+
+test('profiles: applyProfile keeps the current onboarded flag', () => {
+  const saved = customSettings();
+  saved.ui.onboarded = false;
+  const stored = profiles.createProfile('Mine', saved, [], defaults).profiles;
+  const current = defaults.cloneDefaults();
+  current.ui.onboarded = true;
+  const next = profiles.applyProfile(current, stored[0], defaults);
+  assert.equal(next.ui.onboarded, true);
+  // And the other way: a finished snapshot does not mark an
+  // unfinished setup as done.
+  const current2 = defaults.cloneDefaults();
+  current2.ui.onboarded = false;
+  const saved2 = customSettings();
+  saved2.ui.onboarded = true;
+  const stored2 = profiles.createProfile('Done', saved2, [], defaults).profiles;
+  assert.equal(profiles.applyProfile(current2, stored2[0], defaults).ui.onboarded, false);
 });

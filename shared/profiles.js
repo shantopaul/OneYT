@@ -158,7 +158,6 @@
         },
         sidebar: {
           independentScroll: true,
-          keepPlayerVisible: true,
         },
       },
     },
@@ -234,11 +233,24 @@
   // Apply a custom profile: full replace with its snapshot.
   // A corrupt snapshot never wipes the current settings —
   // it returns them back, unchanged (cloned).
+  // `onboarded` is a "setup finished" flag, not a preference:
+  // a profile saved before onboarding finished must not
+  // un-complete the setup (the welcome page would show
+  // step 1 again on re-open), so the current value is kept.
   function applyProfile(currentSettings, profile, defaultsApi) {
     if (!profile || !isPlainObject(profile.settings)) {
       return defaultsApi.deepClone(currentSettings);
     }
-    return defaultsApi.migrateSettings(profile.settings);
+    var next = defaultsApi.migrateSettings(profile.settings);
+    if (
+      currentSettings &&
+      currentSettings.ui &&
+      typeof currentSettings.ui.onboarded === 'boolean'
+    ) {
+      next.ui = next.ui || {};
+      next.ui.onboarded = currentSettings.ui.onboarded;
+    }
+    return next;
   }
 
   // Repair a stored profiles value into a clean array:
@@ -259,6 +271,16 @@
       if (name.length === 0 || name.length > MAX_PROFILE_NAME_LENGTH) continue;
       var lower = name.toLowerCase();
       if (seen[lower]) continue;
+      // Create/rename reject built-in preset names — repair
+      // must too, or a hand-edited list could shadow one.
+      var isBuiltin = false;
+      for (var k = 0; k < BUILTIN_PRESETS.length; k++) {
+        if (BUILTIN_PRESETS[k].id === lower || BUILTIN_PRESETS[k].name.toLowerCase() === lower) {
+          isBuiltin = true;
+          break;
+        }
+      }
+      if (isBuiltin) continue;
       seen[lower] = true;
       out.push({
         name: name,

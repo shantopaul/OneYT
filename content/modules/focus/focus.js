@@ -65,6 +65,12 @@
       id: 'focus',
       init: function () {},
       apply: function (settings, page) {
+        // AD-07: the per-tab override resets on navigation.
+        // apply() runs on every navigation, so a changed page
+        // type clears the override before the new page is
+        // evaluated — a tab can never get stuck in Focus Mode
+        // after navigating away.
+        if (lastPage !== null && page !== lastPage) tabOverride = null;
         lastSettings = settings;
         lastPage = page;
         if (!settings || !settings.productivity || (page !== 'watch' && page !== 'home')) {

@@ -6,6 +6,7 @@ const { createFakeElement, createFakeDocument, createFakeDom, quietLogger } = re
 const { createSidebarModule } = require('../content/modules/sidebar/sidebar');
 const { createPlayerModule } = require('../content/modules/player/player');
 const { createLayoutModule, shortsWatchUrl } = require('../content/modules/layout/layout');
+const { createNavigationModule } = require('../content/modules/navigation/navigation');
 
 function settingsWith(patch) {
   const s = defaults.cloneDefaults();
@@ -610,4 +611,195 @@ test('all three Phase 2 modules register and run through the manager', () => {
   mm.updateAll(settingsWith(), 'home');
   assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), false);
   mm.destroy();
+});
+
+test('base.css must not define the "0 = default" width variables', () => {
+  // The player/sidebar modules remove the inline variable when
+  // the setting is 0, and their CSS rules fall back to none /
+  // auto. A base value here would silently re-apply (maxWidth 0
+  // used to cap the player at 1280px, customWidth 0 forced the
+  // sidebar to 402px) — the documented promise would be a lie.
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const text = fs.readFileSync(path.join(__dirname, '..', 'content', 'styles', 'base.css'), 'utf8');
+  assert.equal(text.includes('--oneyt-player-max-width:'), false);
+  assert.equal(text.includes('--oneyt-sidebar-width:'), false);
+});
+
+test('player: mini-player config clears when it closes, re-applies on reopen', () => {
+  const doc = createFakeDocument();
+  const flexy = createFakeElement();
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const state = { mini: null };
+  const dom = {
+    query: (key) => {
+      if (key === 'watchFlexy') return flexy;
+      if (key === 'playerContainer') return container;
+      if (key === 'player') return moviePlayer;
+      if (key === 'miniPlayer') return state.mini;
+      return null;
+    },
+  };
+  const mod = createPlayerModule({ dom, logger: quietLogger, document: doc });
+  const settings = settingsWith();
+  settings.player.miniPlayer = {
+    size: 400,
+    position: 'default',
+    borderRadius: 0,
+    shadow: 'none',
+    offsetX: 0,
+    offsetY: 0,
+  };
+  // Opens with size 400.
+  state.mini = createFakeElement();
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
+  assert.equal(doc._root._vars.get('--oneyt-miniplayer-width'), '400px');
+  // Closes: the same settings must not leave stale classes/vars
+  // behind (the old code returned early here, so the reopen
+  // observer saw no change and never re-applied).
+  state.mini = null;
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), false);
+  assert.equal(doc._root._vars.has('--oneyt-miniplayer-width'), false);
+  // Reopens with a new size: the current config applies.
+  state.mini = createFakeElement();
+  settings.player.miniPlayer.size = 300;
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
+  assert.equal(doc._root._vars.get('--oneyt-miniplayer-width'), '300px');
+});
+
+test('layout: numeric values are clamped to the dashboard ranges', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  mod.apply(
+    settingsWith({
+      layout: { watchSpacing: 99999, cardSpacing: 999, thumbnailSize: 9999, homeMaxWidth: 9999 },
+    }),
+    'home'
+  );
+  // homeMaxWidth/cardSpacing/thumbnailSize apply on home.
+  assert.equal(doc._root._vars.get('--oneyt-card-spacing'), '60px');
+  assert.equal(doc._root._vars.get('--oneyt-thumb-width'), '800px');
+  assert.equal(doc._root._vars.get('--oneyt-home-max-width'), '2560px');
+  mod.apply(settingsWith({ layout: { watchSpacing: 99999 } }), 'watch');
+  assert.equal(doc._root._vars.get('--oneyt-watch-spacing'), '200px');
+});
+
+test('navigation: guide width is clamped and compact wins over wide', () => {
+  const doc = createFakeDocument();
+  const mod = createNavigationModule({ document: doc });
+  mod.apply(settingsWith({ navigation: { guideWidth: 999 } }));
+  assert.equal(doc._root._classes.has('oneyt-nav-wide'), true);
+  assert.equal(doc._root._vars.get('--oneyt-guide-width'), '400px');
+  // Compact + wide together used to give a 300px guide with
+  // hidden titles (the wide rule won on equal specificity).
+  mod.apply(settingsWith({ navigation: { compact: true, guideWidth: 300 } }));
+  assert.equal(doc._root._classes.has('oneyt-nav-compact'), true);
+  assert.equal(doc._root._classes.has('oneyt-nav-wide'), false);
+  assert.equal(doc._root._vars.has('--oneyt-guide-width'), false);
+});
+
+test('player: numeric values are clamped to the dashboard ranges', () => {
+  const { doc, mod } = playerSetup();
+  const settings = settingsWith({
+    player: {
+      customWidth: 99999,
+      maxWidth: 99999,
+      borderRadius: -5,
+      spacing: 999,
+      miniPlayer: { size: 9999, borderRadius: 99, offsetX: 999, offsetY: -10 },
+    },
+  });
+  settings.sidebar.playerOffset = 999;
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._vars.get('--oneyt-player-width'), '2000px');
+  assert.equal(doc._root._vars.get('--oneyt-player-max-width'), '2000px');
+  assert.equal(doc._root._vars.get('--oneyt-player-radius'), '0px');
+  assert.equal(doc._root._vars.get('--oneyt-player-spacing'), '100px');
+  assert.equal(doc._root._vars.get('--oneyt-player-offset'), '200px');
+});
+
+test('sidebar: numeric values are clamped, invalid maxHeight falls back', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(
+    settingsWith({
+      sidebar: { customWidth: 9999, scrollbarWidth: 99, maxHeight: 'banana' },
+    }),
+    'watch'
+  );
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-width'), '800px');
+  assert.equal(doc._root._vars.get('--oneyt-scrollbar-width'), '24px');
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), 'calc(100vh - 100px)');
+  mod.apply(settingsWith({ sidebar: { maxHeight: '50vh' } }), 'watch');
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), '50vh');
+});
+
+test("player: a stale theater waiter never clears a newer video's waiter", async () => {
+  const doc = createFakeDocument();
+  const flexy = createFakeElement();
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const state = { btn: null, resolvers: [] };
+  const dom = {
+    query: (key) => {
+      if (key === 'watchFlexy') return flexy;
+      if (key === 'playerContainer') return container;
+      if (key === 'player') return moviePlayer;
+      if (key === 'theaterButton') return state.btn;
+      return null;
+    },
+    waitFor: () =>
+      new Promise((resolve) => {
+        state.resolvers.push(resolve);
+      }),
+  };
+  const loc = { href: 'https://www.youtube.com/watch?v=AAAAAAAAAAA' };
+  const mod = createPlayerModule({ dom, logger: quietLogger, document: doc, location: loc });
+  const settings = settingsWith({ player: { defaultTheater: true } });
+  mod.apply(settings, 'watch'); // waiter 1, video A (button absent)
+  assert.equal(state.resolvers.length, 1);
+  loc.href = 'https://www.youtube.com/watch?v=BBBBBBBBBBB';
+  mod.apply(settings, 'watch'); // waiter 2, video B
+  assert.equal(state.resolvers.length, 2);
+  // Video A's waiter resolves late: it must not clear B's
+  // flag, or the next re-apply would start a third waiter.
+  state.resolvers[0]();
+  await Promise.resolve();
+  await Promise.resolve();
+  mod.apply(settings, 'watch');
+  assert.equal(state.resolvers.length, 2);
+});
+
+test('sidebar: wheel handler is not re-bound when element and sensitivity are unchanged', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  const settings = settingsWith({ sidebar: { scrollSensitivity: 2 } });
+  mod.apply(settings, 'watch');
+  assert.equal((secondary._listeners.wheel || []).length, 1);
+  const first = secondary._listeners.wheel[0];
+  mod.apply(settings, 'watch');
+  assert.equal(secondary._listeners.wheel.length, 1);
+  assert.equal(secondary._listeners.wheel[0], first);
+  // A changed sensitivity re-binds with a new handler.
+  mod.apply(settingsWith({ sidebar: { scrollSensitivity: 3 } }), 'watch');
+  assert.equal(secondary._listeners.wheel.length, 1);
+  assert.notEqual(secondary._listeners.wheel[0], first);
 });

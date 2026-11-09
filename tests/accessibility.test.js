@@ -88,3 +88,29 @@ test('a11y: dashboard and popup controls are labelled', () => {
   assert.ok(popupHtml.includes('for="focus-toggle"'));
   assert.ok(popupHtml.includes('for="theme-select"') || popupHtml.includes('aria-label'));
 });
+
+test('a11y: dark primary buttons use the AA-passing accent, and save errors are red', () => {
+  // White text on the dark --ui-accent #ff0033 is ~3.9:1, so
+  // the dark-scope .btn-primary override must use #e6002e
+  // (4.53) with a #cc0027 hover, in all three pages.
+  assert.ok(themes.contrastRatio('#ffffff', '#e6002e') >= AA, 'white on #e6002e');
+  assert.ok(themes.contrastRatio('#ffffff', '#cc0027') >= AA, 'white on #cc0027');
+  for (const cssPath of [
+    '../options/options.css',
+    '../popup/popup.css',
+    '../onboarding/onboarding.css',
+  ]) {
+    const css = fs.readFileSync(path.join(__dirname, cssPath), 'utf8');
+    assert.ok(
+      css.includes(":root:not([data-theme='light']) .btn-primary"),
+      cssPath + ' needs the dark primary-button override'
+    );
+    assert.ok(css.includes('background: #e6002e;'), cssPath + ' primary must be #e6002e');
+    assert.ok(css.includes('background: #cc0027;'), cssPath + ' primary hover must be #cc0027');
+  }
+  const optionsCss = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  assert.ok(
+    optionsCss.includes('.saved-indicator.error'),
+    'save-failure text must have an error style'
+  );
+});

@@ -32,6 +32,7 @@
         label: 'Sidebar max height',
         description: 'CSS height, e.g. calc(100vh - 100px).',
         placeholder: 'calc(100vh - 100px)',
+        cssProperty: 'maxHeight',
         keywords: ['sidebar', 'height', 'max'],
       },
       {
@@ -68,13 +69,6 @@
         max: 3,
         step: 0.1,
         keywords: ['sidebar', 'scroll', 'sensitivity', 'wheel'],
-      },
-      {
-        key: 'sidebar.keepPlayerVisible',
-        type: 'toggle',
-        label: 'Keep player visible',
-        description: 'Keep the player in view while scrolling recommendations.',
-        keywords: ['sidebar', 'player', 'visible'],
       },
       {
         key: 'sidebar.playerOffset',

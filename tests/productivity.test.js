@@ -273,7 +273,11 @@ test('navigation: hide entries, compact, guide width; disable restores', () => {
   assert.equal(doc._root._classes.has('oneyt-nav-hide-home'), true);
   assert.equal(doc._root._classes.has('oneyt-nav-hide-shorts'), true);
   assert.equal(doc._root._classes.has('oneyt-nav-compact'), true);
-  assert.equal(doc._root._vars.get('--oneyt-guide-width'), '300px');
+  // Compact wins over wide: the old code set the 300px
+  // guide width too, and the wide rule won on equal
+  // specificity — a wide guide with hidden titles.
+  assert.equal(doc._root._classes.has('oneyt-nav-wide'), false);
+  assert.equal(doc._root._vars.has('--oneyt-guide-width'), false);
   mod.apply(settingsWith({ navigation: { guideWidth: 50 } }), 'home');
   assert.equal(doc._root._classes.has('oneyt-nav-wide'), false);
   mod.disable();
@@ -336,4 +340,67 @@ test('phase 4 modules register and run through the manager', () => {
   assert.equal(doc._root._classes.has('oneyt-focus'), true);
   assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
   mm.destroy();
+});
+
+test('focus: per-tab override resets on navigation', () => {
+  const doc = createFakeDocument();
+  const mod = createFocusModule({ logger: quietLogger, document: doc });
+  mod.apply(settingsWith({ productivity: { focusMode: true } }), 'watch');
+  assert.equal(mod.isEffective(), true);
+  mod.toggleTab(); // per-tab off
+  assert.equal(mod.isEffective(), false);
+  assert.equal(doc._root._classes.has('oneyt-focus'), false);
+  // Navigate to home: the override clears and the global
+  // setting rules again.
+  mod.apply(settingsWith({ productivity: { focusMode: true } }), 'home');
+  assert.equal(mod.isEffective(), true);
+  assert.equal(doc._root._classes.has('oneyt-focus'), true);
+  // Back to watch: still the global setting, not the stale
+  // override.
+  mod.apply(settingsWith({ productivity: { focusMode: true } }), 'watch');
+  assert.equal(mod.isEffective(), true);
+  assert.equal(doc._root._classes.has('oneyt-focus'), true);
+});
+
+test('keyboard: held toggle shortcut is swallowed on repeats, action runs once', () => {
+  const win = fakeWindow();
+  const dom = createFakeDom({ video: createFakeElement() });
+  let focusToggled = 0;
+  const s = settingsWith();
+  const mod = keyboardApi.createKeyboardModule({
+    dom,
+    logger: quietLogger,
+    window: win,
+    settingsManager: { get: () => s, set: () => {} },
+    actions: {
+      toggleFocus: () => {
+        focusToggled++;
+      },
+    },
+  });
+  mod.init();
+  mod.apply(s, 'watch');
+  let prevented = 0;
+  let stopped = 0;
+  const repeatEvent = () =>
+    keyEvent('F', {
+      shiftKey: true,
+      repeat: true,
+      preventDefault: () => {
+        prevented++;
+      },
+      stopPropagation: () => {
+        stopped++;
+      },
+    });
+  win.dispatch('keydown', keyEvent('F', { shiftKey: true }));
+  assert.equal(focusToggled, 1);
+  // Holding the shortcut: the action must not re-run, but the
+  // event must still be swallowed so YouTube never sees the
+  // repeats (the old code returned before preventDefault).
+  win.dispatch('keydown', repeatEvent());
+  win.dispatch('keydown', repeatEvent());
+  assert.equal(focusToggled, 1);
+  assert.equal(prevented, 2);
+  assert.equal(stopped, 2);
 });

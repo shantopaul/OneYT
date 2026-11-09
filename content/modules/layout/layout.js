@@ -54,6 +54,18 @@
     return '/watch?v=' + m[1];
   }
 
+  // Clamp a number to the dashboard control's range. Non-numbers
+  // pass through unchanged (the caller's type check decides what
+  // happens to them). A hand-edited import bypasses the dashboard
+  // inputs, so the content script is the last line of defence
+  // against e.g. a 99999px gap.
+  function clampNum(value, min, max) {
+    if (typeof value !== 'number' || !isFinite(value)) return value;
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+  }
+
   function createLayoutModule(deps) {
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
@@ -121,9 +133,10 @@
 
     function applyWatch(layout) {
       setClass('oneyt-hide-comments', layout.hideComments === true);
-      var spaced = layout.watchSpacing && layout.watchSpacing > 0;
+      var spacing = clampNum(layout.watchSpacing, 0, 200);
+      var spaced = spacing && spacing > 0;
       setClass('oneyt-watch-spaced', !!spaced);
-      setVar('--oneyt-watch-spacing', spaced ? layout.watchSpacing + 'px' : null);
+      setVar('--oneyt-watch-spacing', spaced ? spacing + 'px' : null);
       setClass('oneyt-hide-shorts-watch', layout.hideShortsWatch === true);
     }
 
@@ -131,15 +144,18 @@
       var columns = layout.homeColumns && layout.homeColumns >= 1 && layout.homeColumns <= 12;
       setClass('oneyt-home-columns', !!columns);
       setVar('--oneyt-home-columns', columns ? String(layout.homeColumns) : null);
-      var spaced = layout.cardSpacing && layout.cardSpacing > 0;
+      var gap = clampNum(layout.cardSpacing, 0, 60);
+      var spaced = gap && gap > 0;
       setClass('oneyt-card-spaced', !!spaced);
-      setVar('--oneyt-card-spacing', spaced ? layout.cardSpacing + 'px' : null);
-      var sized = layout.thumbnailSize && layout.thumbnailSize >= 120;
+      setVar('--oneyt-card-spacing', spaced ? gap + 'px' : null);
+      var thumb = clampNum(layout.thumbnailSize, 0, 800);
+      var sized = thumb && thumb >= 120;
       setClass('oneyt-thumb-sized', !!sized);
-      setVar('--oneyt-thumb-width', sized ? layout.thumbnailSize + 'px' : null);
-      var capped = layout.homeMaxWidth && layout.homeMaxWidth > 0;
+      setVar('--oneyt-thumb-width', sized ? thumb + 'px' : null);
+      var cap = clampNum(layout.homeMaxWidth, 0, 2560);
+      var capped = cap && cap > 0;
       setClass('oneyt-home-max-width', !!capped);
-      setVar('--oneyt-home-max-width', capped ? layout.homeMaxWidth + 'px' : null);
+      setVar('--oneyt-home-max-width', capped ? cap + 'px' : null);
       setClass('oneyt-hide-shorts-home', layout.hideShortsHome === true);
       setClass('oneyt-hide-topic-chips', layout.hideTopicChips === true);
       setClass('oneyt-hide-live-shelf', layout.hideLiveShelf === true);

@@ -140,8 +140,14 @@
 
     // Click a YouTube toggle button only when its aria-pressed
     // state is readable and differs from what the user wants.
+    // A non-boolean desired value (e.g. "yes" from a
+    // hand-edited import that predates the migration
+    // repair) must never click: (pressed === 'true') !==
+    // "yes" is always true, so without this guard the
+    // module would flip the toggle on every apply.
     function applyToggle(key, desired) {
       if (desired === null || desired === undefined) return;
+      if (typeof desired !== 'boolean') return;
       var btn = dom ? dom.query(key) : null;
       if (!btn || typeof btn.getAttribute !== 'function') return;
       var pressed = btn.getAttribute('aria-pressed');
@@ -184,8 +190,12 @@
       if (!el) return;
       var size = (settings.playback || {}).captionFontSize;
       if (typeof size === 'number' && size > 0) {
+        // Clamp to the dashboard control's max (200%): a
+        // hand-edited import bypasses the dashboard inputs,
+        // and 10000% captions would fill the screen.
+        var clamped = size > 200 ? 200 : size;
         el.classList.add('oneyt-caption-sized');
-        el.style.setProperty('--oneyt-caption-font-size', size + '%');
+        el.style.setProperty('--oneyt-caption-font-size', clamped + '%');
       } else {
         el.classList.remove('oneyt-caption-sized');
         el.style.removeProperty('--oneyt-caption-font-size');
@@ -259,6 +269,15 @@
           return;
         }
         applyCaptionSize(settings);
+        if (video && typeof video.isConnected === 'boolean' && !video.isConnected) {
+          // YouTube swapped the <video> element (SPA navigation):
+          // drop the stale reference so the waitFor path below
+          // finds the new element instead of applying prefs to
+          // a detached one forever.
+          detachListeners(video);
+          video = null;
+          lastApplied = '';
+        }
         if (!dom || video) {
           if (video) {
             loadRemembered().then(function () {

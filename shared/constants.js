@@ -13,7 +13,6 @@
 
   var CONSTANTS = {
     EXTENSION_NAME: 'OneYT',
-    SCHEMA_VERSION: 1,
 
     // Page types returned by PageDetector.detect()
     PAGE_TYPES: {

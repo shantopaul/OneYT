@@ -214,3 +214,18 @@ test('savedThemes: import rejects bad files', () => {
   );
   assert.equal(dup.error, 'A saved theme named "dup" already exists.');
 });
+
+test('savedThemes: validateSavedThemes drops names that shadow built-in themes', () => {
+  const repaired = savedThemes.validateSavedThemes(
+    [
+      { name: 'dark', createdAt: 1, theme: 'dark', colors: {} },
+      { name: 'Dark', createdAt: 2, theme: 'light', colors: {} },
+      { name: 'My night', createdAt: 3, theme: 'midnight', colors: {} },
+    ],
+    themes
+  );
+  assert.deepEqual(
+    repaired.map((t) => t.name),
+    ['My night']
+  );
+});

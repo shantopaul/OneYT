@@ -84,3 +84,19 @@ test('themes: custom font names — valid names resolve, invalid fall back', () 
   assert.equal(themes.isValidCustomFontName('x'.repeat(65)), false);
   assert.equal(themes.isValidCustomFontName(42), false);
 });
+
+test('themes: each --yt-spec-* target has exactly one owning token', () => {
+  const seen = {};
+  for (const token of Object.keys(themes.YT_SPEC_VARS)) {
+    const target = themes.YT_SPEC_VARS[token];
+    assert.equal(seen[target], undefined, token + ' collides on ' + target);
+    seen[target] = token;
+  }
+  // surface owns the raised background, surfaceHover the
+  // 10-percent layer — card / buttonHover keep only their
+  // own --oneyt-* variables.
+  assert.equal(themes.YT_SPEC_VARS.surface, '--yt-spec-raised-background');
+  assert.equal(themes.YT_SPEC_VARS.surfaceHover, '--yt-spec-10-percent-layer');
+  assert.equal(themes.YT_SPEC_VARS.card, undefined);
+  assert.equal(themes.YT_SPEC_VARS.buttonHover, undefined);
+});

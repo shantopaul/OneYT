@@ -38,6 +38,7 @@
     var waitPending = false;
     var wheelEl = null;
     var wheelHandler = null;
+    var wheelSensitivity = null;
 
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -70,6 +71,7 @@
       }
       wheelEl = null;
       wheelHandler = null;
+      wheelSensitivity = null;
     }
 
     function clampSensitivity(value) {
@@ -83,10 +85,52 @@
       return value;
     }
 
+    // Clamp a number to the dashboard control's range (see
+    // layout.js: a hand-edited import bypasses the dashboard
+    // inputs). Non-numbers pass through unchanged.
+    function clampNum(value, min, max) {
+      if (typeof value !== 'number' || !isFinite(value)) return value;
+      if (value < min) return min;
+      if (value > max) return max;
+      return value;
+    }
+
+    // Validate a max-height value: a plain CSS length, 'none' /
+    // 'auto', or a calc() built only from numbers, units and
+    // arithmetic. Anything else (e.g. "banana" from a
+    // hand-edited import) falls back to the default — an
+    // invalid max-height would leave the sidebar unclamped
+    // and break independent scroll.
+    function validMaxHeight(value) {
+      if (typeof value !== 'string') return null;
+      var v = value.trim();
+      if (v === 'none' || v === 'auto') return v;
+      if (/^\d+(\.\d+)?(px|vh|vw|%|em|rem|vmin|vmax)$/.test(v)) return v;
+      if (v.indexOf('calc(') === 0 && v.charAt(v.length - 1) === ')') {
+        var inner = v.slice(5, -1);
+        if (!/^[\d\s.+\-*\/\%a-z()]+$/.test(inner)) return null;
+        var depth = 0;
+        for (var i = 0; i < inner.length; i++) {
+          if (inner[i] === '(') depth++;
+          if (inner[i] === ')') {
+            depth--;
+            if (depth < 0) return null;
+          }
+        }
+        if (depth === 0) return v;
+      }
+      return null;
+    }
+
     function bindWheel(el, sensitivity) {
-      unbindWheel();
-      if (!el || typeof el.addEventListener !== 'function') return;
       sensitivity = clampSensitivity(sensitivity);
+      // Already bound to this element at this sensitivity:
+      // re-binding on every apply churned listeners for
+      // nothing (and each apply re-attached the same one).
+      if (wheelEl === el && wheelSensitivity === sensitivity) return;
+      unbindWheel();
+      wheelSensitivity = null;
+      if (!el || typeof el.addEventListener !== 'function') return;
       if (sensitivity === 1) return; // native scrolling is fine
       wheelHandler = function (event) {
         try {
@@ -98,6 +142,7 @@
       };
       el.addEventListener('wheel', wheelHandler, { passive: false });
       wheelEl = el;
+      wheelSensitivity = sensitivity;
     }
 
     function cleanup() {
@@ -123,14 +168,20 @@
       var scrollOn = isWatch && sb.independentScroll === true && !fullscreen;
 
       if (isWatch && !fullscreen) {
-        setVar('--oneyt-sidebar-max-height', sb.maxHeight || 'calc(100vh - 100px)');
-        if (sb.customWidth && sb.customWidth > 0) {
-          setVar('--oneyt-sidebar-width', sb.customWidth + 'px');
+        var height = validMaxHeight(sb.maxHeight);
+        if (!height && sb.maxHeight) {
+          logger.debug('sidebar: invalid maxHeight "' + sb.maxHeight + '" ignored');
+        }
+        setVar('--oneyt-sidebar-max-height', height || 'calc(100vh - 100px)');
+        var width = clampNum(sb.customWidth, 0, 800);
+        if (width && width > 0) {
+          setVar('--oneyt-sidebar-width', width + 'px');
         } else {
           setVar('--oneyt-sidebar-width', null);
         }
-        if (sb.scrollbarWidth && sb.scrollbarWidth > 0) {
-          setVar('--oneyt-scrollbar-width', sb.scrollbarWidth + 'px');
+        var barWidth = clampNum(sb.scrollbarWidth, 0, 24);
+        if (barWidth && barWidth > 0) {
+          setVar('--oneyt-scrollbar-width', barWidth + 'px');
         } else {
           setVar('--oneyt-scrollbar-width', null);
         }

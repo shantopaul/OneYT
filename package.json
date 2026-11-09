@@ -13,5 +13,5 @@
     "package": "bash scripts/package-extension.sh",
     "test": "node --test tests/*.test.js"
   },
-  "version": "1.1.0"
+  "version": "1.16.1"
 }

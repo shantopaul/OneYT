@@ -6,10 +6,10 @@
 
 **Your YouTube. Your Layout. Your Rules.**
 
-[![Version](https://img.shields.io/badge/version-1.16.0-FF0033)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.16.1-FF0033)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)](https://developer.chrome.com/docs/extensions/mv3/intro/)
-[![Tests](https://img.shields.io/badge/tests-121%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-264%20passing-brightgreen)](tests/)
 [![Privacy](https://img.shields.io/badge/privacy-no%20data%20collected-brightgreen)](docs/PRIVACY.md)
 [![Vanilla JS](https://img.shields.io/badge/vanilla-JS-yellow)](Architecture.md)
 

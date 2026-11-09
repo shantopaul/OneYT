@@ -284,9 +284,15 @@
         if (seen[id]) continue; // duplicate: first binding wins
         seen[id] = true;
         if (eventMatches(parsed, event)) {
-          if (event.repeat && TOGGLE_ACTIONS[action]) return;
+          // Swallow the event first, even on repeats: the
+          // old code returned before preventDefault, so
+          // holding a toggle shortcut let YouTube see the
+          // repeats — and toggle fullscreen while the user
+          // held Shift+F. Only the ACTION is skipped on
+          // repeats.
           if (typeof event.preventDefault === 'function') event.preventDefault();
           if (typeof event.stopPropagation === 'function') event.stopPropagation();
+          if (event.repeat && TOGGLE_ACTIONS[action]) return;
           runAction(action);
           return;
         }

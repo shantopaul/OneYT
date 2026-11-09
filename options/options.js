@@ -373,13 +373,28 @@
     }
 
     function getDefault(key) {
-      return getPath(defaultsApi.DEFAULT_SETTINGS, key);
+      var value = getPath(defaultsApi.DEFAULT_SETTINGS, key);
+      // appearance.colors.* has no per-colour default (the
+      // defaults object is {}); a per-setting Reset stored
+      // undefined and the button title showed
+      // 'Restore default: —'. Empty means "no override",
+      // which the colour control already renders as empty.
+      if (value === undefined && key.indexOf('appearance.colors.') === 0) return '';
+      return value;
     }
 
     function markSaved() {
-      if (savedEl) savedEl.textContent = 'Saved — live on YouTube tabs';
+      if (savedEl) {
+        savedEl.textContent = 'Saved — live on YouTube tabs';
+        savedEl.classList.remove('error');
+      }
     }
 
+    // Resolves true on a successful write, false on failure.
+    // Callers that claim success (import applied, preset
+    // applied) must gate their notice on the boolean — the
+    // old code resolved either way, so a failed write still
+    // showed a success message.
     function saveNow() {
       if (saveTimer) {
         clearTimeout(saveTimer);
@@ -387,15 +402,33 @@
       }
       return storage
         .set({ [STORAGE_KEY]: state })
-        .then(markSaved)
+        .then(function () {
+          markSaved();
+          return true;
+        })
         .catch(function () {
-          if (savedEl) savedEl.textContent = 'Save failed — try again';
+          if (savedEl) {
+            savedEl.textContent = 'Save failed — try again';
+            savedEl.classList.add('error');
+          }
+          return false;
         });
     }
 
     function saveSoon(delay) {
       if (saveTimer) clearTimeout(saveTimer);
       saveTimer = setTimeout(saveNow, delay || 150);
+    }
+
+    // State-replacing paths (import, reset all, preset/profile
+    // apply, per-section reset) all go through here so the
+    // dashboard theme follows the new state: a profile that
+    // sets ui.dashboardTheme to 'light' used to leave the
+    // dashboard on the old theme until reload.
+    function replaceState(next) {
+      state = next;
+      applyDashboardTheme();
+      return saveNow();
     }
 
     function setValue(key, value, delay) {
@@ -485,7 +518,26 @@
       return {
         node: input,
         set: function (value) {
-          input.value = settingToSelect(control.source, value);
+          if (control.source === 'speedPresets') {
+            // The option list is built from the current
+            // presets: editing the preset list must refresh
+            // it, or the default-speed select keeps showing
+            // speeds that no longer exist.
+            input.textContent = '';
+            resolveSelectOptions(control.source, state, apis).forEach(function (opt) {
+              input.appendChild(el(doc, 'option', { value: String(opt.value), text: opt.label }));
+            });
+          }
+          var v = value;
+          if (control.source === 'themes') {
+            // An unknown stored theme (hand-edited import)
+            // used to leave the select blank: fall back to
+            // 'default' (appearance rendering already falls
+            // back the same way).
+            var names = (apis.themes && apis.themes.THEME_NAMES) || ['default'];
+            if (names.indexOf(String(value)) === -1) v = 'default';
+          }
+          input.value = settingToSelect(control.source, v);
         },
         bind: function () {
           input.addEventListener('change', function () {
@@ -559,9 +611,27 @@
         set: function (value) {
           input.value = value === undefined || value === null ? '' : String(value);
         },
-        bind: function () {
+        bind: function (row) {
           input.addEventListener('change', function () {
-            setValue(control.key, input.value, 0);
+            var value = input.value;
+            if (control.cssProperty) {
+              // Probe-validate free-text CSS against a dummy
+              // element: the browser's CSSOM rejects invalid
+              // values by leaving the property empty. An
+              // invalid value is warned about and reverted
+              // instead of being stored (the content side
+              // already drops it, but the dashboard used to
+              // save it silently).
+              var probe = doc.createElement('div');
+              probe.style[control.cssProperty] = value;
+              if (value.trim() !== '' && probe.style[control.cssProperty] === '') {
+                showWarning(row, 'Not a valid CSS ' + control.cssProperty + ' value.');
+                input.value = getPath(state, control.key) || '';
+                return;
+              }
+              showWarning(row, '');
+            }
+            setValue(control.key, value, 0);
           });
         },
       };
@@ -755,6 +825,12 @@
           input.addEventListener('focus', function () {
             input.value = '';
           });
+          input.addEventListener('blur', function () {
+            // Focus without capturing (keyboard tab-through)
+            // blanked the field with no restore: put the
+            // stored shortcut back.
+            if (!capturing) input.value = getPath(state, control.key) || '';
+          });
           input.addEventListener('click', function () {
             if (capturing) return;
             capturing = true;
@@ -882,9 +958,12 @@
         applyBtn.style.display = 'none';
         pendingImport = null;
         var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
-        if (text.length > maxBytes) {
+        // text.length counts UTF-16 units, not bytes: a file
+        // of 200k emoji is ~400k bytes. Measure real bytes.
+        var byteLength = utf8ByteLength(text);
+        if (byteLength > maxBytes) {
           importMsg.textContent =
-            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+            'Import is too large (' + byteLength + ' bytes, max ' + maxBytes + ' bytes).';
           importMsg.style.display = 'block';
           return;
         }
@@ -966,11 +1045,12 @@
       });
       applyBtn.addEventListener('click', function () {
         if (!pendingImport) return;
-        state = defaultsApi.deepClone(pendingImport);
-        saveNow().then(function () {
+        replaceState(defaultsApi.deepClone(pendingImport)).then(function (saved) {
           renderSection(currentSection);
-          importMsg.textContent = 'Import applied.';
-          importMsg.style.display = 'block';
+          if (saved) {
+            importMsg.textContent = 'Import applied.';
+            importMsg.style.display = 'block';
+          }
         });
       });
       importBox.appendChild(exportBtn);
@@ -997,8 +1077,7 @@
       });
       resetAllBtn.addEventListener('click', function () {
         if (!window.confirm('Reset ALL OneYT settings to defaults?')) return;
-        state = defaultsApi.cloneDefaults();
-        saveNow().then(function () {
+        replaceState(defaultsApi.cloneDefaults()).then(function () {
           renderSection(currentSection);
         });
       });
@@ -1066,12 +1145,13 @@
           text: 'Apply ' + preset.name,
         });
         applyBtn.addEventListener('click', function () {
-          state = profilesApi.applyPreset(state, preset.id, defaultsApi);
-          saveNow().then(function () {
-            refreshValues();
-            profilesNotice = 'Applied preset "' + preset.name + '".';
-            renderSection(currentSection);
-          });
+          replaceState(profilesApi.applyPreset(state, preset.id, defaultsApi)).then(
+            function (saved) {
+              refreshValues();
+              if (saved) profilesNotice = 'Applied preset "' + preset.name + '".';
+              renderSection(currentSection);
+            }
+          );
         });
         row.appendChild(applyBtn);
         presetBox.appendChild(row);
@@ -1143,13 +1223,16 @@
           text: 'Apply',
         });
         applyBtn.addEventListener('click', function () {
-          state = profilesApi.applyProfile(state, profile, defaultsApi);
-          saveNow().then(function () {
-            refreshValues();
-            profilesNotice =
-              'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
-            renderSection(currentSection);
-          });
+          replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(
+            function (saved) {
+              refreshValues();
+              if (saved) {
+                profilesNotice =
+                  'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+              }
+              renderSection(currentSection);
+            }
+          );
         });
         var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
         renameBtn.addEventListener('click', function () {
@@ -1198,6 +1281,7 @@
           text: 'Delete',
         });
         deleteBtn.addEventListener('click', function () {
+          if (!window.confirm('Delete profile "' + profile.name + '"?')) return;
           profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
           saveProfiles().then(function () {
             profilesNotice = 'Deleted profile "' + profile.name + '".';
@@ -1456,6 +1540,7 @@
           text: 'Delete',
         });
         deleteBtn.addEventListener('click', function () {
+          if (!window.confirm('Delete theme "' + savedTheme.name + '"?')) return;
           savedThemes = savedThemesApi.deleteSavedTheme(savedThemes, savedTheme.name, themesApi);
           saveSavedThemes().then(function () {
             savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
@@ -1499,9 +1584,12 @@
         addBtn.style.display = 'none';
         pendingTheme = null;
         var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
-        if (text.length > maxBytes) {
+        // text.length counts UTF-16 units, not bytes: measure
+        // real bytes (see the settings import above).
+        var byteLength = utf8ByteLength(text);
+        if (byteLength > maxBytes) {
           importMsg.textContent =
-            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+            'Import is too large (' + byteLength + ' bytes, max ' + maxBytes + ' bytes).';
           importMsg.style.display = 'block';
           return;
         }
@@ -1577,6 +1665,10 @@
       var section = sectionById(sectionId);
       if (!section) return;
       currentSection = sectionId;
+      // Drop the old inputs: renderControlRow rebuilds them
+      // below, and a stale entry would point refreshValues
+      // at a detached node.
+      inputsByKey = {};
       navEl.querySelectorAll('.nav-item').forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
       });
@@ -1593,10 +1685,11 @@
           text: 'Reset this section',
         });
         resetSectionBtn.addEventListener('click', function () {
+          var next = defaultsApi.deepClone(state);
           section.controls.forEach(function (control) {
-            setPath(state, control.key, defaultsApi.deepClone(getDefault(control.key)));
+            setPath(next, control.key, defaultsApi.deepClone(getDefault(control.key)));
           });
-          saveNow().then(function () {
+          replaceState(next).then(function () {
             renderSection(sectionId);
           });
         });
@@ -1793,6 +1886,48 @@
       });
     }
 
+    // Tool-box items have no control row, so they are not in
+    // buildSearchIndex's static section list. They are
+    // appended at search time (profiles and saved themes are
+    // dynamic): activating one switches to its section, with
+    // no row to scroll to.
+    function dynamicSearchEntries() {
+      var entries = [];
+      var add = function (sectionId, sectionTitle, label, description, keywords) {
+        entries.push({
+          key: '',
+          sectionId: sectionId,
+          sectionTitle: sectionTitle,
+          label: label,
+          description: description,
+          haystack: [sectionTitle, label, description, keywords].join(' ').toLowerCase(),
+        });
+      };
+      if (cssTemplatesApi && cssTemplatesApi.CSS_TEMPLATES) {
+        cssTemplatesApi.CSS_TEMPLATES.forEach(function (t) {
+          add(
+            'appearance',
+            'Appearance',
+            'CSS template: ' + t.name,
+            t.description || '',
+            'css template'
+          );
+        });
+      }
+      if (layoutPresetsApi && layoutPresetsApi.LAYOUT_PRESETS) {
+        layoutPresetsApi.LAYOUT_PRESETS.forEach(function (p) {
+          add('layout', 'Layout', 'Layout preset: ' + p.name, p.description || '', 'layout preset');
+        });
+      }
+      profiles.forEach(function (profile) {
+        add('profiles', 'Profiles', 'Profile: ' + profile.name, 'Saved profile', 'profile');
+      });
+      savedThemes.forEach(function (theme) {
+        add('appearance', 'Appearance', 'Saved theme: ' + theme.name, 'Saved theme', 'theme');
+      });
+      return entries;
+    }
+
     function bindSearch() {
       if (!searchEl || !resultsEl) return;
       var MAX_RESULTS = 8;
@@ -1841,7 +1976,7 @@
           .toLowerCase()
           .split(/\s+/)
           .filter(Boolean);
-        currentResults = searchSettings(searchIndex, query);
+        currentResults = searchSettings(searchIndex.concat(dynamicSearchEntries()), query);
         resultItems = [];
         activeIndex = -1;
         resultsEl.textContent = '';
@@ -1927,11 +2062,23 @@
     }
 
     function load() {
+      // Each read fails independently: one failing get used
+      // to reset ALL state (settings, profiles, health,
+      // themes) to defaults. The migrate/validate functions
+      // already treat undefined as "use defaults".
       return Promise.all([
-        storage.get(STORAGE_KEY),
-        storage.get(PROFILES_KEY),
-        storage.get(HEALTH_KEY),
-        storage.get(SAVED_THEMES_KEY),
+        storage.get(STORAGE_KEY).catch(function () {
+          return undefined;
+        }),
+        storage.get(PROFILES_KEY).catch(function () {
+          return undefined;
+        }),
+        storage.get(HEALTH_KEY).catch(function () {
+          return undefined;
+        }),
+        storage.get(SAVED_THEMES_KEY).catch(function () {
+          return undefined;
+        }),
       ])
         .then(function (results) {
           state = defaultsApi.migrateSettings(results[0]);
@@ -2001,6 +2148,30 @@
             if (changes && changes[HEALTH_KEY]) {
               refreshHealth();
             }
+            // Profiles and saved themes can change from
+            // another dashboard tab: re-read them and
+            // re-render the open section if it shows them.
+            // The handler used to ignore both keys, so an
+            // open Profiles/Appearance section went stale.
+            if (changes && changes[PROFILES_KEY] && changes[PROFILES_KEY].newValue !== undefined) {
+              profiles = profilesApi
+                ? profilesApi.validateProfiles(changes[PROFILES_KEY].newValue, defaultsApi)
+                : [];
+              if (currentSection === 'profiles') renderSection('profiles');
+            }
+            if (
+              changes &&
+              changes[SAVED_THEMES_KEY] &&
+              changes[SAVED_THEMES_KEY].newValue !== undefined
+            ) {
+              savedThemes = savedThemesApi
+                ? savedThemesApi.validateSavedThemes(
+                    changes[SAVED_THEMES_KEY].newValue,
+                    apis.themes
+                  )
+                : [];
+              if (currentSection === 'appearance') renderSection('appearance');
+            }
             var change = changes && changes[STORAGE_KEY];
             if (!change || !change.newValue) return;
             var next = defaultsApi.migrateSettings(change.newValue);
@@ -2008,6 +2179,11 @@
             state = next;
             applyDashboardTheme();
             refreshValues();
+            // The layout preview is drawn in renderSection,
+            // not in refreshValues: re-render the Layout
+            // section so an external change visibly updates
+            // the preview instead of leaving stale numbers.
+            if (currentSection === 'layout') renderSection('layout');
           });
         }
       });
@@ -2020,6 +2196,17 @@
         return state;
       },
     };
+  }
+
+  // Byte length of a string (UTF-8): text.length counts
+  // UTF-16 units, so a file of 200k emoji is ~400k bytes.
+  // globalThis.TextEncoder keeps ESLint's no-undef happy
+  // (TextEncoder is not in its globals list).
+  function utf8ByteLength(text) {
+    if (typeof globalThis !== 'undefined' && typeof globalThis.TextEncoder === 'function') {
+      return new globalThis.TextEncoder().encode(text).length;
+    }
+    return String(text).length;
   }
 
   // Clamps numeric settings to the min/max of the matching

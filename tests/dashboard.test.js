@@ -302,3 +302,104 @@ test('dashboard: manifest declares the options page and every script exists', ()
     assert.ok(html.includes('id="' + id + '"'), 'missing id: ' + id);
   });
 });
+
+test('dashboard: state-replacing actions go through replaceState (theme follows)', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('function replaceState(next)'), 'replaceState helper exists');
+  assert.ok(src.includes('replaceState(defaultsApi.cloneDefaults())'), 'reset all uses it');
+  assert.ok(src.includes('replaceState(defaultsApi.deepClone(pendingImport))'), 'import uses it');
+  assert.ok(src.includes('replaceState(profilesApi.applyPreset('), 'preset apply uses it');
+  assert.ok(src.includes('replaceState(profilesApi.applyProfile('), 'profile apply uses it');
+  // load()'s catch legitimately falls back to cloneDefaults;
+  // the reset-all path must not assign state directly.
+  assert.ok(
+    !src.includes('state = defaultsApi.deepClone(pendingImport);'),
+    'no direct import bypass'
+  );
+  assert.ok(!src.includes('state = profilesApi.applyPreset('), 'no direct preset bypass');
+  assert.ok(!src.includes('state = profilesApi.applyProfile('), 'no direct profile bypass');
+  // saveNow resolves a boolean so success notices are gated on a real write.
+  assert.ok(src.includes('return true;'), 'saveNow resolves true on success');
+  assert.ok(src.includes('return false;'), 'saveNow resolves false on failure');
+  assert.ok(src.includes('.then(function (saved)'), 'callers receive the boolean');
+});
+
+test('dashboard: control fixes — shortcut blur restore, colour reset, speed options, theme clamp', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  // B3: blur restores the stored shortcut when not capturing.
+  assert.ok(src.includes("input.addEventListener('blur', function () {"));
+  assert.ok(src.includes("if (!capturing) input.value = getPath(state, control.key) || '';"));
+  // B5: getDefault returns '' for appearance.colors.* (defaults are {}).
+  assert.ok(src.includes("key.indexOf('appearance.colors.') === 0"));
+  // B4: speedPresets options are rebuilt in set().
+  assert.ok(src.includes("if (control.source === 'speedPresets')"));
+  // B7: unknown theme falls back to 'default' in makeSelect set().
+  assert.ok(src.includes("if (control.source === 'themes')"));
+  assert.ok(src.includes("if (names.indexOf(String(value)) === -1) v = 'default';"));
+});
+
+test('dashboard: deletes confirm, loads fail independently, import size is bytes', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  // B10: profile and saved-theme deletes confirm first, like reset-all.
+  assert.ok(src.includes('Delete profile "'), 'profile delete confirms');
+  assert.ok(src.includes('Delete theme "'), 'saved-theme delete confirms');
+  // B11: each storage read in load() has its own catch.
+  assert.ok(
+    src.includes('storage.get(STORAGE_KEY).catch(function () {'),
+    'settings read fails independently'
+  );
+  assert.ok(
+    src.includes('storage.get(PROFILES_KEY).catch(function () {'),
+    'profiles read fails independently'
+  );
+  assert.ok(
+    src.includes('storage.get(HEALTH_KEY).catch(function () {'),
+    'health read fails independently'
+  );
+  assert.ok(
+    src.includes('storage.get(SAVED_THEMES_KEY).catch(function () {'),
+    'themes read fails independently'
+  );
+  // B13: import size is measured in bytes, not UTF-16 units.
+  assert.ok(src.includes('utf8ByteLength(text)'), 'byte length measured via helper');
+  assert.ok(src.includes('new globalThis.TextEncoder().encode(text).length'), 'UTF-8 encoder used');
+  assert.ok(!src.includes('text.length > maxBytes'), 'no UTF-16 length check remains');
+  assert.ok(src.includes("' bytes, max '"), 'message reports bytes');
+});
+
+test('dashboard: onChanged refreshes profiles, themes and the layout preview', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('changes[PROFILES_KEY]'), 'profiles key handled in onChanged');
+  assert.ok(
+    src.includes("if (currentSection === 'profiles') renderSection('profiles');"),
+    'open Profiles section re-renders'
+  );
+  assert.ok(src.includes('changes[SAVED_THEMES_KEY]'), 'saved-themes key handled in onChanged');
+  assert.ok(
+    src.includes("if (currentSection === 'appearance') renderSection('appearance');"),
+    'open Appearance section re-renders'
+  );
+  assert.ok(
+    src.includes("if (currentSection === 'layout') renderSection('layout');"),
+    'open Layout section re-renders so the preview updates'
+  );
+});
+
+test('dashboard: free-text CSS controls carry a cssProperty for probe validation', () => {
+  const player = require('../options/sections/player');
+  const sidebar = require('../options/sections/sidebar');
+  const byKey = {};
+  player.controls.concat(sidebar.controls).forEach(function (c) {
+    byKey[c.key] = c;
+  });
+  assert.equal(byKey['player.border'].cssProperty, 'border');
+  assert.equal(byKey['player.shadow'].cssProperty, 'boxShadow');
+  assert.equal(byKey['player.miniPlayer.shadow'].cssProperty, 'boxShadow');
+  assert.equal(byKey['sidebar.maxHeight'].cssProperty, 'maxHeight');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('probe.style[control.cssProperty] = value'), 'probe assignment exists');
+  assert.ok(
+    src.includes("showWarning(row, 'Not a valid CSS ' + control.cssProperty + ' value.');"),
+    'invalid CSS warns and reverts'
+  );
+});

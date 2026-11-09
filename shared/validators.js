@@ -8,7 +8,9 @@
  *   Returns { valid, errors[], warnings[], cleaned }.
  *   - valid=false when the top level is not a plain object, or a
  *     known key has the wrong type. Nothing is applied then.
- *   - Unknown keys are dropped from `cleaned` with a warning.
+ *   - Unknown keys are PRESERVED in `cleaned` (forward-compat,
+ *     see the deepMerge rule in shared/defaults.js) with a
+ *     warning — they are not dropped or ignored.
  *   - Known keys with wrong types are dropped with an error and
  *     the import is rejected (valid=false) — a half-applied
  *     import is worse than a rejected one.
@@ -34,11 +36,7 @@
     var out = {};
     for (var key in defaults) {
       if (Object.prototype.hasOwnProperty.call(defaults, key)) {
-        out[key] = Array.isArray(defaults[key])
-          ? 'array'
-          : defaults[key] === null
-            ? 'any'
-            : typeof defaults[key];
+        out[key] = Array.isArray(defaults[key]) ? 'array' : typeof defaults[key];
       }
     }
     return out;
@@ -68,10 +66,9 @@
     for (var key in data) {
       if (!Object.prototype.hasOwnProperty.call(data, key)) continue;
       if (!(key in expected)) {
-        warnings.push('Unknown setting "' + key + '" will be ignored.');
+        warnings.push('Unknown setting "' + key + '" is not a OneYT setting yet — kept as-is.');
         continue;
       }
-      if (expected[key] === 'any') continue;
       if (typeOf(data[key]) !== expected[key]) {
         errors.push(
           'Setting "' + key + '" must be ' + expected[key] + ' but got ' + typeOf(data[key]) + '.'
@@ -117,22 +114,62 @@
     // cannot fetch anything. Found in the Phase 6 security review:
     // the old validator blocked @import but not url(https://…),
     // which would have fetched a remote resource (and could act
-    // as a tracking pixel) when the CSS was applied.
-    var urlPattern = /url\(\s*(['"]?)([^)'"]*)\1\s*\)/gi;
-    var urlMatch;
-    while ((urlMatch = urlPattern.exec(css)) !== null) {
-      var target = (urlMatch[2] || '').trim().toLowerCase();
+    // as a tracking pixel) when the CSS was applied. The scan
+    // below (not a regex) also catches a quote smuggled into an
+    // unquoted url(), e.g. url(https://evil.com/a'b) — the old
+    // regex stopped at the quote and missed the remote URL.
+    var lowerCss = css.toLowerCase();
+    var urlAt = 0;
+    while ((urlAt = lowerCss.indexOf('url(', urlAt)) !== -1) {
+      var j = urlAt + 4;
+      while (j < css.length && /\s/.test(css[j])) j++;
+      var quote = css[j] === '"' || css[j] === "'" ? css[j] : null;
+      var start = quote ? j + 1 : j;
+      var end = start;
+      if (quote) {
+        while (end < css.length && css[end] !== quote) end++;
+      } else {
+        while (end < css.length && css[end] !== ')') end++;
+      }
+      var target = css.slice(start, end).trim().toLowerCase();
       if (target.indexOf('data:') !== 0) {
         errors.push(
           'Custom CSS must not load remote resources with url() (only data: URLs are allowed).'
         );
         break;
       }
+      urlAt = end + 1;
     }
+    // Balanced braces/parens. Braces and parens inside string
+    // literals (content: "}") and /* comments */ are not syntax
+    // — counting them rejected valid CSS.
     var depth = 0;
     var parenDepth = 0;
+    var inString = null;
+    var inComment = false;
     for (var i = 0; i < css.length; i++) {
       var ch = css[i];
+      if (inComment) {
+        if (ch === '*' && css[i + 1] === '/') {
+          inComment = false;
+          i++;
+        }
+        continue;
+      }
+      if (inString) {
+        if (ch === '\\') i++;
+        else if (ch === inString) inString = null;
+        continue;
+      }
+      if (ch === '/' && css[i + 1] === '*') {
+        inComment = true;
+        i++;
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        inString = ch;
+        continue;
+      }
       if (ch === '{') depth++;
       if (ch === '}') depth--;
       if (ch === '(') parenDepth++;

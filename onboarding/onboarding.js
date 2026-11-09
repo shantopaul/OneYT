@@ -52,7 +52,16 @@
 
   function init() {
     var doc = document;
-    if (!doc || !defaultsApi || !profilesApi || !onboardingApi || !ns.storage) return;
+    if (!doc) return;
+    if (!defaultsApi || !profilesApi || !onboardingApi || !ns.storage) {
+      // A failed script load used to leave a blank page with
+      // no explanation: say so in plain text.
+      var errorEl = doc.getElementById('onboarding-steps');
+      if (errorEl) {
+        errorEl.textContent = 'OneYT could not load its setup scripts — please reload this page.';
+      }
+      return;
+    }
 
     var step = 'preset';
     var settings = defaultsApi.cloneDefaults();
@@ -142,7 +151,7 @@
         if (!card) return;
         markChecked(presetCards, card);
         presetChoice = card.getAttribute('data-preset');
-        var presetId = onboardingApi.onboardingPresetId(presetChoice);
+        var presetId = onboardingApi.onboardingPresetId(presetChoice, profilesApi);
         if (presetId) {
           settings = profilesApi.applyPreset(settings, presetId, defaultsApi);
         }
@@ -197,7 +206,11 @@
         if (onboardingApi.isOnboardingComplete(settings, 'preset')) {
           // Already finished or skipped (e.g. the popup
           // re-opened the page): show the last step, where
-          // the button opens the dashboard.
+          // the button opens the dashboard. The theme must
+          // be applied first — the old code returned before
+          // applyTheme(), so the page stayed on the
+          // pre-JS fallback theme.
+          applyTheme();
           showStep('done');
           return;
         }

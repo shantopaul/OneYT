@@ -46,10 +46,19 @@
   // The preset choice a step-1 click applies. 'keep' means
   // "Keep YouTube as it is" — no preset, nothing changes.
   // Unknown ids are treated as 'keep' (never apply a
-  // preset the page does not know).
-  function onboardingPresetId(choice) {
+  // preset the page does not know). The known ids come from
+  // the presets module when the caller passes it, so a
+  // renamed/added preset cannot silently go stale here;
+  // the literal list is only the fallback for callers
+  // (tests) that do not pass the API.
+  function onboardingPresetId(choice, profilesApi) {
     if (choice === 'keep') return null;
-    var known = ['stock', 'focus', 'clean', 'cinema'];
+    var known =
+      profilesApi && Array.isArray(profilesApi.BUILTIN_PRESETS)
+        ? profilesApi.BUILTIN_PRESETS.map(function (preset) {
+            return preset.id;
+          })
+        : ['stock', 'focus', 'clean', 'cinema'];
     if (known.indexOf(choice) !== -1) return choice;
     return null;
   }

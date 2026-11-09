@@ -25,6 +25,15 @@
   // How OneYT tokens map onto YouTube's own CSS variables.
   // YouTube components read these; overriding them themes the
   // surfaces the extension never touches directly.
+  // One token owns each --yt-spec-* target: `surface` and
+  // `card` both used to point at --yt-spec-raised-background
+  // (and `surfaceHover` / `buttonHover` at
+  // --yt-spec-10-percent-layer), so the later token in preset
+  // order silently overwrote the earlier one and the mapping
+  // table promised something the code could not deliver.
+  // `surface` owns the raised background and `surfaceHover`
+  // owns the 10-percent layer; `card` / `buttonHover` still
+  // have their own --oneyt-* variables above.
   var YT_SPEC_VARS = {
     bg: '--yt-spec-base-background',
     surface: '--yt-spec-raised-background',
@@ -33,9 +42,7 @@
     text: '--yt-spec-text-primary',
     textSecondary: '--yt-spec-text-secondary',
     accent: '--yt-spec-call-to-action',
-    card: '--yt-spec-raised-background',
     buttonBg: '--yt-spec-badge-chip-background',
-    buttonHover: '--yt-spec-10-percent-layer',
   };
 
   // Presets (Design.md §2.4). `default` is null: no overrides,

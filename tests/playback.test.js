@@ -179,3 +179,53 @@ test('playback: non-watch pages detach everything', async () => {
   assert.equal(t.doc._root._classes.has('oneyt-caption-sized'), false);
   t.mod.disable();
 });
+
+test('playback: non-boolean autoplay/captions never click the toggle', async () => {
+  const storage = mapStorage();
+  const t = playbackSetup(storage);
+  const settings = settingsWith({ playback: { autoplay: 'yes', captions: 42 } });
+  t.mod.apply(settings, 'watch');
+  await tick(30);
+  assert.equal(t.autonavClicked(), false);
+  assert.equal(t.ccClicked(), false);
+  // A second apply must not flip them either (the old bug
+  // clicked on every apply because "yes" !== pressed).
+  t.mod.apply(settings, 'watch');
+  await tick(30);
+  assert.equal(t.autonavClicked(), false);
+  assert.equal(t.ccClicked(), false);
+});
+
+test('playback: caption font size is clamped to 200%', async () => {
+  const storage = mapStorage();
+  const t = playbackSetup(storage);
+  t.mod.apply(settingsWith({ playback: { captionFontSize: 10000 } }), 'watch');
+  await tick(30);
+  assert.equal(t.doc._root._vars.get('--oneyt-caption-font-size'), '200%');
+});
+
+test('playback: a detached video element is dropped and the new one is attached', async () => {
+  const storage = mapStorage();
+  const doc = createFakeDocument();
+  const videoA = createFakeElement();
+  videoA.isConnected = true;
+  videoA.playbackRate = 1;
+  videoA.volume = 1;
+  const elements = { video: videoA };
+  const dom = createFakeDom(elements);
+  const mod = createPlaybackModule({ dom, logger: quietLogger, document: doc, storage });
+  mod.apply(settingsWith({ playback: { defaultSpeed: 1.5 } }), 'watch');
+  await tick(30);
+  assert.equal(videoA.playbackRate, 1.5);
+  // YouTube swaps the element on SPA navigation: A detaches, B appears.
+  videoA.isConnected = false;
+  const videoB = createFakeElement();
+  videoB.isConnected = true;
+  videoB.playbackRate = 1;
+  videoB.volume = 1;
+  elements.video = videoB;
+  mod.apply(settingsWith({ playback: { defaultSpeed: 2 } }), 'watch');
+  await tick(30);
+  assert.equal(videoB.playbackRate, 2);
+  assert.equal(videoA.playbackRate, 1.5); // untouched after detach
+});

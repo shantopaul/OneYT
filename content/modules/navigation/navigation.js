@@ -12,6 +12,16 @@
 (function () {
   'use strict';
 
+  // Clamp a number to the dashboard control's range (see
+  // layout.js: a hand-edited import bypasses the dashboard
+  // inputs). Non-numbers pass through unchanged.
+  function clampNum(value, min, max) {
+    if (typeof value !== 'number' || !isFinite(value)) return value;
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+  }
+
   function createNavigationModule(deps) {
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
@@ -55,10 +65,18 @@
         setClass(el, 'oneyt-nav-hide-library', nav.hideLibrary === true);
         setClass(el, 'oneyt-nav-hide-history', nav.hideHistory === true);
         setClass(el, 'oneyt-nav-compact', nav.compact === true);
-        var wide = typeof nav.guideWidth === 'number' && nav.guideWidth >= 72;
+        // Compact wins over wide: the two CSS rules have equal
+        // specificity and the wide rule comes later, so setting
+        // both gave a 300px guide with hidden titles. A compact
+        // guide is always 72px.
+        var wide =
+          nav.compact !== true && typeof nav.guideWidth === 'number' && nav.guideWidth >= 72;
         setClass(el, 'oneyt-nav-wide', wide);
-        if (wide) el.style.setProperty('--oneyt-guide-width', nav.guideWidth + 'px');
-        else el.style.removeProperty('--oneyt-guide-width');
+        if (wide) {
+          el.style.setProperty('--oneyt-guide-width', clampNum(nav.guideWidth, 72, 400) + 'px');
+        } else {
+          el.style.removeProperty('--oneyt-guide-width');
+        }
       },
       disable: function () {
         cleanup();

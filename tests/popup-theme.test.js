@@ -130,3 +130,26 @@ test('channel Shorts tab: selector, CSS rule, toggle copy and health metadata', 
     'not-seen'
   );
 });
+
+test('popup: unknown stored theme falls back to default in render', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'popup', 'popup.js'), 'utf8');
+  assert.ok(
+    src.includes("knownThemes.indexOf(storedTheme) !== -1 ? storedTheme : 'default'"),
+    'render must clamp an unknown stored theme to default'
+  );
+});
+
+test('popup: toggles share one in-memory settings copy with chained writes', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'popup', 'popup.js'), 'utf8');
+  assert.ok(src.includes('var cachedSettings = null;'), 'in-memory cache exists');
+  assert.ok(src.includes('var writeChain = Promise.resolve();'), 'write chain exists');
+  assert.ok(src.includes('function persist(settings)'), 'persist helper exists');
+  // update() must build on the cache, not load() per toggle.
+  assert.ok(
+    src.includes('var base = cachedSettings ? defaultsApi.deepClone(cachedSettings) : null;'),
+    'update builds on the cached settings'
+  );
+  assert.ok(src.includes('cachedSettings = defaultsApi.deepClone(settings);'), 'cache refreshed');
+  // The preset handler uses the same cache.
+  assert.ok(src.includes('var done = base ? run(base) : load().then(run);'), 'preset uses cache');
+});
