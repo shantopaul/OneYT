@@ -324,16 +324,17 @@ and memory need Chrome/Edge/Brave on Shanto's PC
 
 ---
 
-## Phase 7 — Public Release ✅ CODE COMPLETE (2026-11-09)
+## Phase 7 — Public Release ✅ MERGED (2026-11-09)
 
 **Goal:** Chrome Web Store listing + v1.0.0.
 
 **Deliverable:** public release, v1.0.0.
 
-**Status 2026-11-09:** code complete on branch
-`feature/Release` (11 part-by-part commits on top of
-`feature/Optimisation` `4ddac3d`, pushed after completion,
-nothing merged). `npm test` 121/121 pass, lint + format
+**Status 2026-11-09:** **merged to `main` — PR #7,
+`main` now `4ca8a88`. All 7 phases are in `main`.**
+Code complete on branch `feature/Release` (12 part-by-part
+commits on top of `feature/Optimisation` `4ddac3d`, pushed
+after completion). `npm test` 121/121 pass, lint + format
 clean, manifest valid, `npm run package` builds a clean
 100 KB submission zip. Delivered: final branding (original Y
 mark replacing the Phase 1 play-button placeholder), icons
@@ -345,12 +346,11 @@ Done check (code column complete, browser column open).
 **Still open, all Shanto's:** browser checklists Phases 1–6,
 5 real screenshots, privacy-policy URL decision
 (repo-public vs shantopaul.com), tag `v1.0.0` + GitHub
-release (after the merge), Chrome Web Store submission.
+release, Chrome Web Store submission.
 Branch note: PR #6 was still open when Phase 7 started, so
 `feature/Release` is based on `feature/Optimisation`.
-Shanto merged PR #6 himself during Phase 7 (`main` now
-`383e35a`), so the release branch is a clean descendant of
-`main` and the release PR merges without conflict.
+Shanto merged PR #6 himself during Phase 7 (`main`
+`383e35a`), then PR #7 himself (`main` `4ca8a88`).
 
 ### Tasks
 
