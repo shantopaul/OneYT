@@ -12,6 +12,7 @@ const popup = require('../popup/popup');
 const SECTION_FILES = [
   'general',
   'profiles',
+  'health',
   'player',
   'sidebar',
   'layout',

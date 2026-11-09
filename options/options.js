@@ -339,10 +339,13 @@
     var STORAGE_KEY = constants.STORAGE_KEY || 'oneyt.settings.v1';
     var profilesApi = deps.profilesApi || null;
     var PROFILES_KEY = constants.PROFILES_STORAGE_KEY || 'oneyt.profiles.v1';
+    var healthApi = deps.healthApi || null;
+    var HEALTH_KEY = constants.HEALTH_STORAGE_KEY || 'oneyt.health.v1';
 
     var state = defaultsApi.cloneDefaults();
     var profiles = [];
     var profilesNotice = '';
+    var healthRecord = {};
     var saveTimer = null;
     var navEl = doc.getElementById('options-nav');
     var mainEl = doc.getElementById('options-main');
@@ -1236,7 +1239,76 @@
       });
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);
+      if (section.id === 'health') renderHealthTools(mainEl);
       checkShortcutWarnings();
+    }
+
+    // Health (Phase 18, PL-18). Mirrors renderProfilesTools:
+    // tool-boxes built with el(), no innerHTML. The overall
+    // status comes from healthApi.summarizeHealth on the
+    // stored record; the per-feature rows carry the same
+    // three statuses the section description explains.
+    // "Check again" re-reads storage (the health module
+    // writes it from YouTube tabs — the dashboard never
+    // queries YouTube itself).
+    function renderHealthTools(sectionEl) {
+      if (!healthApi) {
+        sectionEl.appendChild(
+          el(doc, 'p', { text: 'Health is unavailable — the health module did not load.' })
+        );
+        return;
+      }
+      var summary = healthApi.summarizeHealth(healthRecord);
+
+      var statusBox = el(doc, 'div', { class: 'tool-box' });
+      var statusText =
+        summary.status === 'ok'
+          ? 'All checked features are working.'
+          : summary.status === 'broken'
+            ? 'Some features are not working — YouTube may have changed its layout. Nothing is disabled; the features below simply cannot find what they look for.'
+            : 'No health data yet — open YouTube, wait a few seconds, then come back here.';
+      statusBox.appendChild(el(doc, 'h3', { text: 'Status' }));
+      statusBox.appendChild(el(doc, 'p', { text: statusText }));
+      var checkedPages = Object.keys(summary.checked);
+      if (checkedPages.length > 0) {
+        checkedPages.forEach(function (pageType) {
+          statusBox.appendChild(
+            el(doc, 'p', {
+              text:
+                pageType +
+                ' page checked ' +
+                new Date(summary.checked[pageType]).toLocaleString() +
+                '.',
+            })
+          );
+        });
+      }
+      var refreshBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn',
+        text: 'Check again',
+      });
+      refreshBtn.addEventListener('click', function () {
+        refreshHealth();
+      });
+      statusBox.appendChild(refreshBtn);
+      sectionEl.appendChild(statusBox);
+
+      var listBox = el(doc, 'div', { class: 'tool-box' });
+      listBox.appendChild(el(doc, 'h3', { text: 'Features' }));
+      var statusLabels = {
+        working: 'Working',
+        broken: 'Not working',
+        'not-seen': 'Not seen on this visit',
+        unchecked: 'Not checked yet',
+      };
+      summary.features.forEach(function (row) {
+        var item = el(doc, 'div', { class: 'profile-row' });
+        item.appendChild(el(doc, 'strong', { text: row.feature }));
+        item.appendChild(el(doc, 'p', { text: statusLabels[row.status] || row.status }));
+        listBox.appendChild(item);
+      });
+      sectionEl.appendChild(listBox);
     }
 
     function renderNav() {
@@ -1399,15 +1471,36 @@
     }
 
     function load() {
-      return Promise.all([storage.get(STORAGE_KEY), storage.get(PROFILES_KEY)])
+      return Promise.all([
+        storage.get(STORAGE_KEY),
+        storage.get(PROFILES_KEY),
+        storage.get(HEALTH_KEY),
+      ])
         .then(function (results) {
           state = defaultsApi.migrateSettings(results[0]);
           profiles = profilesApi ? profilesApi.validateProfiles(results[1], defaultsApi) : [];
+          healthRecord = healthApi ? healthApi.validateHealthRecord(results[2]) : {};
         })
         .catch(function () {
           state = defaultsApi.cloneDefaults();
           profiles = [];
+          healthRecord = {};
         });
+    }
+
+    // Re-read the stored health record (the health module
+    // writes it from YouTube tabs) and re-render the Health
+    // section if it is the one open. A failed read keeps
+    // the last record — never blank the section on a
+    // transient failure.
+    function refreshHealth() {
+      return storage
+        .get(HEALTH_KEY)
+        .then(function (stored) {
+          healthRecord = healthApi ? healthApi.validateHealthRecord(stored) : {};
+          if (currentSection === 'health') renderSection('health');
+        })
+        .catch(function () {});
     }
 
     // Persist the profiles list (local only — never synced).
@@ -1433,6 +1526,12 @@
         if (storage.onChanged) {
           storage.onChanged(function (changes, areaName) {
             if (areaName !== 'local') return;
+            // The health module writes its record from
+            // YouTube tabs; refresh the Health section
+            // when it changes (independent of settings).
+            if (changes && changes[HEALTH_KEY]) {
+              refreshHealth();
+            }
             var change = changes && changes[STORAGE_KEY];
             if (!change || !change.newValue) return;
             var next = defaultsApi.migrateSettings(change.newValue);
@@ -1520,6 +1619,7 @@
     var order = [
       'general',
       'profiles',
+      'health',
       'player',
       'sidebar',
       'layout',
@@ -1539,6 +1639,7 @@
       validators: ns.validators,
       themes: ns.themes,
       profilesApi: ns.profiles,
+      healthApi: ns.health,
       keyboardApi: ns.modules && ns.modules.keyboard,
       sections: sections,
       constants: ns.constants,
