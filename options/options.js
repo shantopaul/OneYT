@@ -110,6 +110,11 @@
         });
         break;
       }
+      case 'dashboardThemes':
+        push('system', 'System');
+        push('dark', 'Dark');
+        push('light', 'Light');
+        break;
       case 'fontFamilies': {
         push('', 'YouTube default');
         var stacks = (apis.themes && apis.themes.FONT_STACKS) || {};
@@ -205,11 +210,103 @@
       .split(/\s+/)
       .filter(Boolean);
     if (words.length === 0) return [];
-    return index.filter(function (entry) {
-      return words.every(function (word) {
+    var scored = [];
+    index.forEach(function (entry, pos) {
+      var ok = words.every(function (word) {
         return entry.haystack.indexOf(word) !== -1;
       });
+      if (!ok) return;
+      // Rank: a word in the label beats a word in the key or
+      // section title, which beats a word only in the
+      // description/keywords. Ties keep index order.
+      var score = 0;
+      var where = (entry.key + ' ' + entry.sectionTitle).toLowerCase();
+      var label = entry.label.toLowerCase();
+      words.forEach(function (word) {
+        if (label.indexOf(word) !== -1) score += 2;
+        else if (where.indexOf(word) !== -1) score += 1;
+      });
+      scored.push({ entry: entry, score: score, pos: pos });
     });
+    scored.sort(function (a, b) {
+      return b.score - a.score || a.pos - b.pos;
+    });
+    return scored.map(function (s) {
+      return s.entry;
+    });
+  }
+
+  // Pure: split text into { text, match } segments around the
+  // query words (case-insensitive, longest word first so
+  // 'theme' wins over 'the'). Used to <mark> matches in
+  // search results.
+  function splitHighlight(text, words) {
+    var clean = (words || [])
+      .filter(Boolean)
+      .map(function (w) {
+        return String(w).toLowerCase();
+      })
+      .sort(function (a, b) {
+        return b.length - a.length;
+      });
+    if (!text || clean.length === 0) return [{ text: text || '', match: false }];
+    var lower = String(text).toLowerCase();
+    var out = [];
+    var plain = '';
+    var i = 0;
+    while (i < text.length) {
+      var hitLen = 0;
+      for (var w = 0; w < clean.length; w++) {
+        var word = clean[w];
+        if (word && lower.indexOf(word, i) === i && word.length > hitLen) {
+          hitLen = word.length;
+        }
+      }
+      if (hitLen > 0) {
+        if (plain) out.push({ text: plain, match: false });
+        plain = '';
+        out.push({ text: text.slice(i, i + hitLen), match: true });
+        i += hitLen;
+      } else {
+        plain += text[i];
+        i++;
+      }
+    }
+    if (plain) out.push({ text: plain, match: false });
+    return out;
+  }
+
+  // Pure: resolve the effective dashboard theme. 'dark'/'light'
+  // force one; anything else ('system' or a bad stored value)
+  // follows the OS (prefers-color-scheme).
+  function resolveDashboardTheme(setting, prefersDark) {
+    if (setting === 'dark') return 'dark';
+    if (setting === 'light') return 'light';
+    return prefersDark ? 'dark' : 'light';
+  }
+
+  // Pure: what an ArrowDown/ArrowUp/Enter/Escape keypress means
+  // for the search dropdown. Returns { action, index } where
+  // action is 'move' | 'activate' | 'close' | 'clear' | 'none'.
+  // count is the number of visible results, isOpen whether the
+  // dropdown is showing.
+  function searchKeyAction(key, activeIndex, count, isOpen) {
+    if (key === 'Escape') {
+      if (isOpen) return { action: 'close', index: -1 };
+      return { action: 'clear', index: -1 };
+    }
+    if (!isOpen || count === 0) return { action: 'none', index: activeIndex };
+    if (key === 'ArrowDown') {
+      return { action: 'move', index: activeIndex < count - 1 ? activeIndex + 1 : 0 };
+    }
+    if (key === 'ArrowUp') {
+      return { action: 'move', index: activeIndex > 0 ? activeIndex - 1 : count - 1 };
+    }
+    if (key === 'Enter') {
+      if (activeIndex >= 0) return { action: 'activate', index: activeIndex };
+      return { action: 'activate', index: 0 };
+    }
+    return { action: 'none', index: activeIndex };
   }
 
   // ---------- DOM app ----------
@@ -247,6 +344,7 @@
     var mainEl = doc.getElementById('options-main');
     var searchEl = doc.getElementById('options-search');
     var resultsEl = doc.getElementById('search-results');
+    var clearEl = doc.getElementById('search-clear');
     var savedEl = doc.getElementById('saved-indicator');
     var searchIndex = buildSearchIndex(sections);
     var currentSection = sections.length > 0 ? sections[0].id : null;
@@ -287,7 +385,22 @@
 
     function setValue(key, value, delay) {
       setPath(state, key, value);
+      if (key === 'ui.dashboardTheme') applyDashboardTheme();
       saveSoon(delay);
+    }
+
+    function systemPrefersDark() {
+      if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    // Apply the dashboard theme as a data-theme attribute on
+    // <html>. CSS carries the tokens; the attribute is the one
+    // source of truth (the prefers-color-scheme media query in
+    // the CSS is only the pre-JS fallback).
+    function applyDashboardTheme() {
+      var theme = resolveDashboardTheme(getPath(state, 'ui.dashboardTheme'), systemPrefersDark());
+      if (doc.documentElement) doc.documentElement.setAttribute('data-theme', theme);
     }
 
     function refreshValues() {
@@ -954,42 +1067,145 @@
       });
     }
 
+    function appendHighlighted(parent, text, words) {
+      splitHighlight(text, words).forEach(function (seg) {
+        if (seg.match) {
+          parent.appendChild(el(doc, 'mark', { text: seg.text }));
+        } else {
+          parent.appendChild(doc.createTextNode(seg.text));
+        }
+      });
+    }
+
     function bindSearch() {
       if (!searchEl || !resultsEl) return;
-      searchEl.addEventListener('input', function () {
+      var MAX_RESULTS = 8;
+      var activeIndex = -1;
+      var currentResults = [];
+      var resultItems = [];
+
+      function closeResults() {
+        activeIndex = -1;
+        resultsEl.style.display = 'none';
+        searchEl.setAttribute('aria-expanded', 'false');
+        searchEl.removeAttribute('aria-activedescendant');
+      }
+
+      function setActive(index) {
+        activeIndex = index;
+        resultItems.forEach(function (item, i) {
+          if (i === index) {
+            item.classList.add('active');
+            searchEl.setAttribute('aria-activedescendant', item.getAttribute('id'));
+          } else {
+            item.classList.remove('active');
+          }
+        });
+        if (index < 0) searchEl.removeAttribute('aria-activedescendant');
+      }
+
+      function activate(entry) {
+        renderSection(entry.sectionId);
+        searchEl.value = '';
+        closeResults();
+        if (clearEl) clearEl.hidden = true;
+        var row = mainEl.querySelector('[data-control-key="' + entry.key + '"]');
+        if (row) {
+          row.scrollIntoView({ block: 'center' });
+          row.classList.add('highlight');
+          setTimeout(function () {
+            row.classList.remove('highlight');
+          }, 2000);
+        }
+      }
+
+      function renderResults() {
         var query = searchEl.value;
-        var results = searchSettings(searchIndex, query);
+        var words = String(query || '')
+          .toLowerCase()
+          .split(/\s+/)
+          .filter(Boolean);
+        currentResults = searchSettings(searchIndex, query);
+        resultItems = [];
+        activeIndex = -1;
         resultsEl.textContent = '';
-        if (results.length === 0) {
-          resultsEl.style.display = 'none';
+        searchEl.removeAttribute('aria-activedescendant');
+        if (clearEl) clearEl.hidden = query.length === 0;
+        if (words.length === 0) {
+          closeResults();
           return;
         }
-        results.slice(0, 8).forEach(function (entry) {
-          var item = el(doc, 'button', {
-            type: 'button',
-            class: 'search-result',
-            text: entry.sectionTitle + ' — ' + entry.label,
-          });
+        if (currentResults.length === 0) {
+          resultsEl.appendChild(
+            el(doc, 'div', {
+              class: 'search-no-results',
+              text: 'No settings match "' + query + '".',
+            })
+          );
+          resultsEl.style.display = 'block';
+          searchEl.setAttribute('aria-expanded', 'true');
+          return;
+        }
+        currentResults.slice(0, MAX_RESULTS).forEach(function (entry, i) {
+          var item = el(doc, 'button', { type: 'button', class: 'search-result' });
+          item.setAttribute('role', 'option');
+          item.setAttribute('id', 'search-result-' + i);
+          item.appendChild(doc.createTextNode(entry.sectionTitle + ' — '));
+          appendHighlighted(item, entry.label, words);
           item.addEventListener('click', function () {
-            renderSection(entry.sectionId);
-            searchEl.value = '';
-            resultsEl.style.display = 'none';
-            var row = mainEl.querySelector('[data-control-key="' + entry.key + '"]');
-            if (row) {
-              row.scrollIntoView({ block: 'center' });
-              row.classList.add('highlight');
-              setTimeout(function () {
-                row.classList.remove('highlight');
-              }, 2000);
-            }
+            activate(entry);
+          });
+          item.addEventListener('mousemove', function () {
+            setActive(i);
           });
           resultsEl.appendChild(item);
+          resultItems.push(item);
         });
+        if (currentResults.length > MAX_RESULTS) {
+          resultsEl.appendChild(
+            el(doc, 'div', {
+              class: 'search-count',
+              text:
+                'Showing ' +
+                MAX_RESULTS +
+                ' of ' +
+                currentResults.length +
+                ' results — refine your search to see more.',
+            })
+          );
+        }
         resultsEl.style.display = 'block';
+        searchEl.setAttribute('aria-expanded', 'true');
+      }
+
+      searchEl.addEventListener('input', renderResults);
+      searchEl.addEventListener('focus', function () {
+        if (searchEl.value) renderResults();
       });
+      searchEl.addEventListener('keydown', function (event) {
+        var isOpen = resultsEl.style.display === 'block';
+        var visible = Math.min(currentResults.length, MAX_RESULTS);
+        var decision = searchKeyAction(event.key, activeIndex, visible, isOpen);
+        if (decision.action === 'none') return;
+        event.preventDefault();
+        if (decision.action === 'move') setActive(decision.index);
+        else if (decision.action === 'activate') activate(currentResults[decision.index]);
+        else if (decision.action === 'close') closeResults();
+        else if (decision.action === 'clear') {
+          searchEl.value = '';
+          renderResults();
+        }
+      });
+      if (clearEl) {
+        clearEl.addEventListener('click', function () {
+          searchEl.value = '';
+          renderResults();
+          searchEl.focus();
+        });
+      }
       doc.addEventListener('click', function (event) {
         if (resultsEl && !resultsEl.contains(event.target) && event.target !== searchEl) {
-          resultsEl.style.display = 'none';
+          closeResults();
         }
       });
     }
@@ -1009,6 +1225,12 @@
       renderNav();
       bindSearch();
       return load().then(function () {
+        applyDashboardTheme();
+        if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+            if (getPath(state, 'ui.dashboardTheme') === 'system') applyDashboardTheme();
+          });
+        }
         renderSection(currentSection);
         if (storage.onChanged) {
           storage.onChanged(function (changes, areaName) {
@@ -1018,6 +1240,7 @@
             var next = defaultsApi.migrateSettings(change.newValue);
             if (JSON.stringify(next) === JSON.stringify(state)) return;
             state = next;
+            applyDashboardTheme();
             refreshValues();
           });
         }
@@ -1077,6 +1300,9 @@
     settingToSelect: settingToSelect,
     buildSearchIndex: buildSearchIndex,
     searchSettings: searchSettings,
+    splitHighlight: splitHighlight,
+    searchKeyAction: searchKeyAction,
+    resolveDashboardTheme: resolveDashboardTheme,
     createOptionsApp: createOptionsApp,
   };
 

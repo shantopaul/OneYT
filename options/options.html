@@ -11,15 +11,35 @@
       <header class="options-topbar">
         <span class="options-logo">OneYT</span>
         <span class="options-title">Settings</span>
-        <input
-          type="search"
-          id="options-search"
-          class="options-search"
-          placeholder="Search settings… (e.g. speed, focus, theme)"
-          aria-label="Search settings"
-        />
+        <div class="search-wrap">
+          <input
+            type="search"
+            id="options-search"
+            class="options-search"
+            placeholder="Search settings… (e.g. speed, focus, theme)"
+            aria-label="Search settings"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="search-results"
+            aria-autocomplete="list"
+          />
+          <button
+            type="button"
+            id="search-clear"
+            class="search-clear"
+            aria-label="Clear search"
+            hidden
+          >
+            ×
+          </button>
+          <div
+            id="search-results"
+            class="search-results"
+            role="listbox"
+            style="display: none"
+          ></div>
+        </div>
         <span id="saved-indicator" class="saved-indicator"></span>
-        <div id="search-results" class="search-results" style="display: none"></div>
       </header>
 
       <div class="options-body">

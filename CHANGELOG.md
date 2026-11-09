@@ -2,7 +2,32 @@
 
 All notable changes, newest first. Version numbers follow the
 phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
-1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts).
+1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts),
+1.2.0 (Phase 9 dashboard theme + search).
+
+## 1.2.0 — 2026-11-09 (Dashboard Theme + Search, Phase 9)
+
+- **Dashboard theme** (`ui.dashboardTheme`, default System):
+  the settings dashboard now has its own dark / light mode.
+  System follows the OS, Dark and Light force one; the choice
+  applies instantly, follows OS changes while on System, and
+  syncs across browsers like any other setting.
+- **Light-mode contrast fixed** (measured, not eyeballed):
+  warning, success, danger and accent text were 2.04 / 2.16 /
+  3.57 / 3.76 on light surfaces — below WCAG AA. Now #b45309
+  (4.77), #15803d (4.76), #b91c1c (6.15), accent #e6002e
+  (4.53). Native controls follow the scheme via color-scheme.
+- **Search bar, position:** the results dropdown is anchored
+  to the input inside a `.search-wrap` (was magic offsets from
+  the topbar that detached on narrow windows); the topbar wraps
+  and the search takes its own row under 640px.
+- **Search bar, functionality:** ArrowDown/Up navigation
+  (wraps), Enter to jump, Escape to close/clear, match
+  highlighting, ranked results (label > key/section >
+  description), no-results feedback, result count past 8,
+  clear button, and ARIA combobox semantics.
+- Browser verification of the theme and the search on a real
+  dashboard page is still open (browser check).
 
 ## 1.1.0 — 2026-11-09 (Block Shorts, Phase 8)
 

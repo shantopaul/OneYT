@@ -384,26 +384,68 @@ them everywhere and do not show them.
 
 **Status 2026-11-09:** code complete on branch
 `feature/shorts-block` (8 part-by-part commits on top of
-`main` `4ca8a88`, pushed after completion, nothing merged).
-`npm test` 123/123 pass, lint + format clean, manifest valid,
-`npm run package` builds a clean 100 KB `oneyt-1.1.0.zip`.
-Delivered: new setting `layout.blockShorts` (default off,
-additive); layout module sets `oneyt-block-shorts` on every
-page type and redirects `/shorts/VIDEOID` to
-`/watch?v=VIDEOID` (pure helper `shortsWatchUrl`, injectable
-redirect); CSS hides rich shelves, reel shelves (search /
-subscriptions), guide + mini-guide Shorts entries, and
-Shorts video cards in grids and search; master toggle at the
-top of the Layout section; selector count 20 → 21
-(`reelShelf`); version 1.1.0 + CHANGELOG. The three older
-per-page Shorts toggles are unchanged. **Browser
-verification still open** — the new selectors and the
-redirect need a real YouTube page on Shanto's PC. Known
-limit: the Shorts tab on channel pages is not hidden yet
-(v1.1 follow-up).
+`main` `4ca8a88`, pushed after completion). **Merged by
+Shanto as PR #9 → `main` `c04274e`.** `npm test` 123/123 pass,
+lint + format clean, manifest valid, `npm run package` builds
+a clean 100 KB `oneyt-1.1.0.zip`. Delivered: new setting
+`layout.blockShorts` (default off, additive); layout module
+sets `oneyt-block-shorts` on every page type and redirects
+`/shorts/VIDEOID` to `/watch?v=VIDEOID` (pure helper
+`shortsWatchUrl`, injectable redirect); CSS hides rich
+shelves, reel shelves (search / subscriptions), guide +
+mini-guide Shorts entries, and Shorts video cards in grids
+and search; master toggle at the top of the Layout section;
+selector count 20 → 21 (`reelShelf`); version 1.1.0 +
+CHANGELOG. The three older per-page Shorts toggles are
+unchanged. **Browser verification still open** — the new
+selectors and the redirect need a real YouTube page on
+Shanto's PC. Known limit: the Shorts tab on channel pages
+is not hidden yet (v1.1 follow-up).
+
+## Phase 9 — Dashboard Theme + Search (v1.2) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** the settings dashboard gets its own dark / light
+mode, every section optimised under light mode — then the
+dashboard search bar optimised, position AND functionality.
+
+**Deliverable:** v1.2.0.
+
+**Status 2026-11-09:** code complete on branch
+`feature/dashboard-theme` (10 part-by-part commits on top of
+`main` `c04274e`, pushed after completion, nothing merged).
+`npm test` 132/132 pass, lint + format clean, manifest valid,
+`npm run package` builds a clean `oneyt-1.2.0.zip`.
+Delivered: new setting `ui.dashboardTheme` (default System,
+additive — old stored settings migrate with the default);
+General section select (System / Dark / Light) via a new
+`dashboardThemes` source; JS applies the choice as a
+`data-theme` attribute on `<html>` (pure
+`resolveDashboardTheme`, applied on load, on change, on
+external storage changes, and on OS scheme change while on
+System); CSS carries the theme in `:root[data-theme]` rules
+with the media query kept as the pre-JS fallback only.
+Light-mode contrast fixed by measurement: warning #f59e0b
+2.04 → #b45309 4.77, success #22c55e 2.16 → #15803d 4.76,
+danger #ef4444 3.57 → #b91c1c 6.15, accent #ff0033 3.76 →
+#e6002e 4.53 (white button text 4.77), hover #cc0027 5.84;
+text/secondary/muted already passed. `color-scheme`
+dark/light keeps native controls in the right scheme. Search
+position: input + clear button + dropdown in one
+`.search-wrap`, dropdown anchored under the input (the old
+magic `top: 56px` offsets are gone), topbar wraps with a
+full-width search row under 640px. Search functionality:
+ArrowDown/Up navigation (wraps), Enter to jump, Escape to
+close/clear, `<mark>` match highlighting (pure
+`splitHighlight`, no innerHTML), ranked results (label >
+key/section > description), no-results feedback, result
+count past 8, clear button, ARIA combobox semantics.
+**Browser verification still open** — the theme and the
+search need a real dashboard page on Shanto's PC. The popup
+stays dark-only for now (follow-up).
 
 ## Future (v1.1+, not in scope now)
 
+- Popup dark/light theme to match the dashboard (follow-up to Phase 9)
 - Channel-page Shorts tab hiding (follow-up to Block Shorts)
 - Workspace presets / saved profiles (per-page profiles)
 - Multiple saved themes + community theme sharing (exportable presets)

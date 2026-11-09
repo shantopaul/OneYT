@@ -151,6 +151,7 @@ test('options: select sources resolve for every declared source', () => {
   });
   assert.deepEqual([...sources].sort(), [
     'alignments',
+    'dashboardThemes',
     'densities',
     'fontFamilies',
     'fontWeights',

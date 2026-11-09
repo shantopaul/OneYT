@@ -27,6 +27,13 @@
       enabled: false, // opt-in (AD-08): mirror settings to chrome.storage.sync
     },
 
+    // Dashboard UI itself (v1.2): which colour scheme the
+    // settings dashboard uses. 'system' follows the OS
+    // (prefers-color-scheme); 'dark'/'light' force one.
+    ui: {
+      dashboardTheme: 'system', // system | dark | light
+    },
+
     modules: {
       player: true,
       layout: true,
