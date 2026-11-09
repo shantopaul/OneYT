@@ -4,7 +4,27 @@ All notable changes, newest first. Version numbers follow the
 phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts),
 1.2.0 (Phase 9 dashboard theme + search),
-1.3.0 (Phase 10 hide endscreen cards).
+1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts).
+
+## 1.4.0 — 2026-11-09 (Hide Counts, Phase 11)
+
+- **Hide counts** (`player.hideLikeCount` /
+  `player.hideViewCount` / `player.hideSubscriberCount`,
+  all default off): three separate toggles in the Player
+  section. The like number, the "X views" line and the "X
+  subscribers" next to the channel name are hidden; the
+  Like button stays clickable and the Subscribe button
+  stays. Class-only hiding — turning a toggle off restores
+  the number exactly; the classes are cleared off watch
+  pages and in fullscreen like every other player class.
+  Selectors: like `#segmented-like-button
+  .yt-spec-button-shape-next__button-text-content`, views
+  `ytd-video-primary-info-renderer #info-text`, subscribers
+  `ytd-video-owner-renderer #subscriber-count`. The views
+  selector needs a live check on a real watch page —
+  YouTube moved the views line into the description box in
+  the 2023 layout (see `tests/manual-checklist.md`
+  Phase 11).
 
 ## 1.3.0 — 2026-11-09 (Hide Endscreen Cards, Phase 10)
 

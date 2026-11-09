@@ -444,7 +444,7 @@ count past 8, clear button, ARIA combobox semantics.
 search need a real dashboard page on Shanto's PC. The popup
 stays dark-only for now (follow-up).
 
-## Phase 10 — Hide Endscreen Cards (v1.3) ⏳ IN PROGRESS (2026-11-09)
+## Phase 10 — Hide Endscreen Cards (v1.3) ✅ MERGED (PR #12, 2026-11-09)
 
 **Goal:** one toggle that hides the video suggestions shown
 at the end of a video (the endscreen cards), so a video ends
@@ -454,7 +454,8 @@ cleanly instead of offering the next watch.
 
 **Status 2026-11-09:** code complete on branch
 `feature/hide-endscreen` (8 part-by-part commits on top of
-`main` `7b70b80`, pushed after completion, nothing merged).
+`main` `7b70b80`, pushed after completion) and **merged by
+Shanto as PR #12 → `main` `dc3061b`**.
 `npm test` 134/134 pass, lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.3.0.zip`.
 Delivered: new setting `player.hideEndscreen` (default off,
@@ -471,6 +472,53 @@ theater, fullscreen, non-watch) + manual checklist item.
 real video end on Shanto's PC (it is the well-known YouTube
 endscreen hook, but YouTube renames DOM elements, so the
 live check is the proof).
+
+## Phase 11 — Hide Counts (v1.4) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** three separate toggles that hide the like count,
+the view count and the subscriber count on the watch page —
+the numbers go away, the buttons stay (Like stays clickable,
+Subscribe stays clickable).
+
+**Deliverable:** v1.4.0.
+
+**Plan (part-by-part, push only when complete):** three new
+settings `player.hideLikeCount` / `player.hideViewCount` /
+`player.hideSubscriberCount` (all default off, additive);
+three selectors in `shared/selectors.js` (count 22 → 25) —
+like `#segmented-like-button
+.ytp-spec-button-shape-next__button-text-content` (the count
+text inside the Like button; sourced from Return YouTube
+Dislike + a current userstyle), views
+`ytd-video-primary-info-renderer #info-text` (classic info
+line), subscribers `ytd-video-owner-renderer
+#subscriber-count`; player module sets
+`oneyt-player-hide-like-count` / `-view-count` /
+`-subscriber-count` on `<html>` and its CSS hides each
+number (class-only hiding, cleared off watch pages and in
+fullscreen like every player class); three toggles in the
+Player section; module tests + manual checklist item.
+**Done (8 commits):** `a72aa90` start (PRD PL-10–12 +
+plan, Memory.md corrected to Phase 10 merged as PR #12),
+`4aed32f` settings, `3b0fc96` selectors (count 22 → 25),
+`85698a6` player module + CSS, `403f3fb` dashboard toggles,
+`eeaac99` tests (136/136 with the endscreen tests) +
+checklist, `c86a029` version 1.4.0. Rebased onto `main`
+`dc3061b` after PR #12 merged (conflicts in 12 files,
+all resolved by keeping both phases' changes). **Browser
+verification still open** — all three
+selectors need a real watch page on Shanto's PC; YouTube
+moved the views line into the description box in the 2023
+layout, so the views selector is the one most likely to
+need a correction after the live check (the live check is
+the proof, same as the endscreen selector in Phase 10).
+Numbering note: PL-09 is the endscreen row (Phase 10,
+merged as PR #12) and this phase takes PL-10–12; v1.4.0
+follows because 1.3.0 is in `main` now. Ambient mode was
+redirected mid-work: branch `feature/disable-ambient-mode`
+exists (no commits yet) with the research done —
+`#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 12
+when resumed.
 
 ## Future (v1.1+, not in scope now)
 

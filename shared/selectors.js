@@ -57,6 +57,17 @@
     // The video suggestions shown at the end of a video.
     endscreenContent: '.ytp-endscreen-content',
 
+    // --- Watch-page counts (Phase 11) ---
+    // Like count: the number text inside the Like button
+    // (#segmented-like-button is the button id used by Return
+    // YouTube Dislike; the text class is from a current
+    // userstyle). Hiding the text keeps the button clickable.
+    likeCountText: '#segmented-like-button .yt-spec-button-shape-next__button-text-content',
+    // View count: the "X views" info line (classic hook).
+    viewCountText: 'ytd-video-primary-info-renderer #info-text',
+    // Subscriber count: next to the channel name.
+    subscriberCount: 'ytd-video-owner-renderer #subscriber-count',
+
     // --- Focus Mode targets (Phase 4) ---
     chat: '#chat', // Live chat container on watch pages
     actions: '#actions', // Like/share/download row under the player
