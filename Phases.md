@@ -1195,6 +1195,48 @@ checklist, `d5f7a65` version 1.15.0, docs (this commit).
 **Browser verification still open** — the live DOM is
 the proof (`tests/manual-checklist.md` Phase 23).
 
+## Phase 24 — Custom Font (v1.16) ⬜ IN PROGRESS (2026-11-09)
+
+**Goal:** the font list stops at five built-ins. A user
+whose font is not in the list — `Hind Siliguri`, `Noto
+Sans Bengali`, `Inter`, any font they installed — has
+no way to use it. One text setting lets them type the
+name; the browser uses the locally installed font.
+
+**Deliverable:** v1.16.0.
+
+**Plan (part-by-part, push only when complete):** one new
+setting `appearance.typography.customFont` (string,
+default `''` — empty means "use the Font family select";
+additive, old settings migrate with the default). A pure
+helper in `shared/themes.js` — `isValidCustomFontName`
+(trimmed, 1–64 chars, starts with a letter or digit,
+only letters/digits/spaces/hyphens/underscores) +
+`resolveFontFamily(fontFamily, customFont)` (a valid
+custom name wins and resolves to `"Name", sans-serif`;
+otherwise the `FONT_STACKS` entry for `fontFamily`;
+otherwise null). The typography module uses the
+resolver instead of its direct `FONT_STACKS` lookup;
+an invalid custom name is warned about and falls back
+to the select — the raw string is never applied. No
+Google Fonts, no download, no new permission, no new
+selector, no new script: a font the device does not
+have falls back to sans-serif. Dashboard: one `text`
+control in the Appearance section right after "Font
+family". Same scope as typography today — video titles,
+descriptions and comments only; player, captions and
+navigation untouched. Profiles snapshot the setting
+automatically (it is part of settings); saved themes
+are theme-only, so they do not carry it — same as the
+other typography numbers.
+**Browser verification still open** — the live page is
+the proof (`tests/manual-checklist.md` Phase 24).
+**Honest limits:** only fonts installed on the device
+work — typing a font name does not install it, and a
+name the device lacks silently falls back to
+sans-serif; the check for "is it installed" is the
+user seeing the titles change.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
