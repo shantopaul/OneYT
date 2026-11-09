@@ -123,8 +123,7 @@
 
   // Font family allowlist -> CSS stacks (typography module).
   var FONT_STACKS = {
-    system:
-      'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
+    system: 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
     Roboto: 'Roboto, Arial, sans-serif',
     Arial: 'Arial, Helvetica, sans-serif',
     Georgia: 'Georgia, "Times New Roman", serif',
@@ -132,9 +131,7 @@
   };
 
   function isValidHex(value) {
-    return (
-      typeof value === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value)
-    );
+    return typeof value === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value);
   }
 
   // Resolve the final token map for a theme name + user colours.
@@ -142,8 +139,7 @@
   // 'custom' starts from the dark preset, then applies user colours.
   function resolveThemeVars(themeName, customColors) {
     var name = THEMES[themeName] !== undefined ? themeName : 'default';
-    var base =
-      name === 'custom' ? THEMES.dark : THEMES[name] || null;
+    var base = name === 'custom' ? THEMES.dark : THEMES[name] || null;
     var vars = {};
     if (base) {
       for (var k in base) {
@@ -185,11 +181,7 @@
       var s = c / 255;
       return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
     }
-    return (
-      0.2126 * channel(rgb.r) +
-      0.7152 * channel(rgb.g) +
-      0.0722 * channel(rgb.b)
-    );
+    return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
   }
 
   function contrastRatio(hexA, hexB) {

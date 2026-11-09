@@ -59,6 +59,11 @@
     if (ns.modules && ns.modules.layout) {
       moduleManager.register(ns.modules.layout.createLayoutModule({}));
     }
+    if (ns.modules && ns.modules.appearance) {
+      moduleManager.register(
+        ns.modules.appearance.createAppearanceModule({ dom: domManager, logger: logger })
+      );
+    }
 
     var app = ns.app.createApp({
       logger: logger,

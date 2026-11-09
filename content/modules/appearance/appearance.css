@@ -1,0 +1,32 @@
+/* OneYT — appearance module styles (Phase 3).
+ * Scoped under html.oneyt-enabled + the module classes the
+ * appearance module adds. All colours come from CSS variables
+ * the module sets; disabling the module removes the classes
+ * and the variables, restoring YouTube's own theme.
+ * Verify each rule live — YouTube renames DOM ids sometimes. */
+
+/* Surfaces that don't read --yt-spec-* reliably: */
+html.oneyt-enabled.oneyt-themed #masthead-container,
+html.oneyt-enabled.oneyt-themed ytd-masthead {
+  background: var(--oneyt-bg);
+}
+
+html.oneyt-enabled.oneyt-themed #guide-content,
+html.oneyt-enabled.oneyt-themed ytd-guide-renderer {
+  background: var(--oneyt-bg);
+}
+
+html.oneyt-enabled.oneyt-themed ytd-rich-grid-renderer {
+  background: var(--oneyt-bg);
+}
+
+/* Border radius on thumbnails (appearance.borderRadius): */
+html.oneyt-enabled.oneyt-radius ytd-thumbnail img,
+html.oneyt-enabled.oneyt-radius ytd-thumbnail #thumbnail {
+  border-radius: var(--oneyt-radius);
+}
+
+/* UI spacing between filter chips (appearance.spacing): */
+html.oneyt-enabled.oneyt-spaced ytd-feed-filter-chip-bar-renderer #chips {
+  gap: var(--oneyt-spacing);
+}

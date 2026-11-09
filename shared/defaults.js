@@ -80,6 +80,8 @@
       },
       customCSS: '',
       customCSSEnabled: false,
+      borderRadius: 12, // px, thumbnails/cards (0 = sharp corners)
+      spacing: 16, // px, UI gaps (filter chips)
     },
 
     playback: {
