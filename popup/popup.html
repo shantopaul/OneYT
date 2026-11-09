@@ -26,19 +26,56 @@
 
       <p class="hint" id="page-hint">Open a YouTube page to see OneYT at work.</p>
 
-      <button
-        class="btn btn-secondary"
-        id="open-dashboard"
-        disabled
-        title="Full settings dashboard arrives in Phase 5"
-      >
-        Open Full Dashboard (Phase 5)
-      </button>
+      <h2 class="section-title">Quick Settings</h2>
+
+      <label class="row" for="focus-toggle">
+        <span class="row-text">
+          <span class="row-label">Focus Mode</span>
+          <span class="row-desc">Hide comments, chat, recommendations and Shorts.</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" id="focus-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+
+      <label class="row" for="scroll-toggle">
+        <span class="row-text">
+          <span class="row-label">Independent sidebar scroll</span>
+          <span class="row-desc">Scroll recommendations without moving the player.</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" id="scroll-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+
+      <label class="row" for="player-toggle">
+        <span class="row-text">
+          <span class="row-label">Player customisation</span>
+          <span class="row-desc">Size, position and appearance of the video player.</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" id="player-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+
+      <label class="row" for="theme-select">
+        <span class="row-text">
+          <span class="row-label">Theme</span>
+          <span class="row-desc">YouTube colour theme.</span>
+        </span>
+        <select id="theme-select" class="theme-select"></select>
+      </label>
+
+      <button class="btn btn-primary" id="open-dashboard">Open Full Dashboard</button>
     </main>
 
     <script src="../shared/constants.js"></script>
     <script src="../shared/defaults.js"></script>
     <script src="../shared/storage.js"></script>
+    <script src="../shared/themes.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>
