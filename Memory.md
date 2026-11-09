@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · **Phase 4 — Playback & Productivity ✅ code complete, pushed to branch** (browser check still open) |
-| **Version** | 0.1.0 (foundation + layout + appearance + playback/productivity, no dashboard yet) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d49ac19` (Phases 1–3 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`); branch `feature/Productivity` pushed 2026-11-09, **not merged** |
-| **Code written** | Phases 1–4: sidebar, player, layout, appearance, typography, playback, focus, recommendations, keyboard, navigation modules + themes + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 4 code done; waiting for browser check + Phase 5 go-ahead) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–4 sections); Phase 5 start decision |
-| **Last verified** | 2026-11-09 — `npm test` 83/83 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · **Phase 5 — Settings Dashboard ✅ code complete, pushed to branch** (browser check still open) |
+| **Version** | 0.1.0 (foundation + layout + appearance + playback/productivity + dashboard, sync still Phase 6) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `33d9e08` (Phases 1–4 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`); branch `feature/Settings` pushed 2026-11-09, **not merged** |
+| **Code written** | Phases 1–5: all modules + dashboard (9 sections, 96 controls) + final popup + tests (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 5 code done; waiting for browser check + Phase 6 go-ahead) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–5 sections); Phase 6 start decision |
+| **Last verified** | 2026-11-09 — `npm test` 93/93 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
 
@@ -116,6 +116,9 @@
 | 2026-11-09 | Shanto merged PR #3 (`feature/appearance` → `main`, `d49ac19`) himself | GitHub API (remote `main` HEAD) |
 | 2026-11-09 | AD-07 decided: Focus Mode = global setting + per-tab in-memory toggle | `Architecture.md` AD-07 |
 | 2026-11-09 | Phase 4 same rule: branch `feature/Productivity` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
+| 2026-11-09 | Shanto merged PR #4 (`feature/Productivity` → `main`, `33d9e08`) himself | GitHub API (remote `main` HEAD) |
+| 2026-11-09 | AD-08 decided: sync scope — opt-in; everything syncs except `appearance.customCSS` (local-only, sync size limits); remembered playback never syncs | `Architecture.md` AD-08 |
+| 2026-11-09 | Phase 5 same rule: branch `feature/Settings` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -128,7 +131,8 @@
 | D-08 | Phase 3 start? | Recommend: after the Phase 2 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 3 start", branch `feature/appearance` from `main` (`d6d2df1`, PR #2 merged), same part-by-part rule, push only when complete |
 | D-09 | Default player radius 12px — keep, or 0 (YouTube sharp corners)? | Recommend: keep 12px unless Shanto prefers stock look | ⬜ Awaiting user — note: radius is now a setting (`appearance.borderRadius`), default stays 12 per schema; changeable without code |
 | D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 4 start", branch `feature/Productivity` from `main` (`d49ac19`, PR #3 merged), same part-by-part rule, push only when complete |
-| D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
+| D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 5 start", branch `feature/Settings` from `main` (`33d9e08`, PR #4 merged), same part-by-part rule, push only when complete |
+| D-12 | Phase 6 start? | Recommend: after the Phase 5 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -201,8 +205,30 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
 - [x] Navigation hiding never removes account menu or accessibility
   controls (module only touches the guide; unit-tested classes)
 
-**Phase 5 — Settings Dashboard** (not started; awaiting user
-go-ahead): see `Phases.md` Phase 5 checklist.
+**Phase 5 — Settings Dashboard** (code complete 2026-11-09;
+✅ = verified here in Node, ⬜ = needs Chrome on Shanto's PC):
+
+- [x] Every setting reachable from the dashboard; every setting
+  has name + description + current + default + reset
+  (unit-tested: full coverage of the defaults tree)
+- [x] Search finds settings by keyword and jumps to them
+  (unit-tested index; jump + highlight is browser-open)
+- [x] Live changes apply without reload; reset restores defaults
+  (writes go to storage, content scripts watch onChanged;
+  live-apply is browser-open)
+- [x] Import validates and previews before applying; invalid
+  file rejected with field errors (unit-tested round-trip +
+  rejection; file picker is browser-open)
+- [x] Export → import round-trip reproduces the same settings
+  (unit-tested)
+- [x] Disabling a module from the dashboard disables only that
+  module (module toggles in General; isolation is browser-open)
+- [x] Popup opens fast, shows correct page status, all quick
+  toggles work (parsePageStatus unit-tested; live popup is
+  browser-open)
+
+**Phase 6 — Optimisation & Testing** (not started; awaiting user
+go-ahead): see `Phases.md` Phase 6 checklist.
 
 ---
 
@@ -381,6 +407,42 @@ go-ahead): see `Phases.md` Phase 5 checklist.
 - Deliberately deferred to Phase 5 (dashboard): shortcut reset
   UI, speed-preset add/remove UI, recommendation section
   toggles, caption appearance beyond font size.
+
+### 2026-11-09 — Phase 5: Settings Dashboard DONE (code, branch only)
+
+- Shanto merged PR #4 (`feature/Productivity` → `main`, `33d9e08`)
+  himself before Phase 5 started, so Phase 5 branched from
+  `main` (`33d9e08`).
+- Branch `feature/Settings`. **11 part-by-part commits, pushed
+  only when Phase 5 was fully complete** (same rule — no
+  intermediate push, no merge to `main`).
+- Built: dashboard shell (`options/options.html` + `options.css`,
+  Design.md §2.2 dark-first tokens, light variant via
+  prefers-color-scheme) + engine (`options/options.js`: data-
+  driven renderer for 8 control types, storage writes, live
+  preview via the existing onChanged watch, search with
+  jump-to-control + highlight, import/export with diff preview,
+  per-setting / per-section / global reset) + 9 section files
+  (96 controls, unit-tested to cover every leaf setting) +
+  final popup (quick toggles, page status, theme, dashboard
+  opener) + manifest (`options_page` returns, `activeTab`
+  permission for the popup's page status only).
+- **AD-08 decided:** sync scope (see Architecture.md). No sync
+  toggle ships in Phase 5 — the implementation is Phase 6
+  work, and a dead toggle would be dishonest.
+- Verification here: `npm test` **93/93 pass** (83 Phase 1–4 +
+  10 new), `npm run lint` clean, `npm run format` clean, every
+  JS file `node --check` clean, manifest valid with all files
+  present, grep: no polling / network / eval in extension code.
+  7 ESLint errors found in the new files during verification
+  were fixed (unused vars, optional catch binding, browser
+  globals, curly) before the tests commit.
+- **Not verified here (needs Chrome on Shanto's PC):** the live
+  dashboard — opening it, search jump, import file picker,
+  popup on a real tab, settings applying live on an open
+  YouTube tab, module toggles isolating correctly. All listed
+  in the new Phase 5 section of `tests/manual-checklist.md`.
+  Phase 5 is code-complete, not browser-verified.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

@@ -249,3 +249,71 @@ Navigation (set `navigation.*`):
 
 Notes / failures:
 - _…_
+
+---
+
+# Phase 5 Manual Checklist (browser) — Settings Dashboard
+
+Load the `feature/Settings` branch unpacked. The dashboard
+opens from the popup ("Open Full Dashboard") or from
+`chrome://extensions` → OneYT → Details → Extension options.
+Tick only after verifying in the browser.
+
+Dashboard (open it):
+- [ ] All 9 sections appear in the left nav (General, Player,
+      Sidebar, Layout, Appearance, Playback, Productivity,
+      Keyboard, Advanced); clicking one shows its controls
+- [ ] Every control shows its name, description, current value
+      and default value; the Reset button on a row restores
+      that setting's default
+- [ ] "Reset this section" restores every control in that
+      section; "Reset all settings" (Advanced) restores
+      everything (after confirm)
+- [ ] Change a setting (e.g. Player width 900) — an open
+      YouTube tab applies it immediately, without a reload
+- [ ] Change the same setting from the popup while the
+      dashboard is open — the dashboard value updates
+      without stealing focus from a field you are typing in
+
+Search:
+- [ ] Type "speed" in the top search — matching settings
+      appear; click one — it jumps to the section and
+      highlights the control
+- [ ] Type "zzzqqq" — no results shown
+
+Sections (spot-check):
+- [ ] General: turn a module off (e.g. Player) — only that
+      module stops working; the others keep working
+- [ ] Appearance: pick the Midnight theme — YouTube turns
+      dark; set a custom accent colour — it applies;
+      clear it — the preset colour returns
+- [ ] Appearance: type invalid CSS (`@import url(...)`) in
+      Custom CSS — it is rejected with an error and the old
+      value stays; valid CSS applies when enabled
+- [ ] Playback: add a speed preset (1.75), remove one —
+      the list updates; try 8x — rejected
+- [ ] Keyboard: click a shortcut field and press Shift+G —
+      it captures; press the same combo for another action —
+      a duplicate warning appears; bind a plain `f` —
+      a YouTube-native conflict warning appears
+
+Import / Export (Advanced):
+- [ ] Export — a `oneyt-settings.json` file downloads
+- [ ] Change a setting, then import the exported file —
+      the preview lists exactly the changed settings
+      (old → new); Apply restores them
+- [ ] Paste invalid JSON — rejected with an error, nothing
+      changes; paste JSON with a wrong type
+      (e.g. `"enabled": "yes"`) — rejected with a field error
+
+Popup:
+- [ ] On a watch page it says "Watch page"; on Home "Home";
+      on a non-YouTube tab "Not on YouTube"
+- [ ] Focus toggle works; Scroll toggle works; Player toggle
+      works; theme selector changes the theme
+- [ ] Turn the master switch off — the quick controls grey
+      out; turn it back on — they work again
+- [ ] "Open Full Dashboard" opens the dashboard
+
+Notes / failures:
+- _…_
