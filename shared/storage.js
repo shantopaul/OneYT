@@ -94,12 +94,19 @@
           var jobs = [];
           for (var key in items) {
             var value = items[key];
-            if (!value || typeof value !== 'object' || !value.sync || typeof value.sync !== 'object') {
+            if (
+              !value ||
+              typeof value !== 'object' ||
+              !value.sync ||
+              typeof value.sync !== 'object'
+            ) {
               continue;
             }
             if (value.sync.enabled === true) {
               jobs.push(
-                Promise.resolve(syncStore.set({ [key]: syncableSettings(value) })).catch(function () {})
+                Promise.resolve(syncStore.set({ [key]: syncableSettings(value) })).catch(
+                  function () {}
+                )
               );
             } else if (typeof syncStore.remove === 'function') {
               jobs.push(Promise.resolve(syncStore.remove(key)).catch(function () {}));

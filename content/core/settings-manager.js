@@ -83,9 +83,7 @@
         .then(function (stored) {
           var migrated = defaultsApi.migrateSettings(stored);
           var changed =
-            seeded ||
-            stored === undefined ||
-            JSON.stringify(stored) !== JSON.stringify(migrated);
+            seeded || stored === undefined || JSON.stringify(stored) !== JSON.stringify(migrated);
           current = migrated;
           loaded = true;
           if (changed) {
@@ -159,17 +157,14 @@
           // merges are skipped, so a mirror write back to sync
           // cannot loop (mirror -> sync event -> same merge).
           var merged = defaultsApi.migrateSettings(change.newValue);
-          var localCSS =
-            current && current.appearance ? current.appearance.customCSS || '' : '';
+          var localCSS = current && current.appearance ? current.appearance.customCSS || '' : '';
           if (!merged.appearance) merged.appearance = {};
           merged.appearance.customCSS = localCSS;
           if (JSON.stringify(merged) === JSON.stringify(current)) return;
           current = merged;
-          storage
-            .set({ [STORAGE_KEY]: defaultsApi.deepClone(current) })
-            .catch(function (err) {
-              logger.error('settings: failed to save merged sync settings', err);
-            });
+          storage.set({ [STORAGE_KEY]: defaultsApi.deepClone(current) }).catch(function (err) {
+            logger.error('settings: failed to save merged sync settings', err);
+          });
           notify();
           return;
         }
