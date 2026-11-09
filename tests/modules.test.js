@@ -215,6 +215,46 @@ test('player: non-watch page applies nothing', () => {
   assert.equal(doc._root._classes.size, 0);
 });
 
+test('player: hide-count classes on/off on watch, in theater too', () => {
+  const { doc, mod } = playerSetup();
+  const on = settingsWith({
+    player: { hideLikeCount: true, hideViewCount: true, hideSubscriberCount: true },
+  });
+  mod.apply(on, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-like-count'), true);
+  assert.equal(doc._root._classes.has('oneyt-player-hide-view-count'), true);
+  assert.equal(doc._root._classes.has('oneyt-player-hide-subscriber-count'), true);
+  // Off again restores everything — class-only hiding.
+  mod.apply(settingsWith({ player: {} }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-like-count'), false);
+  assert.equal(doc._root._classes.has('oneyt-player-hide-view-count'), false);
+  assert.equal(doc._root._classes.has('oneyt-player-hide-subscriber-count'), false);
+  // Theater: the counts live below the player, so the classes
+  // stay set in theater just like the appearance classes.
+  const theater = playerSetup({ theater: true });
+  theater.mod.apply(on, 'watch');
+  assert.equal(theater.doc._root._classes.has('oneyt-player-hide-like-count'), true);
+  assert.equal(theater.doc._root._classes.has('oneyt-player-hide-view-count'), true);
+  assert.equal(theater.doc._root._classes.has('oneyt-player-hide-subscriber-count'), true);
+});
+
+test('player: hide-count classes cleared off watch and in fullscreen', () => {
+  const { doc, mod } = playerSetup();
+  const on = settingsWith({
+    player: { hideLikeCount: true, hideViewCount: true, hideSubscriberCount: true },
+  });
+  mod.apply(on, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-like-count'), true);
+  mod.apply(on, 'home');
+  assert.equal(doc._root._classes.has('oneyt-player-hide-like-count'), false);
+  assert.equal(doc._root._classes.has('oneyt-player-hide-view-count'), false);
+  assert.equal(doc._root._classes.has('oneyt-player-hide-subscriber-count'), false);
+  mod.apply(on, 'watch');
+  doc.fullscreenElement = createFakeElement();
+  mod.apply(on, 'watch');
+  assert.equal(doc._root._classes.size, 0);
+});
+
 // ---------- Layout ----------
 
 test('layout: shortsWatchUrl maps /shorts/VIDEOID to watch, nothing else', () => {

@@ -396,3 +396,37 @@ Phase 10 — Hide endscreen cards (browser):
 
 Notes / failures:
 - _…_
+
+---
+
+## Phase 11 — Hide Counts (v1.4) — live on a real watch page
+
+Selectors under test: like `#segmented-like-button
+.yt-spec-button-shape-next__button-text-content`, views
+`ytd-video-primary-info-renderer #info-text`, subscribers
+`ytd-video-owner-renderer #subscriber-count`. The views
+selector is the risky one — YouTube moved the views line
+into the description box in the 2023 layout, so if the
+views number is still visible with the toggle on, note the
+real element here and fix the selector.
+
+- [ ] Open a video — Like button shows a number, the "X
+      views" line is visible, the channel shows "X
+      subscribers"
+- [ ] Turn on "Hide like count" — the number next to Like
+      disappears, the Like button still works (click it,
+      the thumb fills)
+- [ ] Turn on "Hide view count" — the "X views" line
+      disappears (note: if it does not, record the real
+      views element from DevTools → Elements)
+- [ ] Turn on "Hide subscriber count" — "X subscribers"
+      disappears, the Subscribe button still works
+- [ ] Turn all three off again — every number returns
+      exactly (class-only hiding)
+- [ ] Same three checks in theater mode — the toggles
+      still hide the numbers
+- [ ] Fullscreen — the numbers return (player classes are
+      cleared in fullscreen, like the other player classes)
+
+Notes / failures:
+- _…_
