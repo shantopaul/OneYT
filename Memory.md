@@ -16,11 +16,11 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · **Phase 7 — Public Release ✅ code complete, pushed to branch** (browser check + screenshots + submission still open) |
-| **Version** | 1.0.0 — public release (Phase 7) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `383e35a` (Phases 1–6 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a` — merged by Shanto while Phase 7 was in progress); branch `feature/Release` pushed 2026-11-09, **not merged** |
-| **Code written** | Phases 1–6: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 7 code done; waiting for browser check + screenshots + submission) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · **Phase 7 ✅ (merged, PR #7) — all phases complete** |
+| **Version** | 1.0.0 — public release, in `main` |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `4ca8a88` (Phases 1–7 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`) |
+| **Code written** | Phases 1–7: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + release packaging (see "What Has Been Completed") |
+| **Currently working on** | — (all phases merged; waiting for browser check + screenshots + tag/release + store submission) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
@@ -122,6 +122,8 @@
 | 2026-11-09 | Shanto merged PR #5 (`feature/Settings` → `main`, `5b44c9e`) himself | GitHub API (remote `main` HEAD) |
 | 2026-11-09 | Phase 6 same rule: branch `feature/Optimisation` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Phase 7 same rule: branch `feature/Release`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
+| 2026-11-09 | Shanto merged PR #6 (`feature/Optimisation` → `main`, `383e35a`) and PR #7 (`feature/Release` → `main`, `4ca8a88`) himself — all 7 phases now in `main` | GitHub API (remote `main` HEAD) |
+| 2026-11-09 | Update all plan files to record full completion (Phases 0–7 merged, v1.0.0 in `main`) | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -136,7 +138,7 @@
 | D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 4 start", branch `feature/Productivity` from `main` (`d49ac19`, PR #3 merged), same part-by-part rule, push only when complete |
 | D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 5 start", branch `feature/Settings` from `main` (`33d9e08`, PR #4 merged), same part-by-part rule, push only when complete |
 | D-12 | Phase 6 start? | Recommend: after the Phase 5 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 6 start", branch `feature/Optimisation` from `main` (`5b44c9e`, PR #5 merged), same part-by-part rule, push only when complete |
-| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 7 start", branch `feature/Release` (based on `feature/Optimisation` because PR #6 was still open at the time — Shanto merged PR #6 himself during Phase 7, `main` now `383e35a`), same part-by-part rule, push only when complete |
+| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 7 start", branch `feature/Release` (based on `feature/Optimisation` because PR #6 was still open at the time — Shanto merged PR #6 himself during Phase 7, then PR #7 himself; `main` now `4ca8a88`), same part-by-part rule, push only when complete |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -568,7 +570,7 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   while Phase 7 was in progress (`main` now `383e35a`), so
   the release branch is now a clean descendant of `main`
   and the release PR merges without conflict.
-- Branch `feature/Release`. **11 part-by-part commits,
+- Branch `feature/Release`. **12 part-by-part commits,
   pushed only when Phase 7 was fully complete** (same rule —
   no intermediate push, no merge to `main`).
 - Final branding: the Phase 1 placeholder icon was a red
@@ -621,6 +623,11 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   URL and the repo is private), tag + GitHub release after
   the merge, Chrome Web Store submission ($5 account,
   1–3 day review).
+- **Update 2026-11-09:** Shanto merged PR #7 himself
+  (`main` now `4ca8a88`) — Phase 7 is in `main`, and all
+  plan files (PRD, Architecture, Design, Memory, Phases,
+  RELEASE_CHECKLIST) were updated the same day to record
+  full completion.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
