@@ -357,3 +357,46 @@ test('focus: per-tab override resets on navigation', () => {
   assert.equal(mod.isEffective(), true);
   assert.equal(doc._root._classes.has('oneyt-focus'), true);
 });
+
+test('keyboard: held toggle shortcut is swallowed on repeats, action runs once', () => {
+  const win = fakeWindow();
+  const dom = createFakeDom({ video: createFakeElement() });
+  let focusToggled = 0;
+  const s = settingsWith();
+  const mod = keyboardApi.createKeyboardModule({
+    dom,
+    logger: quietLogger,
+    window: win,
+    settingsManager: { get: () => s, set: () => {} },
+    actions: {
+      toggleFocus: () => {
+        focusToggled++;
+      },
+    },
+  });
+  mod.init();
+  mod.apply(s, 'watch');
+  let prevented = 0;
+  let stopped = 0;
+  const repeatEvent = () =>
+    keyEvent('F', {
+      shiftKey: true,
+      repeat: true,
+      preventDefault: () => {
+        prevented++;
+      },
+      stopPropagation: () => {
+        stopped++;
+      },
+    });
+  win.dispatch('keydown', keyEvent('F', { shiftKey: true }));
+  assert.equal(focusToggled, 1);
+  // Holding the shortcut: the action must not re-run, but the
+  // event must still be swallowed so YouTube never sees the
+  // repeats (the old code returned before preventDefault).
+  win.dispatch('keydown', repeatEvent());
+  win.dispatch('keydown', repeatEvent());
+  assert.equal(focusToggled, 1);
+  assert.equal(prevented, 2);
+  assert.equal(stopped, 2);
+});
