@@ -1135,7 +1135,8 @@
           state = profilesApi.applyProfile(state, profile, defaultsApi);
           saveNow().then(function () {
             refreshValues();
-            profilesNotice = 'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+            profilesNotice =
+              'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
             renderSection(currentSection);
           });
         });
@@ -1413,11 +1414,9 @@
     // A failure never touches the settings; the notice is
     // shown the next time the Profiles section renders.
     function saveProfiles() {
-      return storage
-        .set({ [PROFILES_KEY]: profiles })
-        .catch(function () {
-          profilesNotice = 'Could not save profiles — please try again.';
-        });
+      return storage.set({ [PROFILES_KEY]: profiles }).catch(function () {
+        profilesNotice = 'Could not save profiles — please try again.';
+      });
     }
 
     function init() {

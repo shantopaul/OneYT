@@ -101,17 +101,11 @@ test('profiles: createProfile rejects empty, long, duplicate and built-in names'
   const current = defaults.cloneDefaults();
   assert.match(profiles.createProfile('', current, [], defaults).error, /empty/);
   assert.match(profiles.createProfile('   ', current, [], defaults).error, /empty/);
-  assert.match(
-    profiles.createProfile('x'.repeat(41), current, [], defaults).error,
-    /too long/
-  );
+  assert.match(profiles.createProfile('x'.repeat(41), current, [], defaults).error, /too long/);
   assert.match(profiles.createProfile('Focus', current, [], defaults).error, /built-in/);
   assert.match(profiles.createProfile('focus', current, [], defaults).error, /built-in/);
   const one = profiles.createProfile('Work', current, [], defaults).profiles;
-  assert.match(
-    profiles.createProfile('work', current, one, defaults).error,
-    /already exists/
-  );
+  assert.match(profiles.createProfile('work', current, one, defaults).error, /already exists/);
   const trimmed = profiles.createProfile('  Work  ', current, one, defaults);
   assert.match(trimmed.error, /already exists/);
 });
