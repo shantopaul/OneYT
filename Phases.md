@@ -173,11 +173,27 @@ Phase 3 ships the validated apply/enable/disable engine.
 
 ---
 
-## Phase 4 — Playback & Productivity
+## Phase 4 — Playback & Productivity ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** playback preferences, Focus Mode, keyboard shortcuts.
 
 **Deliverable:** productivity + playback modules, v0.4.0.
+
+**Status 2026-11-09:** code complete on branch `feature/Productivity`
+(10 part-by-part commits on top of `main` `d49ac19`, pushed after
+completion, nothing merged). `npm test` 83/83 pass, lint + format
+clean, manifest valid, no polling/network. AD-07 decided (Focus
+Mode = global setting + per-tab in-memory toggle). New defaults:
+`playback.captionFontSize: 0`, `player.miniPlayer.*`,
+`productivity.focusHideButtons/Metadata/Nav`, keyboard shortcut
+defaults (all Shift+ combos), `navigation.*` section (schema stays
+v1). **Browser verification still open** — the real behaviour
+(remembered speed across restarts, quality fallback, Focus restore,
+mini-player drag, shortcuts on a live page, guide hiding) needs
+Chrome on Shanto's PC (`tests/manual-checklist.md` Phase 4 section).
+Deliberately deferred to Phase 5: shortcut reset UI, speed-preset
+add/remove UI, recommendation section toggles (need dashboard list
+UI), caption appearance beyond font size.
 
 ### Tasks
 

@@ -1,0 +1,39 @@
+/* OneYT — navigation module styles (Phase 4).
+ * Guide entries only — the masthead, account menu and
+ * accessibility controls are never touched. Guide entries are
+ * matched by their link (:has + href), so hiding one entry can
+ * never hide another. Verify live. */
+
+html.oneyt-enabled.oneyt-nav-hide-home ytd-guide-entry-renderer:has(a[href='/']) {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-guide-entry-renderer:has(a[href='/shorts']) {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-nav-hide-subscriptions
+  ytd-guide-entry-renderer:has(a[href='/feed/subscriptions']) {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-nav-hide-library ytd-guide-entry-renderer:has(a[href='/feed/library']),
+html.oneyt-enabled.oneyt-nav-hide-library ytd-guide-entry-renderer:has(a[href='/feed/you']) {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-nav-hide-history ytd-guide-entry-renderer:has(a[href='/feed/history']) {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-nav-compact #guide-content {
+  width: 72px;
+}
+
+html.oneyt-enabled.oneyt-nav-compact ytd-guide-entry-renderer .title {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-nav-wide #guide-content {
+  width: var(--oneyt-guide-width);
+}

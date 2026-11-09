@@ -38,6 +38,20 @@
     // --- Navigation (Phase 4) ---
     guide: '#guide',
     masthead: '#masthead',
+
+    // --- Playback controls (Phase 4) ---
+    video: 'video.html5-main-video', // The <video> element itself
+    theaterButton: '#movie_player .ytp-size-button', // Toggles theater mode
+    autonavToggle: '#movie_player .ytp-autonav-toggle-button', // Autoplay-next toggle
+    captionsButton: '#movie_player .ytp-subtitles-button', // Captions toggle
+
+    // --- Mini-player (Phase 4) ---
+    miniPlayer: 'ytd-miniplayer', // Appears only while mini-player is open
+
+    // --- Focus Mode targets (Phase 4) ---
+    chat: '#chat', // Live chat container on watch pages
+    actions: '#actions', // Like/share/download row under the player
+    description: '#description', // Expandable video description
   };
 
   // Selectors that must exist for the watch page to be usable.

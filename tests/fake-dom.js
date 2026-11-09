@@ -35,6 +35,7 @@ function createFakeElement(options) {
       (listeners[type] || []).forEach((fn) => fn(event));
     },
     hasAttribute: (name) => attrs.has(name),
+    getAttribute: (name) => (attrs.has(name) ? attrs.get(name) : null),
     setAttribute: (name, value) => attrs.set(name, value),
     removeAttribute: (name) => attrs.delete(name),
     getBoundingClientRect: () => opts.rect || { width: 0, height: 0, left: 0, top: 0 },

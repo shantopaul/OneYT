@@ -67,6 +67,44 @@
     if (ns.modules && ns.modules.typography) {
       moduleManager.register(ns.modules.typography.createTypographyModule({ logger: logger }));
     }
+    if (ns.modules && ns.modules.playback) {
+      moduleManager.register(
+        ns.modules.playback.createPlaybackModule({
+          dom: domManager,
+          logger: logger,
+          storage: storage,
+        })
+      );
+    }
+    // Kept in a variable: the keyboard module's toggleFocus action
+    // calls focusModule.toggleTab() (wired below).
+    var focusModule = null;
+    if (ns.modules && ns.modules.focus) {
+      focusModule = ns.modules.focus.createFocusModule({ logger: logger });
+      moduleManager.register(focusModule);
+    }
+    if (ns.modules && ns.modules.recommendations) {
+      moduleManager.register(
+        ns.modules.recommendations.createRecommendationsModule({ logger: logger })
+      );
+    }
+    if (ns.modules && ns.modules.keyboard) {
+      moduleManager.register(
+        ns.modules.keyboard.createKeyboardModule({
+          dom: domManager,
+          logger: logger,
+          settingsManager: settingsManager,
+          actions: {
+            toggleFocus: function () {
+              if (focusModule) focusModule.toggleTab();
+            },
+          },
+        })
+      );
+    }
+    if (ns.modules && ns.modules.navigation) {
+      moduleManager.register(ns.modules.navigation.createNavigationModule({ logger: logger }));
+    }
 
     var app = ns.app.createApp({
       logger: logger,

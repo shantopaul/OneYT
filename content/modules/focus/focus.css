@@ -1,0 +1,36 @@
+/* OneYT — focus module styles (Phase 4).
+ * Every rule hides by display:none under the focus classes;
+ * removing the classes restores the page exactly. The masthead
+ * (search + account) is never hidden. Verify live. */
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-comments #comments {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-chat #chat {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-recommendations #secondary {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-recommendations ytd-rich-grid-renderer {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts ytd-rich-shelf-renderer[is-shorts] {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-buttons #actions {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-metadata #description {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-nav #guide-content {
+  display: none;
+}

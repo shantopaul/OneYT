@@ -46,6 +46,14 @@
       shadow: 'none', // CSS box-shadow or "none"
       spacing: 0, // px around player
       sticky: false,
+      miniPlayer: {
+        size: 0, // px width, 0 = YouTube default
+        position: 'default', // default | bottom-right | bottom-left | top-right | top-left
+        borderRadius: 0, // px, 0 = YouTube default
+        shadow: 'none', // CSS box-shadow or "none"
+        offsetX: 0, // px from the chosen corner
+        offsetY: 0, // px from the chosen corner
+      },
     },
 
     sidebar: {
@@ -94,6 +102,7 @@
       autoplay: null, // null = YouTube default
       defaultQuality: 'auto', // auto | 1080p | 720p | ... (best-effort)
       captions: null, // null = YouTube default
+      captionFontSize: 0, // % , 0 = YouTube default
     },
 
     recommendations: {
@@ -109,18 +118,34 @@
       focusHideChat: true,
       focusHideRecommendations: true,
       focusHideShorts: true,
+      focusHideButtons: true, // like/share/download row
+      focusHideMetadata: true, // video description
+      focusHideNav: true, // guide only — masthead (search/account) is never hidden
     },
 
     keyboard: {
       shortcuts: {
-        toggleFocus: '',
-        toggleSidebar: '',
-        togglePlayerPosition: '',
-        speedUp: '',
-        speedDown: '',
-        resetSpeed: '',
-        toggleTheater: '',
-      }, // "" = unbound; defaults assigned in Phase 4
+        // Shift+ combos: plain letters are YouTube-native keys
+        // (f = fullscreen, t = theater, ...), so defaults use
+        // Shift to avoid conflicts. "" = unbound.
+        toggleFocus: 'Shift+F',
+        toggleSidebar: 'Shift+S',
+        togglePlayerPosition: 'Shift+P',
+        speedUp: 'Shift+>',
+        speedDown: 'Shift+<',
+        resetSpeed: 'Shift+R',
+        toggleTheater: 'Shift+T',
+      },
+    },
+
+    navigation: {
+      hideHome: false,
+      hideShorts: false,
+      hideSubscriptions: false,
+      hideLibrary: false,
+      hideHistory: false,
+      compact: false, // mini guide (icons only)
+      guideWidth: 0, // px, 0 = YouTube default (min 72)
     },
   };
 

@@ -9,7 +9,11 @@
         "content/modules/player/player.css",
         "content/modules/layout/layout.css",
         "content/modules/appearance/appearance.css",
-        "content/modules/typography/typography.css"
+        "content/modules/typography/typography.css",
+        "content/modules/playback/playback.css",
+        "content/modules/focus/focus.css",
+        "content/modules/recommendations/recommendations.css",
+        "content/modules/navigation/navigation.css"
       ],
       "js": [
         "shared/constants.js",
@@ -29,6 +33,11 @@
         "content/modules/layout/layout.js",
         "content/modules/appearance/appearance.js",
         "content/modules/typography/typography.js",
+        "content/modules/playback/playback.js",
+        "content/modules/focus/focus.js",
+        "content/modules/recommendations/recommendations.js",
+        "content/modules/keyboard/keyboard.js",
+        "content/modules/navigation/navigation.js",
         "content/core/app.js",
         "content/index.js"
       ],
