@@ -5,7 +5,23 @@ phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts),
 1.2.0 (Phase 9 dashboard theme + search),
 1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts),
-1.5.0 (Phase 12 hide topic chips bar).
+1.5.0 (Phase 12 hide topic chips bar), 1.6.0 (Phase 14
+default theater).
+
+## 1.6.0 — 2026-11-09 (Default Theater Mode, Phase 14)
+
+- **Default theater mode** (`player.defaultTheater`,
+  default off): one toggle in the Player section. Every
+  video opens in theater mode automatically — the player
+  module clicks the existing theater button
+  (`#movie_player .ytp-size-button`) once per video,
+  tracked by the video URL. Exiting theater manually is
+  respected (no re-click on that video); turning the
+  setting on mid-video enters theater immediately;
+  turning it off never exits theater. No new CSS, no new
+  selector, no new permission. See
+  `tests/manual-checklist.md` Phase 14 for the live
+  checks (flash, slow loads, watch → watch navigation).
 
 ## 1.5.0 — 2026-11-09 (Hide Topic Chips Bar, Phase 12)
 

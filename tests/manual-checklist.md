@@ -454,3 +454,37 @@ that container too.
 
 Notes / failures:
 - _…_
+
+---
+
+## Phase 14 — Default Theater Mode (v1.6) — live on a real watch page
+
+Honest limits: the player may flash at default size
+briefly before the click lands (the click happens after
+the page loads, not before it). The proof is a real watch
+page on Shanto's PC — slow loads (button timing) and
+watch → watch SPA navigation are the cases the unit tests
+cannot settle.
+
+- [ ] Turn on "Default theater mode" and open a video —
+      it opens in theater mode by itself (wide player)
+- [ ] Does the player flash at default size first? Note
+      how long — if it is obvious, the click may need to
+      land earlier
+- [ ] Exit theater manually (theater button or "t") — it
+      stays exited, it does NOT snap back to theater
+      (the trap: the theater observer re-applies on exit)
+- [ ] Click a recommended video — the next video opens
+      in theater mode again by itself
+- [ ] Turn the toggle on mid-video — theater starts
+      immediately, no reload
+- [ ] Turn the toggle off mid-video — the video stays in
+      theater (off never exits theater)
+- [ ] Reload with a cold cache / slow connection — the
+      theater click still lands once the button appears
+- [ ] Fullscreen from theater, then exit fullscreen —
+      back in theater, not the default size
+
+
+Notes / failures:
+- _…_

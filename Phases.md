@@ -518,9 +518,10 @@ follows because 1.3.0 is in `main` now. Ambient mode was
 redirected mid-work: branch `feature/disable-ambient-mode`
 exists (no commits yet) with the research done —
 `#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 13
-when resumed (renumbered: this phase takes 12).
+when resumed (renumbered: Phase 12 is hide topic chips,
+Phase 14 is default theater).
 
-## Phase 12 — Hide Topic Chips Bar (v1.5) ✅ CODE COMPLETE (2026-11-09)
+## Phase 12 — Hide Topic Chips Bar (v1.5) ✅ MERGED (2026-11-09)
 
 **Goal:** one toggle that hides the topic filter chips row
 ("All", "Music", "Gaming", …) at the top of the home feed,
@@ -549,11 +550,60 @@ frosted-glass header (`#frosted-glass`, class
 `with-chipbar`) may leave an empty strip where the bar
 was, in which case the fix is to collapse that container
 too — the checklist asks to check for the gap.
-Numbering note: this phase takes Phase 12 because it is
-being built now; ambient mode moves to Phase 13 and
-default theater mode (branch `feature/default-theater`,
-no commits yet) moves to Phase 14. v1.5.0 is unambiguous:
-1.4.0 is in `main` now (PR #13 merged).
+Numbering note: this phase takes Phase 12 because it was
+built now; ambient mode moves to Phase 13 and default
+theater mode is Phase 14. v1.5.0 is unambiguous: 1.4.0
+was in `main` then (PR #13 merged).
+
+## Phase 14 — Default Theater Mode (v1.6) ✅ MERGED (2026-11-09)
+
+**Goal:** every video opens in theater mode automatically
+— no click on the theater button, no "t" key, the wide
+player is just the default.
+
+**Deliverable:** v1.6.0.
+
+**Plan (part-by-part, push only when complete):** one new
+setting `player.defaultTheater` (default off, additive);
+the player module clicks the existing `theaterButton`
+selector (`#movie_player .ytp-size-button`, already in
+`shared/selectors.js` — no new selector, no new CSS, no
+new permission) at most **once per video**, tracked by
+`location.href` (URL change resets it); if the user exits
+theater manually, no re-click on that video; turning the
+setting on mid-video enters theater immediately; turning
+it off never exits theater. If the button is late, the
+existing `dom.waitFor('theaterButton')` (10 s, resolves
+null, never rejects) is used, and the click happens only
+if still on the same video and still not in theater. The
+click-once flag is set synchronously before the click.
+The existing apply() guards stay: off-watch and
+fullscreen skip everything. No cookie route — deliberately
+out of scope (clicking the real button is the documented
+YouTube behaviour, a cookie would be a hidden side
+channel). Dashboard toggle in the Player section; module
+tests + manual checklist item. **Browser verification
+still open** — the player may flash at default size
+briefly before the click lands; slow loads (button
+timing) and watch → watch SPA navigation need a real
+watch page on Shanto's PC. If YouTube ever removes
+`.ytp-size-button`, the feature silently does nothing and
+the page does not break.
+**Done (8 commits):** `b3a8bb9` start (PRD PL-14 + plan,
+branch rebased onto `main` `6f0b965`, Memory.md corrected
+to Phase 11 merged as PR #13), `95a97fe` setting,
+`f5248e8` player module click-once logic, `f8ab988`
+dashboard toggle, `4237ebe` tests (144/144),
+`beecfe7` checklist, `00c263d` version 1.6.0. Selector
+count stays 26 (no new selector); no new CSS, no new
+permission. **Browser verification still open** — the
+flash, slow-load button timing, and watch → watch SPA
+navigation need a real watch page on Shanto's PC.
+Numbering note: this phase takes Phase 14 because Phase
+12 is hide topic chips (merged) and Phase 13 is disable
+ambient mode (parked, branch `feature/disable-ambient-mode`
+with no commits). v1.6.0 assumed 1.5.0 merges first —
+it did.
 
 ## Future (v1.1+, not in scope now)
 

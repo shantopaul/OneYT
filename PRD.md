@@ -142,6 +142,7 @@ and must work flawlessly before anything else ships.
 | PL-11 | Hide view count | Toggle; the "X views" line on the watch page is hidden; live apply |
 | PL-12 | Hide subscriber count | Toggle; the "X subscribers" next to the channel name is hidden, the Subscribe button stays; live apply |
 | PL-13 | Hide topic chips bar (home) | Toggle; the topic filter chips row ("All", "Music", "Gaming", …) at the top of the home feed is hidden; live apply, home page only |
+| PL-14 | Default theater mode | Toggle; every video opens in theater mode automatically; watch page only |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.

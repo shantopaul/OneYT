@@ -57,6 +57,7 @@
       shadow: 'none', // CSS box-shadow or "none"
       spacing: 0, // px around player
       sticky: false,
+      defaultTheater: false, // open every video in theater mode automatically
       hideEndscreen: false, // hide the video suggestions shown at the end of a video
       hideLikeCount: false, // hide the number next to the Like button (button stays clickable)
       hideViewCount: false, // hide the "X views" line on the watch page
