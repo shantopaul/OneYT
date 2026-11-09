@@ -46,9 +46,7 @@ html.oneyt-enabled.oneyt-player-sticky #primary {
    comments do not jump up underneath it. --- */
 html.oneyt-enabled.oneyt-player-fixed #primary,
 html.oneyt-enabled.oneyt-player-absolute #primary {
-  padding-top: calc(
-    var(--oneyt-player-height, 0px) + var(--oneyt-player-offset, 0px)
-  );
+  padding-top: calc(var(--oneyt-player-height, 0px) + var(--oneyt-player-offset, 0px));
 }
 
 html.oneyt-enabled.oneyt-player-fixed #primary {

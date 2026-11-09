@@ -33,7 +33,6 @@
     var logger = deps.logger || { debug: function () {}, error: function () {} };
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
 
-    var ctx = null;
     var lastSettings = null;
     var lastPage = null;
     var waitPending = false;
@@ -131,10 +130,7 @@
 
       setClass('oneyt-sidebar-scroll', scrollOn);
       setClass('oneyt-sidebar-smooth', scrollOn && sb.smoothScroll === true);
-      setClass(
-        'oneyt-sidebar-hide-scrollbar',
-        scrollOn && sb.scrollbarVisible === false
-      );
+      setClass('oneyt-sidebar-hide-scrollbar', scrollOn && sb.scrollbarVisible === false);
 
       if (scrollOn) {
         var el = dom ? dom.query('secondary') : null;
@@ -164,9 +160,7 @@
 
     return {
       id: 'sidebar',
-      init: function (context) {
-        ctx = context;
-      },
+      init: function () {},
       apply: apply,
       update: apply,
       enable: function () {
@@ -177,7 +171,6 @@
       },
       destroy: function () {
         cleanup();
-        ctx = null;
       },
     };
   }

@@ -28,7 +28,6 @@ html.oneyt-enabled.oneyt-sidebar-scroll.oneyt-sidebar-hide-scrollbar #secondary 
   scrollbar-width: none;
 }
 
-html.oneyt-enabled.oneyt-sidebar-scroll.oneyt-sidebar-hide-scrollbar
-  #secondary::-webkit-scrollbar {
+html.oneyt-enabled.oneyt-sidebar-scroll.oneyt-sidebar-hide-scrollbar #secondary::-webkit-scrollbar {
   display: none;
 }

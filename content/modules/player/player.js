@@ -65,7 +65,6 @@
     var logger = deps.logger || { debug: function () {}, error: function () {} };
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
 
-    var ctx = null;
     var lastSettings = null;
     var lastPage = null;
     var waitPending = false;
@@ -184,10 +183,7 @@
       );
       setVar('--oneyt-player-border', pl.border && pl.border !== 'none' ? pl.border : null);
       setVar('--oneyt-player-shadow', pl.shadow && pl.shadow !== 'none' ? pl.shadow : null);
-      setVar(
-        '--oneyt-player-spacing',
-        pl.spacing && pl.spacing > 0 ? pl.spacing + 'px' : null
-      );
+      setVar('--oneyt-player-spacing', pl.spacing && pl.spacing > 0 ? pl.spacing + 'px' : null);
       var offset =
         settings.sidebar && settings.sidebar.playerOffset ? settings.sidebar.playerOffset : 0;
       setVar('--oneyt-player-offset', offset > 0 ? offset + 'px' : null);
@@ -238,8 +234,7 @@
 
     return {
       id: 'player',
-      init: function (context) {
-        ctx = context;
+      init: function () {
         observeTheater();
       },
       apply: apply,
@@ -252,7 +247,6 @@
       },
       destroy: function () {
         cleanup();
-        ctx = null;
       },
     };
   }

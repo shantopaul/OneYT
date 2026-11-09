@@ -19,8 +19,6 @@
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
 
-    var ctx = null;
-
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
     }
@@ -63,9 +61,7 @@
 
     return {
       id: 'layout',
-      init: function (context) {
-        ctx = context;
-      },
+      init: function () {},
       apply: apply,
       update: apply,
       enable: function () {},
@@ -74,7 +70,6 @@
       },
       destroy: function () {
         cleanup();
-        ctx = null;
       },
     };
   }
