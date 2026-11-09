@@ -622,3 +622,17 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 22 — Advanced Layout Editor (v1.14) — live in Chrome
+
+- [ ] Dashboard → Layout: a "Preview" box (mini grid + "4 columns · 12 px gap · full width.") and a "Layout presets" box (Compact / Balanced / Spacious, each with Apply button) below the number controls
+- [ ] Apply "Balanced": the number controls change to 4 columns, 16 px gap, 1600 px max width, 16 px watch spacing — and the preview changes to 4 boxes with "4 columns · 16 px gap · max-width 1600 px."
+- [ ] Apply "Compact": preview shows 5 boxes, "5 columns · 8 px gap · full width." Apply "Spacious": 3 boxes, "3 columns · 24 px gap · max-width 1280 px."
+- [ ] Apply "Balanced", then change Homepage columns to 6 by hand: the preview redraws with 6 boxes on the next render — presets are a starting point, not a lock
+- [ ] On a wide monitor (>1600 px): with "Balanced" applied, open the home page — the feed is capped at 1600 px and centred, with equal empty space on both sides. Watch page and search page are untouched (full width)
+- [ ] Set Homepage max width to 0: the home feed goes full width again, immediately
+- [ ] Set Homepage max width to 800 on a narrow window: the feed is narrow and centred — the empty sides are by design, not a bug
+- [ ] Hiding toggles are untouched by presets: turn on "Hide topic chips bar", apply "Spacious", and the chips bar stays hidden
+
+Notes / failures:
+- _…_
