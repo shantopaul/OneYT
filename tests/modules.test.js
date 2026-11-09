@@ -627,3 +627,50 @@ test('base.css must not define the "0 = default" width variables', () => {
   assert.equal(text.includes('--oneyt-player-max-width:'), false);
   assert.equal(text.includes('--oneyt-sidebar-width:'), false);
 });
+
+test('player: mini-player config clears when it closes, re-applies on reopen', () => {
+  const doc = createFakeDocument();
+  const flexy = createFakeElement();
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const state = { mini: null };
+  const dom = {
+    query: (key) => {
+      if (key === 'watchFlexy') return flexy;
+      if (key === 'playerContainer') return container;
+      if (key === 'player') return moviePlayer;
+      if (key === 'miniPlayer') return state.mini;
+      return null;
+    },
+  };
+  const mod = createPlayerModule({ dom, logger: quietLogger, document: doc });
+  const settings = settingsWith();
+  settings.player.miniPlayer = {
+    size: 400,
+    position: 'default',
+    borderRadius: 0,
+    shadow: 'none',
+    offsetX: 0,
+    offsetY: 0,
+  };
+  // Opens with size 400.
+  state.mini = createFakeElement();
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
+  assert.equal(doc._root._vars.get('--oneyt-miniplayer-width'), '400px');
+  // Closes: the same settings must not leave stale classes/vars
+  // behind (the old code returned early here, so the reopen
+  // observer saw no change and never re-applied).
+  state.mini = null;
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), false);
+  assert.equal(doc._root._vars.has('--oneyt-miniplayer-width'), false);
+  // Reopens with a new size: the current config applies.
+  state.mini = createFakeElement();
+  settings.player.miniPlayer.size = 300;
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
+  assert.equal(doc._root._vars.get('--oneyt-miniplayer-width'), '300px');
+});

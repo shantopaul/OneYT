@@ -340,6 +340,14 @@
         miniObserved = false;
       }
       if (!el) {
+        // The mini-player is closed (or never opened): drop
+        // the stale classes/vars and forget it was present,
+        // so the observer fires a real re-apply with the
+        // CURRENT config when it opens again. Without this,
+        // miniPresent stuck at true and the reopen was a
+        // no-op — the old config kept styling the new
+        // mini-player (e.g. a size set back to 0 stayed).
+        cleanupMini();
         if (configured) observeMini();
         return;
       }
@@ -502,7 +510,11 @@
       id: 'player',
       init: function () {
         observeTheater();
-        observeMini();
+        // No observeMini() here: the mini-player observer
+        // attaches lazily from applyMiniPlayer, only when
+        // something is configured (Phase 6 perf audit) —
+        // attaching it at init briefly watched the whole
+        // document subtree for nothing.
       },
       apply: apply,
       update: apply,
