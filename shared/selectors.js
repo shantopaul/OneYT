@@ -51,10 +51,10 @@
     // the radio link (start_radio=1), from uBlock filter
     // lists — the mixesShelf key covers a Mixes shelf if
     // one ever renders.
-    liveShelf: 'ytd-rich-shelf-renderer[title*="Live now" i]',
-    mixesShelf: 'ytd-rich-shelf-renderer[title*="Mixes" i]',
-    mixesItem: 'ytd-rich-item-renderer:has(a[href*="start_radio=1"])',
-    newsShelf: 'ytd-rich-shelf-renderer[title*="News" i]',
+    liveShelf: "ytd-rich-shelf-renderer[title*='Live now' i]",
+    mixesShelf: "ytd-rich-shelf-renderer[title*='Mixes' i]",
+    mixesItem: "ytd-rich-item-renderer:has(a[href*='start_radio=1'])",
+    newsShelf: "ytd-rich-shelf-renderer[title*='News' i]",
 
     // --- Navigation (Phase 4) ---
     guide: '#guide',
