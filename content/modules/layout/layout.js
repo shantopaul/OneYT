@@ -14,6 +14,8 @@
  * - Card spacing (layout.cardSpacing, px, 0 = default) —
  *   sets --ytd-rich-grid-item-margin through a variable.
  * - Thumbnail size (layout.thumbnailSize, px width, 0 = default).
+ * - Home feed max width (layout.homeMaxWidth, px, 0 = default) —
+ *   caps the home grid width and centres it (the ultrawide fix).
  * - Hide Shorts shelf (layout.hideShortsHome).
  * - Hide topic chips bar (layout.hideTopicChips) — the topic
  *   filter row ("All", "Music", ...) at the top of the feed.
@@ -99,10 +101,12 @@
       setClass('oneyt-hide-live-shelf', false);
       setClass('oneyt-hide-mixes-shelf', false);
       setClass('oneyt-hide-news-shelf', false);
+      setClass('oneyt-home-max-width', false);
       setClass('oneyt-block-shorts', false);
       setVar('--oneyt-home-columns', null);
       setVar('--oneyt-card-spacing', null);
       setVar('--oneyt-thumb-width', null);
+      setVar('--oneyt-home-max-width', null);
     }
 
     // Off the Shorts player page: /shorts/VIDEOID -> /watch?v=VIDEOID.
@@ -133,6 +137,9 @@
       var sized = layout.thumbnailSize && layout.thumbnailSize >= 120;
       setClass('oneyt-thumb-sized', !!sized);
       setVar('--oneyt-thumb-width', sized ? layout.thumbnailSize + 'px' : null);
+      var capped = layout.homeMaxWidth && layout.homeMaxWidth > 0;
+      setClass('oneyt-home-max-width', !!capped);
+      setVar('--oneyt-home-max-width', capped ? layout.homeMaxWidth + 'px' : null);
       setClass('oneyt-hide-shorts-home', layout.hideShortsHome === true);
       setClass('oneyt-hide-topic-chips', layout.hideTopicChips === true);
       setClass('oneyt-hide-live-shelf', layout.hideLiveShelf === true);
@@ -159,9 +166,11 @@
         setClass('oneyt-hide-live-shelf', false);
         setClass('oneyt-hide-mixes-shelf', false);
         setClass('oneyt-hide-news-shelf', false);
+        setClass('oneyt-home-max-width', false);
         setVar('--oneyt-home-columns', null);
         setVar('--oneyt-card-spacing', null);
         setVar('--oneyt-thumb-width', null);
+        setVar('--oneyt-home-max-width', null);
       } else if (page === 'home') {
         applyHome(layout);
         setClass('oneyt-hide-comments', false);

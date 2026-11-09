@@ -150,6 +150,7 @@ and must work flawlessly before anything else ships.
 | PL-19 | Popup theme + channel-page Shorts tab | The popup follows the dashboard theme (System / Dark / Light, same setting, live when it changes); and Block Shorts also hides the Shorts tab on channel pages (`yt-tab-shape[tab-title="Shorts"]`) — no new setting, the Block Shorts toggle covers it |
 | PL-20 | Custom CSS templates | Six ready-made CSS snippets — hide duration badges, fade watched videos, hide video badges, hide home metadata, hide voice search, hide channel banner — one click appends a template to the Custom CSS box and turns custom CSS on; applying the same template twice does nothing; remove a template by editing the Custom CSS text |
 | PL-21 | Saved themes + export/share | Save the current theme (base preset + custom colours) under a name, apply it later in one click, and share it as a JSON file — export downloads `oneyt-theme-<name>.json`, import validates the file first and only adds it when you confirm; saved themes are theme-only (unlike Profiles, which snapshot all settings) and stay on this device |
+| PL-22 | Advanced layout editor | A Layout-section editor: three one-click layout presets (Compact, Balanced, Spacious) that set the home grid numbers together, a home feed max-width (`layout.homeMaxWidth`, 0 = YouTube default — caps and centres the home grid on ultrawide screens), and a live preview of the current grid (columns · gap · max-width) |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.

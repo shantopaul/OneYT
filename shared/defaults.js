@@ -96,6 +96,7 @@
       homeColumns: 0, // 0 = default
       cardSpacing: 0, // px, 0 = default
       thumbnailSize: 0, // px width, 0 = default
+      homeMaxWidth: 0, // px, 0 = YouTube default (Phase 22: cap + centre the home grid)
       hideComments: false,
       watchSpacing: 0, // px gap between player and #below, 0 = default (Phase 2)
     },
