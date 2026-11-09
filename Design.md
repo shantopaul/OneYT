@@ -18,7 +18,7 @@
 | Full name | OneYT — All-in-One YouTube Customizer |
 | Tagline | "Your YouTube. Your Layout. Your Rules." |
 | Voice | Short, plain, confident. No marketing hype, no fake claims. |
-| Logo | Original mark only (to be designed in Phase 7; placeholder geometric mark in Phase 1). Never use YouTube's logo, play button, or red as the *logo itself* — YouTube red is an accent, not the brand. |
+| Logo | **Final (Phase 7):** a bold white geometric "Y" (the Y in OneYT) on a dark rounded square, with a small red dot below the stem — red is an accent, not the logo itself. Original mark, drawn with PIL (`scripts/generate-icons.py`, no font, no copied art). Deliberately NOT a play button: the Phase 1 placeholder (red square + white play triangle) was exactly YouTube's play button and is replaced by this mark. Rendered at 16/48/128 (manifest) + 512 master (`assets/icons/`). |
 
 ---
 
