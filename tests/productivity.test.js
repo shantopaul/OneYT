@@ -337,3 +337,23 @@ test('phase 4 modules register and run through the manager', () => {
   assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
   mm.destroy();
 });
+
+test('focus: per-tab override resets on navigation', () => {
+  const doc = createFakeDocument();
+  const mod = createFocusModule({ logger: quietLogger, document: doc });
+  mod.apply(settingsWith({ productivity: { focusMode: true } }), 'watch');
+  assert.equal(mod.isEffective(), true);
+  mod.toggleTab(); // per-tab off
+  assert.equal(mod.isEffective(), false);
+  assert.equal(doc._root._classes.has('oneyt-focus'), false);
+  // Navigate to home: the override clears and the global
+  // setting rules again.
+  mod.apply(settingsWith({ productivity: { focusMode: true } }), 'home');
+  assert.equal(mod.isEffective(), true);
+  assert.equal(doc._root._classes.has('oneyt-focus'), true);
+  // Back to watch: still the global setting, not the stale
+  // override.
+  mod.apply(settingsWith({ productivity: { focusMode: true } }), 'watch');
+  assert.equal(mod.isEffective(), true);
+  assert.equal(doc._root._classes.has('oneyt-focus'), true);
+});
