@@ -2,7 +2,7 @@
  *
  * Quick settings: master switch, page status, Focus Mode,
  * independent scroll, player module toggle, theme selector,
- * and the dashboard opener. Writes go straight to
+ * preset/profile picker, and the dashboard opener. Writes go straight to
  * chrome.storage.local, so open YouTube tabs apply them live
  * via storage.onChanged — no reload.
  *
@@ -69,7 +69,9 @@
   var defaultsApi = ns.defaults;
   var constants = ns.constants || {};
   var themes = ns.themes || {};
+  var profilesApi = ns.profiles || null;
   var STORAGE_KEY = constants.STORAGE_KEY || 'oneyt.settings.v1';
+  var PROFILES_KEY = constants.PROFILES_STORAGE_KEY || 'oneyt.profiles.v1';
 
   var statusEl = document.getElementById('status');
   var hintEl = document.getElementById('page-hint');
@@ -78,6 +80,8 @@
   var scrollEl = document.getElementById('scroll-toggle');
   var playerEl = document.getElementById('player-toggle');
   var themeEl = document.getElementById('theme-select');
+  var presetEl = document.getElementById('preset-select');
+  var savedProfiles = [];
   var dashboardBtn = document.getElementById('open-dashboard');
 
   (themes.THEME_NAMES || ['default']).forEach(function (name) {
@@ -97,9 +101,47 @@
     statusEl.textContent = enabled ? 'Enabled' : 'Disabled';
     statusEl.classList.toggle('on', enabled);
     statusEl.classList.toggle('off', !enabled);
-    [focusEl, scrollEl, playerEl, themeEl].forEach(function (control) {
+    [focusEl, scrollEl, playerEl, themeEl, presetEl].forEach(function (control) {
       control.disabled = !enabled;
     });
+  }
+
+  // Preset / profile picker (Phase 16, PL-16). Values are
+  // 'preset:<id>' for built-ins and 'profile:<name>' for
+  // saved profiles; the select resets to the placeholder
+  // after applying, so the same choice can be picked again.
+  function renderPresetOptions() {
+    if (!presetEl || !profilesApi) return;
+    presetEl.textContent = '';
+    var placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Choose a preset or profile…';
+    presetEl.appendChild(placeholder);
+    profilesApi.BUILTIN_PRESETS.forEach(function (preset) {
+      var option = document.createElement('option');
+      option.value = 'preset:' + preset.id;
+      option.textContent = preset.name;
+      presetEl.appendChild(option);
+    });
+    savedProfiles.forEach(function (profile) {
+      var option = document.createElement('option');
+      option.value = 'profile:' + profile.name;
+      option.textContent = profile.name + ' (profile)';
+      presetEl.appendChild(option);
+    });
+    presetEl.value = '';
+  }
+
+  function loadProfiles() {
+    if (!profilesApi) return Promise.resolve([]);
+    return storage
+      .get(PROFILES_KEY)
+      .then(function (stored) {
+        return profilesApi.validateProfiles(stored, defaultsApi);
+      })
+      .catch(function () {
+        return [];
+      });
   }
 
   function load() {
@@ -144,6 +186,35 @@
   themeEl.addEventListener('change', function () {
     update('appearance.theme', themeEl.value);
   });
+  presetEl.addEventListener('change', function () {
+    var value = presetEl.value;
+    if (!value || !profilesApi) return;
+    load()
+      .then(function (settings) {
+        var next = settings;
+        if (value.indexOf('preset:') === 0) {
+          next = profilesApi.applyPreset(settings, value.slice(7), defaultsApi);
+        } else if (value.indexOf('profile:') === 0) {
+          var name = value.slice(8);
+          var found = null;
+          savedProfiles.forEach(function (profile) {
+            if (profile.name === name) found = profile;
+          });
+          if (!found) return settings;
+          next = profilesApi.applyProfile(settings, found, defaultsApi);
+        }
+        return storage.set({ [STORAGE_KEY]: next }).then(function () {
+          render(next);
+          return next;
+        });
+      })
+      .catch(function () {
+        return load().then(render);
+      })
+      .then(function () {
+        presetEl.value = '';
+      });
+  });
   dashboardBtn.addEventListener('click', function () {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage();
@@ -156,6 +227,12 @@
       var change = changes && changes[STORAGE_KEY];
       if (change && change.newValue) {
         render(defaultsApi.migrateSettings(change.newValue));
+      }
+      if (changes && changes[PROFILES_KEY]) {
+        loadProfiles().then(function (list) {
+          savedProfiles = list;
+          renderPresetOptions();
+        });
       }
     });
   }
@@ -172,4 +249,8 @@
   }
 
   load().then(render);
+  loadProfiles().then(function (list) {
+    savedProfiles = list;
+    renderPresetOptions();
+  });
 })();
