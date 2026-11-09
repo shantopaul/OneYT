@@ -998,7 +998,7 @@ format, `c0e7e05` version 1.12.0, docs (this commit).
 **Browser verification still open** — the live DOM is
 the proof (`tests/manual-checklist.md` Phase 20).
 
-## Phase 21 — Saved Themes + Export/Share (v1.13) 🔄 IN PROGRESS (2026-11-09)
+## Phase 21 — Saved Themes + Export/Share (v1.13) ✅ MERGED (2026-11-09)
 
 (PRD PL-21 + plan), engine, dashboard wiring, tests,
 checklist, version, docs.
@@ -1047,7 +1047,10 @@ checklist, version, docs.
   (`tests/manual-checklist.md` Phase 21).
 **Status 2026-11-09:** code complete on branch
 `feature/saved-themes` (8 part-by-part commits on top
-of `main` `81201fb`, pushed after completion).
+of `main` `81201fb`, pushed after completion) and
+**merged to `main` — merge `03b6120`, `main` now
+`03b6120`** (per the standing rule: feature complete →
+merge to main).
 `npm test` 203/203 pass (193 baseline + 10 new),
 lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.13.0.zip`
