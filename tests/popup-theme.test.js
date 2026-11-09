@@ -120,7 +120,10 @@ test('channel Shorts tab: selector, CSS rule, toggle copy and health metadata', 
   const record = health.checkHealth('channel', () => false, 1000);
   assert.equal(record.results.channelShortsTab, 'missing');
   const summary = health.summarizeHealth({ channel: record });
-  assert.equal(summary.status, 'ok');
+  // A sometimes-only record cannot say "all OK" —
+  // nothing was actually verified there (this is the
+  // Phase 19 fix to the Phase 18 rule).
+  assert.equal(summary.status, 'unknown');
   assert.equal(
     summary.features.find((f) => f.feature === 'Shorts tab (channel)').status,
     'not-seen'
