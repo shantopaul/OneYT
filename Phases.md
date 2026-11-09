@@ -838,7 +838,7 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 17 is onboarding (merged). v1.10.0 is
 unambiguous: 1.9.0 is in `main` now.
 
-## Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ CODE COMPLETE (2026-11-09)
+## Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) ✅ MERGED (2026-11-09)
 
 **Goal:** the two small follow-ups that still make the
 extension look unfinished from the outside — the popup
@@ -890,8 +890,11 @@ on channel pages.
 **Status 2026-11-09:** code complete on branch
 `feature/popup-theme-shorts-tab` (10 part-by-part
 commits on top of `main` `d2bde2d`, pushed after
-completion). `npm test` 183/183 pass (179 baseline +
-4 new), lint + format clean, manifest valid,
+completion) and **merged to `main` — merge
+`0a0aacd`, `main` now `0a0aacd`** (per the standing
+rule: feature complete → merge to main).
+`npm test` 183/183 pass (179 baseline + 4 new),
+lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.11.0.zip`
 (runtime files only). **Done:** `b3ea475` start
 (PRD PL-19 + plan), `dd9ba55` popup.css tokens +
