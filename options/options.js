@@ -2084,6 +2084,34 @@
             if (changes && changes[HEALTH_KEY]) {
               refreshHealth();
             }
+            // Profiles and saved themes can change from
+            // another dashboard tab: re-read them and
+            // re-render the open section if it shows them.
+            // The handler used to ignore both keys, so an
+            // open Profiles/Appearance section went stale.
+            if (
+              changes &&
+              changes[PROFILES_KEY] &&
+              changes[PROFILES_KEY].newValue !== undefined
+            ) {
+              profiles = profilesApi
+                ? profilesApi.validateProfiles(changes[PROFILES_KEY].newValue, defaultsApi)
+                : [];
+              if (currentSection === 'profiles') renderSection('profiles');
+            }
+            if (
+              changes &&
+              changes[SAVED_THEMES_KEY] &&
+              changes[SAVED_THEMES_KEY].newValue !== undefined
+            ) {
+              savedThemes = savedThemesApi
+                ? savedThemesApi.validateSavedThemes(
+                    changes[SAVED_THEMES_KEY].newValue,
+                    apis.themes
+                  )
+                : [];
+              if (currentSection === 'appearance') renderSection('appearance');
+            }
             var change = changes && changes[STORAGE_KEY];
             if (!change || !change.newValue) return;
             var next = defaultsApi.migrateSettings(change.newValue);
@@ -2091,6 +2119,11 @@
             state = next;
             applyDashboardTheme();
             refreshValues();
+            // The layout preview is drawn in renderSection,
+            // not in refreshValues: re-render the Layout
+            // section so an external change visibly updates
+            // the preview instead of leaving stale numbers.
+            if (currentSection === 'layout') renderSection('layout');
           });
         }
       });

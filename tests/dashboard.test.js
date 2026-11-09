@@ -365,3 +365,21 @@ test('dashboard: deletes confirm, loads fail independently, import size is bytes
   assert.ok(!src.includes("text.length > maxBytes"), 'no UTF-16 length check remains');
   assert.ok(src.includes("' bytes, max '"), 'message reports bytes');
 });
+
+test('dashboard: onChanged refreshes profiles, themes and the layout preview', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('changes[PROFILES_KEY]'), 'profiles key handled in onChanged');
+  assert.ok(
+    src.includes("if (currentSection === 'profiles') renderSection('profiles');"),
+    'open Profiles section re-renders'
+  );
+  assert.ok(src.includes('changes[SAVED_THEMES_KEY]'), 'saved-themes key handled in onChanged');
+  assert.ok(
+    src.includes("if (currentSection === 'appearance') renderSection('appearance');"),
+    'open Appearance section re-renders'
+  );
+  assert.ok(
+    src.includes("if (currentSection === 'layout') renderSection('layout');"),
+    'open Layout section re-renders so the preview updates'
+  );
+});
