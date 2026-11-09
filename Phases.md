@@ -765,6 +765,55 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 16 is presets (merged). v1.9.0 is unambiguous:
 1.8.0 is in `main` now.
 
+## Phase 18 — Selector Health Check (v1.10) ⏳ IN PROGRESS (2026-11-09)
+
+**Goal:** a YouTube DOM change stops failing silently.
+Today a renamed selector means a feature quietly does
+nothing — the user finds out by noticing, if at all.
+After this phase the dashboard says, per feature,
+whether it is working, broken, or simply not seen on
+this visit.
+
+**Deliverable:** v1.10.0.
+
+**Plan (part-by-part, push only when complete):** a pure
+health engine in `shared/health.js` — per-selector
+metadata (`pages`, `feature` label, `presence`:
+`always` = the element exists on every load of those
+pages, `sometimes` = it only exists in some states;
+always-selectors decide the verdict, sometimes ones
+are reported as "not seen" and never alarm) +
+`checkHealth(selectors, pageType, exists)` +
+`validateHealthRecord` (repairs a stored record the
+way `validateProfiles` does) + `summarizeHealth`
+(overall status + per-feature rows for the dashboard).
+A content module `content/modules/health/health.js`
+runs one delayed check (2 s, so late elements have
+loaded) per page type and re-checks on every SPA
+navigation, writing the record to local storage under
+`oneyt.health.v1` (local-only, never synced, never a
+setting); a failed write is logged, never fatal. The
+dashboard gains a Health section (custom render block
+like Profiles) showing the overall status, the
+per-feature rows, the last-checked time per page, and
+a "Check again" button that re-reads the stored
+record. **No auto-disable, deliberately:** a selector
+missing at check time does not prove the feature is
+broken (late loading, page state), and disabling on
+that signal would break working features — the
+warning IS the feature. No new permission, no new
+host, no message relay (the dashboard only reads
+storage, like it already does for settings).
+Module tests for the engine + the module's check
+timing + the record repair + manual checklist item.
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 18).
+Numbering note: this phase takes Phase 18 because
+Phase 13 is disable ambient mode (parked, branch
+`feature/disable-ambient-mode` with no commits) and
+Phase 17 is onboarding (merged). v1.10.0 is
+unambiguous: 1.9.0 is in `main` now.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
