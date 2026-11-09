@@ -344,6 +344,8 @@
     var cssTemplatesApi = deps.cssTemplatesApi || null;
     var savedThemesApi = deps.savedThemesApi || null;
     var SAVED_THEMES_KEY = constants.SAVED_THEMES_STORAGE_KEY || 'oneyt.themes.v1';
+    var layoutPresetsApi = deps.layoutPresetsApi || null;
+    var layoutEditorNotice = '';
 
     var state = defaultsApi.cloneDefaults();
     var profiles = [];
@@ -1609,7 +1611,92 @@
       if (section.id === 'health') renderHealthTools(mainEl);
       if (section.id === 'appearance') renderCssTemplateTools(mainEl);
       if (section.id === 'appearance') renderSavedThemeTools(mainEl);
+      if (section.id === 'layout') renderLayoutEditorTools(mainEl);
       checkShortcutWarnings();
+    }
+
+    // Advanced layout editor (Phase 22, PL-22). Mirrors
+    // renderProfilesTools: tool-boxes built with el(),
+    // no innerHTML. One row per layout preset (apply
+    // writes only the five layout numbers) plus a live
+    // preview — a mini grid drawn from the current
+    // values, so applying a preset visibly changes it.
+    // The preview is a diagram of the numbers, not a
+    // screenshot of YouTube.
+    function renderLayoutEditorTools(sectionEl) {
+      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
+      if (layoutEditorNotice) {
+        msgEl.textContent = layoutEditorNotice;
+        msgEl.style.display = 'block';
+        layoutEditorNotice = '';
+      }
+      sectionEl.appendChild(msgEl);
+      if (!layoutPresetsApi) {
+        sectionEl.appendChild(
+          el(doc, 'p', {
+            text: 'Layout editor is unavailable — the layout-presets module did not load.',
+          })
+        );
+        return;
+      }
+      var summary = layoutPresetsApi.layoutPreviewSummary(state);
+      var previewBox = el(doc, 'div', { class: 'tool-box' });
+      previewBox.appendChild(el(doc, 'h3', { text: 'Preview' }));
+      previewBox.appendChild(
+        el(doc, 'p', {
+          text:
+            summary.columns +
+            ' columns · ' +
+            summary.gap +
+            ' px gap · ' +
+            (summary.maxWidth > 0 ? 'max-width ' + summary.maxWidth + ' px' : 'full width') +
+            '.',
+        })
+      );
+      var grid = el(doc, 'div', { class: 'layout-preview-grid' });
+      grid.setAttribute(
+        'style',
+        'display: flex; gap: ' + Math.min(summary.gap, 24) + 'px; margin-top: 8px;'
+      );
+      for (var i = 0; i < summary.columns; i++) {
+        var cell = el(doc, 'div', { class: 'layout-preview-cell' });
+        cell.setAttribute(
+          'style',
+          'flex: 1; height: 48px; background: var(--ui-accent-soft, rgba(255, 0, 51, 0.12)); border: 1px solid var(--ui-border, #2a2a2a); border-radius: 6px;'
+        );
+        grid.appendChild(cell);
+      }
+      previewBox.appendChild(grid);
+      sectionEl.appendChild(previewBox);
+
+      var presetBox = el(doc, 'div', { class: 'tool-box' });
+      presetBox.appendChild(el(doc, 'h3', { text: 'Layout presets' }));
+      presetBox.appendChild(
+        el(doc, 'p', {
+          text: 'One click sets the home grid numbers together. A preset changes only the layout numbers — hiding toggles, theme and everything else stay as they are. Fine-tune the numbers above afterwards.',
+        })
+      );
+      layoutPresetsApi.LAYOUT_PRESETS.forEach(function (preset) {
+        var row = el(doc, 'div', { class: 'profile-row' });
+        row.appendChild(el(doc, 'strong', { text: preset.name }));
+        row.appendChild(el(doc, 'p', { text: preset.description }));
+        var applyBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn',
+          text: 'Apply ' + preset.name,
+        });
+        applyBtn.addEventListener('click', function () {
+          state = layoutPresetsApi.applyLayoutPreset(state, preset.id, defaultsApi);
+          saveNow().then(function () {
+            refreshValues();
+            layoutEditorNotice = 'Applied layout preset "' + preset.name + '".';
+            renderSection(currentSection);
+          });
+        });
+        row.appendChild(applyBtn);
+        presetBox.appendChild(row);
+      });
+      sectionEl.appendChild(presetBox);
     }
 
     // Health (Phase 18, PL-18). Mirrors renderProfilesTools:
@@ -2024,6 +2111,7 @@
       healthApi: ns.health,
       cssTemplatesApi: ns.cssTemplates,
       savedThemesApi: ns.savedThemes,
+      layoutPresetsApi: ns.layoutPresets,
       keyboardApi: ns.modules && ns.modules.keyboard,
       sections: sections,
       constants: ns.constants,
