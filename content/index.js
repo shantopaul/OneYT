@@ -105,6 +105,15 @@
     if (ns.modules && ns.modules.navigation) {
       moduleManager.register(ns.modules.navigation.createNavigationModule({ logger: logger }));
     }
+    if (ns.modules && ns.modules.health) {
+      moduleManager.register(
+        ns.modules.health.createHealthModule({
+          dom: domManager,
+          logger: logger,
+          storage: storage,
+        })
+      );
+    }
 
     var app = ns.app.createApp({
       logger: logger,
