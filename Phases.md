@@ -521,7 +521,7 @@ exists (no commits yet) with the research done —
 when resumed (renumbered: Phase 12 is hide topic chips,
 Phase 14 is default theater).
 
-## Phase 14 — Default Theater Mode (v1.6) ⏳ IN PROGRESS (2026-11-09)
+## Phase 14 — Default Theater Mode (v1.6) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** every video opens in theater mode automatically
 — no click on the theater button, no "t" key, the wide
@@ -555,6 +555,16 @@ timing) and watch → watch SPA navigation need a real
 watch page on Shanto's PC. If YouTube ever removes
 `.ytp-size-button`, the feature silently does nothing and
 the page does not break.
+**Done (8 commits):** `b3a8bb9` start (PRD PL-14 + plan,
+branch rebased onto `main` `6f0b965`, Memory.md corrected
+to Phase 11 merged as PR #13), `95a97fe` setting,
+`f5248e8` player module click-once logic, `f8ab988`
+dashboard toggle, `4237ebe` tests (144/144),
+`beecfe7` checklist, `00c263d` version 1.6.0. Selector
+count stays 26 (no new selector); no new CSS, no new
+permission. **Browser verification still open** — the
+flash, slow-load button timing, and watch → watch SPA
+navigation need a real watch page on Shanto's PC.
 Numbering note: this phase takes Phase 14 because Phase
 12 is hide topic chips (unmerged branch
 `feature/hide-topic-chips`) and Phase 13 is disable
