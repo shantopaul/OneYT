@@ -765,7 +765,7 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 16 is presets (merged). v1.9.0 is unambiguous:
 1.8.0 is in `main` now.
 
-## Phase 18 — Selector Health Check (v1.10) ✅ CODE COMPLETE (2026-11-09)
+## Phase 18 — Selector Health Check (v1.10) ✅ MERGED (2026-11-09)
 
 **Goal:** a YouTube DOM change stops failing silently.
 Today a renamed selector means a feature quietly does
@@ -810,7 +810,9 @@ timing + the record repair + manual checklist item.
 the proof (`tests/manual-checklist.md` Phase 18).
 **Status 2026-11-09:** code complete on branch
 `feature/selector-health` (11 part-by-part commits on
-top of `main` `f4c31c6`, pushed after completion).
+top of `main` `f4c31c6`, pushed after completion) and **merged
+to `main` — merge `11a28e9`, `main` now `11a28e9`** (per
+the standing rule: feature complete → merge to main).
 `npm test` 179/179 pass (170 baseline + 9 new), lint +
 format clean, manifest valid, `npm run package` builds
 a clean `oneyt-1.10.0.zip` (runtime files only).
