@@ -347,9 +347,10 @@ Done check (code column complete, browser column open).
 (repo-public vs shantopaul.com), tag `v1.0.0` + GitHub
 release (after the merge), Chrome Web Store submission.
 Branch note: PR #6 was still open when Phase 7 started, so
-`feature/Release` is based on `feature/Optimisation` — the
-release PR carries Phase 6 into main with it, and PR #6
-needs no separate merge.
+`feature/Release` is based on `feature/Optimisation`.
+Shanto merged PR #6 himself during Phase 7 (`main` now
+`383e35a`), so the release branch is a clean descendant of
+`main` and the release PR merges without conflict.
 
 ### Tasks
 

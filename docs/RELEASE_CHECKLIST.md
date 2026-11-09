@@ -42,9 +42,8 @@ These run on `main` only — a tag must point at main, not at
 a feature branch.
 
 1. Shanto merges the release PR (`feature/Release` → `main`).
-   PR #6 (`feature/Optimisation`) needs no separate merge —
-   this branch is based on it, so its commits arrive with
-   the release PR. Close PR #6 after.
+   PR #6 is already merged (`main` `383e35a`), so the
+   release PR is a clean fast-forward of `main`.
 2. Verify `main` HEAD, then:
    ```sh
    git tag -a v1.0.0 -m "OneYT 1.0.0 — public release"

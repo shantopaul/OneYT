@@ -16,9 +16,9 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (code complete, pushed to branch — PR #6 still open) · **Phase 7 — Public Release ✅ code complete, pushed to branch** (browser check + screenshots + submission still open) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · **Phase 7 — Public Release ✅ code complete, pushed to branch** (browser check + screenshots + submission still open) |
 | **Version** | 1.0.0 — public release (Phase 7) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`; PR #6 `feature/Optimisation` still open — not merged yet); branch `feature/Release` in progress (based on `feature/Optimisation`, so it carries Phase 6) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `383e35a` (Phases 1–6 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a` — merged by Shanto while Phase 7 was in progress); branch `feature/Release` pushed 2026-11-09, **not merged** |
 | **Code written** | Phases 1–6: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + tests (see "What Has Been Completed") |
 | **Currently working on** | — (Phase 7 code done; waiting for browser check + screenshots + submission) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
@@ -136,7 +136,7 @@
 | D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 4 start", branch `feature/Productivity` from `main` (`d49ac19`, PR #3 merged), same part-by-part rule, push only when complete |
 | D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 5 start", branch `feature/Settings` from `main` (`33d9e08`, PR #4 merged), same part-by-part rule, push only when complete |
 | D-12 | Phase 6 start? | Recommend: after the Phase 5 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 6 start", branch `feature/Optimisation` from `main` (`5b44c9e`, PR #5 merged), same part-by-part rule, push only when complete |
-| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 7 start", branch `feature/Release` (based on `feature/Optimisation` because PR #6 is still open — see log below), same part-by-part rule, push only when complete |
+| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 7 start", branch `feature/Release` (based on `feature/Optimisation` because PR #6 was still open at the time — Shanto merged PR #6 himself during Phase 7, `main` now `383e35a`), same part-by-part rule, push only when complete |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -564,9 +564,10 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   when Phase 7 started, so the release branch was based on
   `feature/Optimisation` (`4ddac3d`) instead of `main` —
   otherwise v1.0.0 would have shipped without sync and all
-  Phase 6 fixes. Consequence: when Shanto merges the release
-  PR, Phase 6 arrives in `main` with it, and PR #6 needs no
-  separate merge (close it after).
+  Phase 6 fixes. **Update:** Shanto merged PR #6 himself
+  while Phase 7 was in progress (`main` now `383e35a`), so
+  the release branch is now a clean descendant of `main`
+  and the release PR merges without conflict.
 - Branch `feature/Release`. **11 part-by-part commits,
   pushed only when Phase 7 was fully complete** (same rule —
   no intermediate push, no merge to `main`).
