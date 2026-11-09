@@ -1,0 +1,88 @@
+/* OneYT — content/modules/player/player.css
+ *
+ * Static rules for the player module. They only take effect when
+ * the module adds its classes to <html> (see player.js).
+ * Dynamic values arrive as CSS variables, set by the module.
+ *
+ * Sizing/position/alignment classes are never added in theater
+ * mode or fullscreen (the module guards that in JS).
+ */
+
+/* --- Sizing --- */
+html.oneyt-enabled.oneyt-player-sized #primary {
+  width: var(--oneyt-player-width);
+}
+
+html.oneyt-enabled.oneyt-player-sized #primary,
+html.oneyt-enabled.oneyt-player-maxed #primary {
+  max-width: var(--oneyt-player-max-width, none);
+}
+
+/* --- Alignment (only meaningful with a custom width) --- */
+html.oneyt-enabled.oneyt-player-align-left #primary {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+html.oneyt-enabled.oneyt-player-align-center #primary {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+html.oneyt-enabled.oneyt-player-align-right #primary {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* --- Position: sticky keeps the whole primary column visible --- */
+html.oneyt-enabled.oneyt-player-sticky #primary {
+  position: sticky;
+  top: var(--oneyt-player-offset, 0px);
+  align-self: flex-start;
+}
+
+/* --- Position: fixed / absolute detach the player; the
+   padding-top on #primary reserves its height so the title and
+   comments do not jump up underneath it. --- */
+html.oneyt-enabled.oneyt-player-fixed #primary,
+html.oneyt-enabled.oneyt-player-absolute #primary {
+  padding-top: calc(
+    var(--oneyt-player-height, 0px) + var(--oneyt-player-offset, 0px)
+  );
+}
+
+html.oneyt-enabled.oneyt-player-fixed #primary {
+  position: relative;
+}
+
+html.oneyt-enabled.oneyt-player-fixed #primary #player {
+  position: fixed;
+  top: var(--oneyt-player-offset, 0px);
+  left: var(--oneyt-player-fixed-left, 0px);
+  width: var(--oneyt-player-fixed-width, auto);
+  z-index: 10;
+  background: #000;
+}
+
+html.oneyt-enabled.oneyt-player-absolute #primary {
+  position: relative;
+}
+
+html.oneyt-enabled.oneyt-player-absolute #primary #player {
+  position: absolute;
+  top: var(--oneyt-player-offset, 0px);
+  left: 0;
+  width: var(--oneyt-player-width, 100%);
+}
+
+/* --- Appearance (safe in theater too) --- */
+html.oneyt-enabled.oneyt-player-styled #movie_player {
+  border-radius: var(--oneyt-player-radius, 12px);
+  border: var(--oneyt-player-border, none);
+  box-shadow: var(--oneyt-player-shadow, none);
+  overflow: hidden;
+}
+
+html.oneyt-enabled.oneyt-player-styled #primary #player {
+  margin-bottom: var(--oneyt-player-spacing, 0px);
+}

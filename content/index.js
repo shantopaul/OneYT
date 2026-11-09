@@ -51,6 +51,11 @@
         ns.modules.sidebar.createSidebarModule({ dom: domManager, logger: logger })
       );
     }
+    if (ns.modules && ns.modules.player) {
+      moduleManager.register(
+        ns.modules.player.createPlayerModule({ dom: domManager, logger: logger })
+      );
+    }
 
     var app = ns.app.createApp({
       logger: logger,

@@ -20,6 +20,7 @@
   var SELECTORS = {
     // --- Watch page core (Phase 1: detection + future Phase 2) ---
     player: '#movie_player', // YouTube video player element
+    playerContainer: '#primary #player', // Wraps #movie_player; positioning target for fixed/absolute (verify live — see tests/manual-checklist.md; player module falls back to #movie_player when absent)
     primary: '#primary', // Left column: player + title + comments
     secondary: '#secondary', // Right column: recommendations sidebar
     watchFlexy: 'ytd-watch-flexy', // Watch page root element

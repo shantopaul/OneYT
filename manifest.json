@@ -3,7 +3,11 @@
   "background": { "service_worker": "background/service-worker.js" },
   "content_scripts": [
     {
-      "css": ["content/styles/base.css", "content/modules/sidebar/sidebar.css"],
+      "css": [
+        "content/styles/base.css",
+        "content/modules/sidebar/sidebar.css",
+        "content/modules/player/player.css"
+      ],
       "js": [
         "shared/constants.js",
         "shared/defaults.js",
@@ -17,6 +21,7 @@
         "content/core/page-detector.js",
         "content/core/module-manager.js",
         "content/modules/sidebar/sidebar.js",
+        "content/modules/player/player.js",
         "content/core/app.js",
         "content/index.js"
       ],
