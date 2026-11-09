@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · **Phase 3 — Appearance ✅ code complete, pushed to branch** (browser check still open) |
-| **Version** | 0.1.0 (foundation + core layout + appearance, no dashboard yet) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d49ac19` (Phases 1–3 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`); branch `feature/Productivity` in progress |
-| **Code written** | Phases 1–3: sidebar, player, layout, appearance, typography modules + themes + tests (see "What Has Been Completed") |
-| **Currently working on** | Phase 4 — Playback & Productivity (branch `feature/Productivity`) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–3 sections) |
-| **Last verified** | 2026-11-09 — `npm test` 68/68 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · **Phase 4 — Playback & Productivity ✅ code complete, pushed to branch** (browser check still open) |
+| **Version** | 0.1.0 (foundation + layout + appearance + playback/productivity, no dashboard yet) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d49ac19` (Phases 1–3 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`); branch `feature/Productivity` pushed 2026-11-09, **not merged** |
+| **Code written** | Phases 1–4: sidebar, player, layout, appearance, typography, playback, focus, recommendations, keyboard, navigation modules + themes + tests (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 4 code done; waiting for browser check + Phase 5 go-ahead) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–4 sections); Phase 5 start decision |
+| **Last verified** | 2026-11-09 — `npm test` 83/83 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
 
@@ -113,6 +113,9 @@
 | 2026-11-09 | Shanto merged PR #1 (`feature/foundation` → `main`, `79aa279`) and PR #2 (`feature/core` → `main`, `d6d2df1`) himself | GitHub API (remote `main` HEAD) |
 | 2026-11-09 | AD-10: themes map OneYT tokens onto YouTube `--yt-spec-*` vars + scoped CSS; custom colours override preset; contrast warn only | `Architecture.md` AD-10 |
 | 2026-11-09 | Phase 3 same rule: branch `feature/appearance` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
+| 2026-11-09 | Shanto merged PR #3 (`feature/appearance` → `main`, `d49ac19`) himself | GitHub API (remote `main` HEAD) |
+| 2026-11-09 | AD-07 decided: Focus Mode = global setting + per-tab in-memory toggle | `Architecture.md` AD-07 |
+| 2026-11-09 | Phase 4 same rule: branch `feature/Productivity` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -124,7 +127,8 @@
 | D-07 | Phase 2 start? | Recommend: after the Phase 1 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 2 start", branch `feature/core` from `feature/foundation`, same part-by-part rule, push only when complete |
 | D-08 | Phase 3 start? | Recommend: after the Phase 2 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 3 start", branch `feature/appearance` from `main` (`d6d2df1`, PR #2 merged), same part-by-part rule, push only when complete |
 | D-09 | Default player radius 12px — keep, or 0 (YouTube sharp corners)? | Recommend: keep 12px unless Shanto prefers stock look | ⬜ Awaiting user — note: radius is now a setting (`appearance.borderRadius`), default stays 12 per schema; changeable without code |
-| D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
+| D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 4 start", branch `feature/Productivity` from `main` (`d49ac19`, PR #3 merged), same part-by-part rule, push only when complete |
+| D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -177,8 +181,28 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
 - [x] Disabling appearance/typography/layout restores YouTube's
   own theme exactly (unit-tested: classes + vars removed)
 
-**Phase 4 — Playback & Productivity** (not started; awaiting
-user go-ahead): see `Phases.md` Phase 4 checklist.
+**Phase 4 — Playback & Productivity** (code complete 2026-11-09;
+✅ = verified here in Node, ⬜ = needs Chrome on Shanto's PC):
+
+- [x] Speed/volume remembered across videos and restarts
+  (unit-tested: storage round-trip, second video re-applies)
+- [x] Speed presets add/remove correctly; invalid speeds rejected
+  (validateSpeedPresets unit-tested; dashboard add/remove UI is
+  Phase 5)
+- [x] Quality preference falls back gracefully when unavailable
+  (unit-tested: no call when the level is missing)
+- [x] Focus Mode hides exactly the configured elements — and
+  restores exactly on toggle-off (class-only hiding, unit-tested)
+- [x] Shortcuts work, duplicates blocked (first wins), YouTube-native
+  conflicts warned (unit-tested; warnings surface in dashboard)
+- [x] Mini-player still works natively (open/close/drag) — no rule
+  applies when nothing is configured (unit-tested; drag check open
+  in browser)
+- [x] Navigation hiding never removes account menu or accessibility
+  controls (module only touches the guide; unit-tested classes)
+
+**Phase 5 — Settings Dashboard** (not started; awaiting user
+go-ahead): see `Phases.md` Phase 5 checklist.
 
 ---
 
@@ -317,6 +341,46 @@ user go-ahead): see `Phases.md` Phase 4 checklist.
 - Note: task 3.6's editor UI (edit/import/export) belongs to
   the Phase 5 dashboard; Phase 3 ships the validated
   apply/enable/disable engine underneath it.
+
+### 2026-11-09 — Phase 4: Playback & Productivity DONE (code, branch only)
+
+- Shanto merged PR #3 (`feature/appearance` → `main`, `d49ac19`)
+  himself before Phase 4 started, so Phase 4 branched from
+  `main` (`d49ac19`).
+- Branch `feature/Productivity` (capital P, as instructed).
+  **10 part-by-part commits, pushed only when Phase 4 was fully
+  complete** (same rule — no intermediate push, no merge to
+  `main`).
+- Built: playback module (default speed/volume, remember across
+  videos/restarts via separate storage keys, best-effort quality
+  via the player API, autoplay/captions via aria-pressed toggles
+  that are never clicked blind, caption font size), focus module
+  (AD-07: global setting + per-tab in-memory toggle; class-only
+  hiding = exact restore; masthead never hidden),
+  recommendations module (hide sidebar, density, card size,
+  metadata), mini-player in the player module (size/position/
+  radius/shadow/offsets; page-independent; observer only
+  re-applies when the element's presence changes), keyboard
+  module (Shift+ defaults, capture-phase listener, typing never
+  hijacked, duplicates first-wins + warned, native conflicts
+  warned), navigation module (guide entries by :has + href,
+  compact, guide width; account/accessibility never touched).
+- **AD-07 decided:** Focus Mode scope. Recorded in
+  `Architecture.md`.
+- Verification here: `npm test` **83/83 pass** (68 Phase 1–3 +
+  15 new), `npm run lint` clean, `npm run format` clean, every
+  JS file `node --check` clean, manifest valid with all files
+  present, grep: no polling / network / eval in extension code.
+- **Not verified here (needs Chrome on Shanto's PC):** the
+  actual behaviour — remembered speed after a real restart,
+  quality fallback on a video without that level, Focus restore
+  on a live page, mini-player drag with styling on, shortcuts
+  on a live page, guide hiding. All listed in the new Phase 4
+  section of `tests/manual-checklist.md`. Phase 4 is
+  code-complete, not browser-verified.
+- Deliberately deferred to Phase 5 (dashboard): shortcut reset
+  UI, speed-preset add/remove UI, recommendation section
+  toggles, caption appearance beyond font size.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

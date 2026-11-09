@@ -177,3 +177,75 @@ Selector / variable sanity (live YouTube DOM):
 
 Notes / failures:
 - _…_
+
+---
+
+# Phase 4 Manual Checklist (browser) — Playback & Productivity
+
+Run on a watch page + Home, after loading the `feature/Productivity`
+branch unpacked. Change settings via the extension's storage
+(`chrome.storage.local`, key `oneyt.settings.v1`) until the Phase 5
+dashboard exists. Tick only after verifying in the browser.
+
+Playback (set `playback.*`):
+- [ ] `defaultSpeed: 1.5` — a video starts at 1.5x
+- [ ] Change speed by hand in YouTube's settings to 2x, open the
+      next video — it starts at 2x (remembered); restart Chrome —
+      still 2x
+- [ ] `rememberSpeed: false` — hand-set speed does NOT carry over
+- [ ] `defaultVolume: 50` — a video starts at half volume;
+      hand-set volume is remembered the same way
+- [ ] `defaultQuality: "720p"` — video plays at 720p when
+      available; on a video with no 720p, YouTube's own choice
+      stays (no error, no stuck player)
+- [ ] `autoplay: false` — the autoplay toggle turns off;
+      `true` — turns on; `null` — untouched
+- [ ] `captions: true` — captions turn on; `false` — off
+- [ ] `captionFontSize: 130` — caption text grows; `0` — default
+- [ ] Speed presets: add/remove in settings, invalid values
+      (e.g. 8x, "x") rejected — check console for the message
+
+Focus Mode (set `productivity.focusMode: true`):
+- [ ] Comments, chat, recommendations, Shorts, buttons and the
+      description disappear; the guide disappears
+- [ ] Search box and account menu STAY visible
+- [ ] Toggle off — every hidden element returns exactly as it was
+- [ ] Shift+F (keyboard) toggles Focus for the current tab only;
+      reload the page — Focus follows the global setting again
+- [ ] Focus on Home — the grid + Shorts hide; toggle off — back
+
+Recommendations (set `recommendations.*` on a watch page):
+- [ ] `hideSidebar: true` — sidebar disappears, player area widens
+- [ ] `density: "compact"` — sidebar items tighten up
+- [ ] `cardSize: 200` — sidebar thumbnails resize
+- [ ] `showMetadata: false` — titles/views under sidebar videos hide
+
+Mini-player (set `player.miniPlayer.*`):
+- [ ] Open the mini-player (YouTube's mini-player button) —
+      it appears at the configured size/position/radius/shadow
+- [ ] With nothing configured — native mini-player behaves
+      exactly as without the extension (open/close/drag)
+- [ ] Drag the configured mini-player — dragging still works
+- [ ] Navigate Home → Watch with the mini-player open — it stays
+      open and keeps its styling
+
+Keyboard (defaults, all Shift+):
+- [ ] Shift+F toggles Focus; Shift+S toggles the sidebar;
+      Shift+P cycles player position; Shift+> / Shift+< step
+      speed; Shift+R resets speed; Shift+T toggles theater
+- [ ] Type in the search box — no shortcut fires while typing
+- [ ] Bind two actions to the same key in settings — only the
+      first fires, console shows a duplicate warning
+- [ ] Bind a plain `f` — console shows a YouTube-native conflict
+      warning
+
+Navigation (set `navigation.*`):
+- [ ] `hideHome: true` — Home disappears from the guide;
+      `hideShorts` / `hideSubscriptions` / `hideLibrary` /
+      `hideHistory` — same for each entry
+- [ ] Account menu and accessibility controls are NEVER hidden
+- [ ] `compact: true` — mini guide (icons only)
+- [ ] `guideWidth: 300` — guide widens; `0` — default
+
+Notes / failures:
+- _…_
