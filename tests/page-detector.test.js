@@ -15,9 +15,11 @@ const cases = [
   ['https://www.youtube.com/channel/UC123', 'channel'],
   ['https://www.youtube.com/playlist?list=PL123', 'playlist'],
   ['https://www.youtube.com/shorts/abc123', 'shorts'],
-  ['https://www.youtube.com/feed/history', 'home'],
+  ['https://www.youtube.com/shorts', 'shorts'],
+  ['https://www.youtube.com/feed/history', 'other'],
   ['https://example.com/', 'other'],
-  ['https://www.youtube.com/feed/library', 'home'],
+  ['https://www.youtube.com/feed/library', 'other'],
+  ['https://www.youtube.com/feed/you', 'other'],
   ['not a url at all', 'other'],
 ];
 
