@@ -69,6 +69,7 @@ body {
   top: 0;
   z-index: 10;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
@@ -87,16 +88,58 @@ body {
   color: var(--ui-text-secondary);
 }
 
-.options-search {
+/* Search wrapper: the input, its clear button and the results
+ * dropdown live in one relatively-positioned box, so the
+ * dropdown always anchors directly under the input — the old
+ * layout positioned the dropdown with magic offsets (top:
+ * 56px, right: 20px) from the topbar, which broke whenever
+ * the topbar wrapped or the saved indicator showed text. */
+.search-wrap {
+  position: relative;
   flex: 1;
   max-width: 480px;
   margin-left: auto;
-  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.options-search {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 8px 32px 8px 12px;
   background: var(--ui-bg);
   color: var(--ui-text);
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-sm);
   font: inherit;
+}
+
+.search-clear {
+  position: absolute;
+  right: 6px;
+  padding: 2px 7px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--ui-text-secondary);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.search-clear:hover {
+  color: var(--ui-text);
+  background: var(--ui-surface-hover);
+}
+
+@media (max-width: 640px) {
+  .search-wrap {
+    flex-basis: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
 }
 
 .options-search:focus {
@@ -113,9 +156,10 @@ body {
 
 .search-results {
   position: absolute;
-  top: 56px;
-  right: 20px;
-  width: min(480px, 90vw);
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
   background: var(--ui-surface);
   border: 1px solid var(--ui-border-strong);
   border-radius: var(--ui-radius-sm);
@@ -136,6 +180,33 @@ body {
 
 .search-result:hover {
   background: var(--ui-surface-hover);
+}
+
+/* Keyboard-active result (arrow keys): same tint as the active
+ * nav item, so it reads as "selected", not just hovered. */
+.search-result.active {
+  background: var(--ui-accent-soft);
+}
+
+/* Matched words inside a result label: tinted background, not
+ * the browser's yellow <mark> — keeps both themes readable. */
+.search-result mark {
+  background: var(--ui-accent-soft);
+  color: inherit;
+  font-weight: 600;
+}
+
+.search-no-results {
+  padding: 10px 12px;
+  color: var(--ui-text-secondary);
+  font-size: 13px;
+}
+
+.search-count {
+  padding: 8px 12px;
+  border-top: 1px solid var(--ui-border);
+  color: var(--ui-text-muted);
+  font-size: 12px;
 }
 
 /* --- Body: nav + main --- */
