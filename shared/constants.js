@@ -33,6 +33,11 @@
     // chrome.storage keys
     STORAGE_KEY: 'oneyt.settings.v1',
 
+    // Custom profiles live under their own key in
+    // chrome.storage.local (Phase 16). Local only, never
+    // synced: a profile holds a full settings snapshot.
+    PROFILES_STORAGE_KEY: 'oneyt.profiles.v1',
+
     // Debounce intervals (ms) — see Rules.md: no storage spam
     // from sliders, no layout thrash from resize.
     DEBOUNCE: {

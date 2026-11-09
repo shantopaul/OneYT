@@ -664,11 +664,44 @@ theater (merged); Phase 13 is disable ambient mode
 commits). v1.7.0 assumed 1.5.0 and 1.6.0 merge first —
 they did.
 
+## Phase 16 — Presets / Profiles (v1.8) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** one click to a whole YouTube setup — four built-in
+presets (Stock YouTube, Focus, Clean, Cinema) plus named
+custom profiles that save the current settings as a snapshot
+and restore them exactly, from a new dashboard Profiles
+section and from the popup.
+
+**Deliverable:** v1.8.0.
+
+**Status 2026-11-09:** code complete on branch
+`feature/presets` (7 part-by-part commits on top of
+`main` `4440b49`, pushed after completion, `main`
+untouched). `npm test` 162/162 pass (146 baseline + 16
+new), lint + format clean, manifest valid, `npm run
+package` builds a clean `oneyt-1.8.0.zip` (114 KB,
+runtime files only — zero test/doc files inside).
+**Done:** `2f5dba3` start (PRD PL-16 + plan, Memory.md
+corrected to Phase 15 merged), `f7149bc` profiles engine
+(`shared/profiles.js` pure + `PROFILES_STORAGE_KEY`),
+`56961c5` dashboard Profiles section
+(`renderProfilesTools`, like `renderAdvancedTools`),
+`0cdd99e` popup preset picker, `cb8c893` tests (16 new)
++ checklist, `26eaa0e` format, `d2fc584` version 1.8.0.
+**Browser verification still open** — the dashboard
+section, popup picker and live apply need a real browser
+on Shanto's PC (`tests/manual-checklist.md` Phase 16).
+Numbering note: this phase takes Phase 16 because Phase
+12 is hide topic chips (merged), Phase 14 is default
+theater (merged) and Phase 15 is hide shelves (merged);
+Phase 13 is disable ambient mode (parked, branch
+`feature/disable-ambient-mode` with no commits). v1.8.0
+assumes 1.7.0 is in `main` — it is.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
 - Channel-page Shorts tab hiding (follow-up to Block Shorts)
-- Workspace presets / saved profiles (per-page profiles)
 - Multiple saved themes + community theme sharing (exportable presets)
 - Advanced layout editor
 - Optional cloud sync / cross-device backup (opt-in, explicit)

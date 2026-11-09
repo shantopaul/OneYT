@@ -16,11 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) |
-| **Version** | 1.7.0 in `main` |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `167ac14` (Phases 1–12 + 14 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`; Phase 15 merges with this commit) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (merged) · Phase 14 ✅ (merged) · Phase 15 ✅ (merged) · Phase 16 ✅ (code complete, branch only) |
+| **Version** | 1.7.0 in `main`; 1.8.0 code-complete on branch `feature/presets` |
+| **Code written** | Phases 1–12 + 14–16 + YouTube domains: all modules + dashboard (10 sections, 106 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + presets / profiles + 5 audit docs + release packaging (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 16 code-complete on branch; browser check still open) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `4440b49` (Phases 1–12 + 14–15 + YouTube domains merged: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`, Phase 12 merge `91fd1f2`, Phase 14 merge `167ac14`, Phase 15 merge `69a9471`); branch `feature/presets` (Phase 16, code complete) |
 | **Code written** | Phases 1–12 + 14–15 + YouTube domains: all modules + dashboard (9 sections, 106 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + default theater mode + hide live/mixes/news shelves + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | — (Phases 12 + 14 + 15 merged; browser check still open) |
+| **Currently working on** | Phase 16 — Presets / Profiles (branch `feature/presets`) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
@@ -678,6 +680,62 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   `/shorts/` → `/watch` redirect on a real page. Known
   limit: the Shorts tab on channel pages is not hidden yet
   (v1.1 follow-up, logged in Phases.md).
+
+### 2026-11-09 — Phase 16: Presets / Profiles STARTED (branch only)
+
+- Branch `feature/presets` from `main` (`4440b49`, v1.7.0).
+  Plan in PRD (PL-16) + Phases (Phase 16, v1.8.0); the
+  "Workspace presets" Future item is now this phase.
+  Design: 4 built-in presets (Stock YouTube, Focus, Clean,
+  Cinema) as partial overrides merged onto current
+  settings; custom profiles as full migrated snapshots
+  (max 10, names 1–40 chars, no duplicates); storage key
+  `oneyt.profiles.v1`, local only, never synced; dashboard
+  Profiles section + popup picker; no content-script
+  changes, no new permission / network / selector.
+  Baseline on `main` before coding: `npm test` 146/146 pass.
+
+### 2026-11-09 — Phase 16: Presets / Profiles DONE (code, branch only)
+
+- Branch `feature/presets` from `main` (`4440b49`).
+  **7 part-by-part commits, pushed only when Phase 16 was
+  fully complete** (same rule — no intermediate push, no
+  merge to `main`).
+- Built: `shared/profiles.js` (pure — `BUILTIN_PRESETS`
+  with partial overrides, `applyPreset` onto current
+  settings, `createProfile` / `applyProfile` /
+  `validateProfiles` / `renameProfile` / `deleteProfile`,
+  max 10 profiles, names 1–40 chars, built-in names
+  reserved, corrupt snapshots never wipe settings);
+  `PROFILES_STORAGE_KEY` (`oneyt.profiles.v1`, local
+  only, never synced) in `shared/constants.js`;
+  dashboard Profiles section (`options/sections/
+  profiles.js`, after General; `renderProfilesTools` in
+  `options.js`, mirroring `renderAdvancedTools`) with
+  preset buttons, save-name input, profile list
+  (Apply / Rename / Delete); popup preset picker
+  (`preset:` / `profile:` select, resets after applying,
+  disabled when the extension is off, refreshes when
+  profiles change elsewhere).
+- Verification here: `npm test` **162/162 pass** (146
+  baseline + 16 new), `npm run lint` clean, `npm run
+  format` clean, manifest valid, `npm run package`
+  builds a clean `oneyt-1.8.0.zip` (114 KB, runtime
+  files only), grep: no polling / network / eval in
+  extension code. Two test updates were needed for the
+  new files: `SECTION_FILES` + the options.html script
+  count (16 → 18) in `tests/dashboard.test.js`.
+- **Not verified here (needs Chrome on Shanto's PC):**
+  the dashboard Profiles section, the popup picker and
+  live apply on a real YouTube tab. All listed in the
+  new Phase 16 section of `tests/manual-checklist.md`.
+  Phase 16 is code-complete, not browser-verified.
+- Note: the first attempt at this phase (delegated to a
+  helper) was refused by a safety check before any work
+  started — nothing was built, branched or committed in
+  that attempt. Shanto asked again in a later turn and
+  the phase was then built directly, in this session,
+  from the same design.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

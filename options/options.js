@@ -337,8 +337,12 @@
     var sections = deps.sections || [];
     var constants = deps.constants || {};
     var STORAGE_KEY = constants.STORAGE_KEY || 'oneyt.settings.v1';
+    var profilesApi = deps.profilesApi || null;
+    var PROFILES_KEY = constants.PROFILES_STORAGE_KEY || 'oneyt.profiles.v1';
 
     var state = defaultsApi.cloneDefaults();
+    var profiles = [];
+    var profilesNotice = '';
     var saveTimer = null;
     var navEl = doc.getElementById('options-nav');
     var mainEl = doc.getElementById('options-main');
@@ -1014,6 +1018,189 @@
       sectionEl.appendChild(infoBox);
     }
 
+    // Profiles (Phase 16, PL-16). Mirrors renderAdvancedTools:
+    // one tool-box per group, built with el(), no innerHTML.
+    // A preset changes only the settings it names; a profile
+    // restores its snapshot exactly (see shared/profiles.js).
+    function renderProfilesTools(sectionEl) {
+      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
+      if (profilesNotice) {
+        msgEl.textContent = profilesNotice;
+        msgEl.style.display = 'block';
+        profilesNotice = '';
+      }
+      sectionEl.appendChild(msgEl);
+      if (!profilesApi) {
+        sectionEl.appendChild(
+          el(doc, 'p', { text: 'Profiles are unavailable — the profiles module did not load.' })
+        );
+        return;
+      }
+
+      // Built-in presets.
+      var presetBox = el(doc, 'div', { class: 'tool-box' });
+      presetBox.appendChild(el(doc, 'h3', { text: 'Built-in presets' }));
+      presetBox.appendChild(
+        el(doc, 'p', {
+          text: 'One click applies a whole setup. A preset changes only the settings it names — everything else you set stays as it is.',
+        })
+      );
+      profilesApi.BUILTIN_PRESETS.forEach(function (preset) {
+        var row = el(doc, 'div', { class: 'profile-row' });
+        row.appendChild(el(doc, 'strong', { text: preset.name }));
+        row.appendChild(el(doc, 'p', { text: preset.description }));
+        var applyBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn',
+          text: 'Apply ' + preset.name,
+        });
+        applyBtn.addEventListener('click', function () {
+          state = profilesApi.applyPreset(state, preset.id, defaultsApi);
+          saveNow().then(function () {
+            refreshValues();
+            profilesNotice = 'Applied preset "' + preset.name + '".';
+            renderSection(currentSection);
+          });
+        });
+        row.appendChild(applyBtn);
+        presetBox.appendChild(row);
+      });
+      sectionEl.appendChild(presetBox);
+
+      // Save the current settings as a profile.
+      var saveBox = el(doc, 'div', { class: 'tool-box' });
+      saveBox.appendChild(el(doc, 'h3', { text: 'Save current settings as a profile' }));
+      saveBox.appendChild(
+        el(doc, 'p', {
+          text:
+            'Saves everything as it is right now — up to ' +
+            profilesApi.MAX_PROFILES +
+            ' profiles. Applying one later restores this exact setup.',
+        })
+      );
+      var nameInput = el(doc, 'input', {
+        type: 'text',
+        class: 'control-input',
+        placeholder: 'Profile name',
+        maxlength: String(profilesApi.MAX_PROFILE_NAME_LENGTH),
+      });
+      nameInput.setAttribute('aria-label', 'Profile name');
+      var saveBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-primary',
+        text: 'Save profile',
+      });
+      saveBtn.addEventListener('click', function () {
+        var result = profilesApi.createProfile(nameInput.value, state, profiles, defaultsApi);
+        if (result.error) {
+          msgEl.textContent = result.error;
+          msgEl.style.display = 'block';
+          return;
+        }
+        profiles = result.profiles;
+        saveProfiles().then(function () {
+          profilesNotice = 'Saved profile "' + nameInput.value.trim() + '".';
+          renderSection(currentSection);
+        });
+      });
+      saveBox.appendChild(nameInput);
+      saveBox.appendChild(saveBtn);
+      sectionEl.appendChild(saveBox);
+
+      // Saved profiles.
+      var listBox = el(doc, 'div', { class: 'tool-box' });
+      listBox.appendChild(
+        el(doc, 'h3', {
+          text: 'Your profiles (' + profiles.length + '/' + profilesApi.MAX_PROFILES + ')',
+        })
+      );
+      if (profiles.length === 0) {
+        listBox.appendChild(
+          el(doc, 'p', { text: 'No saved profiles yet — save one above to restore it later.' })
+        );
+      }
+      profiles.forEach(function (profile) {
+        var row = el(doc, 'div', { class: 'profile-row' });
+        row.appendChild(el(doc, 'strong', { text: profile.name }));
+        var saved = profile.createdAt
+          ? new Date(profile.createdAt).toLocaleDateString()
+          : 'date unknown';
+        row.appendChild(el(doc, 'p', { text: 'Saved ' + saved + '.' }));
+        var applyBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn btn-primary',
+          text: 'Apply',
+        });
+        applyBtn.addEventListener('click', function () {
+          state = profilesApi.applyProfile(state, profile, defaultsApi);
+          saveNow().then(function () {
+            refreshValues();
+            profilesNotice =
+              'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+            renderSection(currentSection);
+          });
+        });
+        var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
+        renameBtn.addEventListener('click', function () {
+          row.textContent = '';
+          var editInput = el(doc, 'input', {
+            type: 'text',
+            class: 'control-input',
+            maxlength: String(profilesApi.MAX_PROFILE_NAME_LENGTH),
+          });
+          editInput.value = profile.name;
+          editInput.setAttribute('aria-label', 'New profile name');
+          var confirmBtn = el(doc, 'button', {
+            type: 'button',
+            class: 'btn btn-primary',
+            text: 'Save name',
+          });
+          confirmBtn.addEventListener('click', function () {
+            var result = profilesApi.renameProfile(
+              profiles,
+              profile.name,
+              editInput.value,
+              defaultsApi
+            );
+            if (result.error) {
+              profilesNotice = result.error;
+              renderSection(currentSection);
+              return;
+            }
+            profiles = result.profiles;
+            saveProfiles().then(function () {
+              profilesNotice = 'Renamed profile to "' + editInput.value.trim() + '".';
+              renderSection(currentSection);
+            });
+          });
+          var cancelBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Cancel' });
+          cancelBtn.addEventListener('click', function () {
+            renderSection(currentSection);
+          });
+          row.appendChild(editInput);
+          row.appendChild(confirmBtn);
+          row.appendChild(cancelBtn);
+        });
+        var deleteBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn btn-danger',
+          text: 'Delete',
+        });
+        deleteBtn.addEventListener('click', function () {
+          profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
+          saveProfiles().then(function () {
+            profilesNotice = 'Deleted profile "' + profile.name + '".';
+            renderSection(currentSection);
+          });
+        });
+        row.appendChild(applyBtn);
+        row.appendChild(renameBtn);
+        row.appendChild(deleteBtn);
+        listBox.appendChild(row);
+      });
+      sectionEl.appendChild(listBox);
+    }
+
     function renderSection(sectionId) {
       var section = sectionById(sectionId);
       if (!section) return;
@@ -1048,6 +1235,7 @@
         mainEl.appendChild(renderControlRow(control));
       });
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
+      if (section.id === 'profiles') renderProfilesTools(mainEl);
       checkShortcutWarnings();
     }
 
@@ -1211,14 +1399,24 @@
     }
 
     function load() {
-      return storage
-        .get(STORAGE_KEY)
-        .then(function (stored) {
-          state = defaultsApi.migrateSettings(stored);
+      return Promise.all([storage.get(STORAGE_KEY), storage.get(PROFILES_KEY)])
+        .then(function (results) {
+          state = defaultsApi.migrateSettings(results[0]);
+          profiles = profilesApi ? profilesApi.validateProfiles(results[1], defaultsApi) : [];
         })
         .catch(function () {
           state = defaultsApi.cloneDefaults();
+          profiles = [];
         });
+    }
+
+    // Persist the profiles list (local only — never synced).
+    // A failure never touches the settings; the notice is
+    // shown the next time the Profiles section renders.
+    function saveProfiles() {
+      return storage.set({ [PROFILES_KEY]: profiles }).catch(function () {
+        profilesNotice = 'Could not save profiles — please try again.';
+      });
     }
 
     function init() {
@@ -1321,6 +1519,7 @@
     var sections = [];
     var order = [
       'general',
+      'profiles',
       'player',
       'sidebar',
       'layout',
@@ -1339,6 +1538,7 @@
       defaultsApi: ns.defaults,
       validators: ns.validators,
       themes: ns.themes,
+      profilesApi: ns.profiles,
       keyboardApi: ns.modules && ns.modules.keyboard,
       sections: sections,
       constants: ns.constants,
