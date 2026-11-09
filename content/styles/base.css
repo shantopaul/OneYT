@@ -25,11 +25,17 @@ html.oneyt-enabled {
   --oneyt-radius-sm: 8px;
   --oneyt-radius-lg: 16px;
   --oneyt-spacing: 16px;
-  --oneyt-sidebar-width: 402px;
   --oneyt-sidebar-max-height: calc(100vh - 100px);
   --oneyt-scrollbar-width: 8px;
-  --oneyt-player-max-width: 1280px;
   --oneyt-font-family: inherit;
   --oneyt-font-size: inherit;
   --oneyt-line-height: inherit;
 }
+
+/* Deliberately NOT defined here: --oneyt-sidebar-width and
+ * --oneyt-player-max-width. Both are "0 = YouTube default /
+ * no cap" settings, and the module CSS rules fall back to
+ * auto / none when the variable is unset. A base value here
+ * would defeat that promise: the modules remove the inline
+ * variable for 0, the base value would apply instead, and
+ * maxWidth 0 would silently cap the player at 1280px. */

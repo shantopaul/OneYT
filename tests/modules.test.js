@@ -611,3 +611,19 @@ test('all three Phase 2 modules register and run through the manager', () => {
   assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), false);
   mm.destroy();
 });
+
+test('base.css must not define the "0 = default" width variables', () => {
+  // The player/sidebar modules remove the inline variable when
+  // the setting is 0, and their CSS rules fall back to none /
+  // auto. A base value here would silently re-apply (maxWidth 0
+  // used to cap the player at 1280px, customWidth 0 forced the
+  // sidebar to 402px) — the documented promise would be a lie.
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const text = fs.readFileSync(
+    path.join(__dirname, '..', 'content', 'styles', 'base.css'),
+    'utf8'
+  );
+  assert.equal(text.includes('--oneyt-player-max-width:'), false);
+  assert.equal(text.includes('--oneyt-sidebar-width:'), false);
+});
