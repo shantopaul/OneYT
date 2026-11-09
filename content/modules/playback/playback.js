@@ -140,8 +140,14 @@
 
     // Click a YouTube toggle button only when its aria-pressed
     // state is readable and differs from what the user wants.
+    // A non-boolean desired value (e.g. "yes" from a
+    // hand-edited import that predates the migration
+    // repair) must never click: (pressed === 'true') !==
+    // "yes" is always true, so without this guard the
+    // module would flip the toggle on every apply.
     function applyToggle(key, desired) {
       if (desired === null || desired === undefined) return;
+      if (typeof desired !== 'boolean') return;
       var btn = dom ? dom.query(key) : null;
       if (!btn || typeof btn.getAttribute !== 'function') return;
       var pressed = btn.getAttribute('aria-pressed');

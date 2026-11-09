@@ -179,3 +179,19 @@ test('playback: non-watch pages detach everything', async () => {
   assert.equal(t.doc._root._classes.has('oneyt-caption-sized'), false);
   t.mod.disable();
 });
+
+test('playback: non-boolean autoplay/captions never click the toggle', async () => {
+  const storage = mapStorage();
+  const t = playbackSetup(storage);
+  const settings = settingsWith({ playback: { autoplay: 'yes', captions: 42 } });
+  t.mod.apply(settings, 'watch');
+  await tick(30);
+  assert.equal(t.autonavClicked(), false);
+  assert.equal(t.ccClicked(), false);
+  // A second apply must not flip them either (the old bug
+  // clicked on every apply because "yes" !== pressed).
+  t.mod.apply(settings, 'watch');
+  await tick(30);
+  assert.equal(t.autonavClicked(), false);
+  assert.equal(t.ccClicked(), false);
+});
