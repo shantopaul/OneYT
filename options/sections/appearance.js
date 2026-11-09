@@ -52,6 +52,15 @@
           keywords: ['font', 'typography', 'family'],
         },
         {
+          key: 'appearance.typography.customFont',
+          type: 'text',
+          label: 'Custom font',
+          description:
+            'Any font installed on this device, by name (e.g. Hind Siliguri). Wins over Font family above when set. Empty = use Font family. Nothing is downloaded — a font that is not installed falls back to sans-serif.',
+          placeholder: 'e.g. Hind Siliguri',
+          keywords: ['font', 'typography', 'custom', 'family', 'name'],
+        },
+        {
           key: 'appearance.typography.fontSize',
           type: 'number',
           label: 'Font size',
