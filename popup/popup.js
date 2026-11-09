@@ -98,6 +98,32 @@
   var savedProfiles = [];
   var dashboardBtn = document.getElementById('open-dashboard');
 
+  // One in-memory copy of the settings. update() used to
+  // load → set per toggle, so two fast toggles raced: the
+  // second load could read the pre-first-write value and
+  // the first toggle was lost. The cache is updated
+  // synchronously on every write and refreshed on every
+  // render / storage change, so a toggle always builds on
+  // the latest known state.
+  var cachedSettings = null;
+
+  // Writes are chained so two fast toggles cannot land out
+  // of order in storage (the cache alone fixes the read,
+  // not the write order). A failed write never blocks the
+  // next one.
+  var writeChain = Promise.resolve();
+  function persist(settings) {
+    // The returned promise rejects on failure (so the
+    // caller can re-read and revert the UI); the chain
+    // itself never stays rejected, so the next write
+    // still runs.
+    var attempt = writeChain.then(function () {
+      return storage.set({ [STORAGE_KEY]: settings });
+    });
+    writeChain = attempt.catch(function () {});
+    return attempt;
+  }
+
   (themes.THEME_NAMES || ['default']).forEach(function (name) {
     var option = document.createElement('option');
     option.value = name;
@@ -122,6 +148,7 @@
   }
 
   function render(settings) {
+    cachedSettings = defaultsApi.deepClone(settings);
     applyPopupTheme(settings);
     var enabled = !!settings.enabled;
     enabledEl.checked = enabled;
@@ -184,27 +211,33 @@
     return storage
       .get(STORAGE_KEY)
       .then(function (stored) {
-        return defaultsApi.migrateSettings(stored);
+        var migrated = defaultsApi.migrateSettings(stored);
+        cachedSettings = defaultsApi.deepClone(migrated);
+        return migrated;
       })
       .catch(function () {
-        return defaultsApi.cloneDefaults();
+        var fallback = defaultsApi.cloneDefaults();
+        cachedSettings = defaultsApi.deepClone(fallback);
+        return fallback;
       });
   }
 
   function update(path, value) {
-    load()
-      .then(function (settings) {
-        var parts = path.split('.');
-        var node = settings;
-        for (var i = 0; i < parts.length - 1; i++) node = node[parts[i]];
-        node[parts[parts.length - 1]] = value;
-        return storage.set({ [STORAGE_KEY]: settings }).then(function () {
-          render(settings);
-        });
-      })
-      .catch(function () {
-        load().then(render);
+    var apply = function (settings) {
+      var parts = path.split('.');
+      var node = settings;
+      for (var i = 0; i < parts.length - 1; i++) node = node[parts[i]];
+      node[parts[parts.length - 1]] = value;
+      cachedSettings = defaultsApi.deepClone(settings);
+      return persist(settings).then(function () {
+        render(settings);
       });
+    };
+    var base = cachedSettings ? defaultsApi.deepClone(cachedSettings) : null;
+    var run = base ? apply(base) : load().then(apply);
+    run.catch(function () {
+      load().then(render);
+    });
   }
 
   enabledEl.addEventListener('change', function () {
@@ -225,25 +258,28 @@
   presetEl.addEventListener('change', function () {
     var value = presetEl.value;
     if (!value || !profilesApi) return;
-    load()
-      .then(function (settings) {
-        var next = settings;
-        if (value.indexOf('preset:') === 0) {
-          next = profilesApi.applyPreset(settings, value.slice(7), defaultsApi);
-        } else if (value.indexOf('profile:') === 0) {
-          var name = value.slice(8);
-          var found = null;
-          savedProfiles.forEach(function (profile) {
-            if (profile.name === name) found = profile;
-          });
-          if (!found) return settings;
-          next = profilesApi.applyProfile(settings, found, defaultsApi);
-        }
-        return storage.set({ [STORAGE_KEY]: next }).then(function () {
-          render(next);
-          return next;
+    var run = function (settings) {
+      var next = settings;
+      if (value.indexOf('preset:') === 0) {
+        next = profilesApi.applyPreset(settings, value.slice(7), defaultsApi);
+      } else if (value.indexOf('profile:') === 0) {
+        var name = value.slice(8);
+        var found = null;
+        savedProfiles.forEach(function (profile) {
+          if (profile.name === name) found = profile;
         });
-      })
+        if (!found) return settings;
+        next = profilesApi.applyProfile(settings, found, defaultsApi);
+      }
+      cachedSettings = defaultsApi.deepClone(next);
+      return persist(next).then(function () {
+        render(next);
+        return next;
+      });
+    };
+    var base = cachedSettings ? defaultsApi.deepClone(cachedSettings) : null;
+    var done = base ? run(base) : load().then(run);
+    done
       .catch(function () {
         return load().then(render);
       })
