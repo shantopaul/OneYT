@@ -242,6 +242,19 @@ main {
 .btn-primary:hover {
   background: var(--ui-accent-hover);
 }
+
+/* Dark theme: white text on #ff0033 is ~3.9:1, below AA 4.5.
+   Primary buttons use the darker #e6002e (4.53) and #cc0027
+   on hover; --ui-accent stays #ff0033 for non-text accents. */
+:root:not([data-theme='light']) .btn-primary {
+  background: #e6002e;
+  border-color: #e6002e;
+}
+
+:root:not([data-theme='light']) .btn-primary:hover {
+  background: #cc0027;
+  border-color: #cc0027;
+}
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
