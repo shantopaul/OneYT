@@ -18,7 +18,7 @@
 | **Date** | 2026-11-09 |
 | **Phase** | Phase 0 ✅ · Phase 1 ✅ (code, pushed) · **Phase 2 — Core Layout ✅ code complete, pushed to branch** (browser check still open) |
 | **Version** | 0.1.0 (foundation + core layout, no dashboard yet) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `a52cd3e`; branches `feature/foundation` (`6385ad3`) and `feature/core` (pushed 2026-11-09), **neither merged to `main`** |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d6d2df1` (Phase 1 + Phase 2 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`); branch `feature/appearance` in progress |
 | **Code written** | Phase 1 + Phase 2: sidebar, player, layout modules + tests (see "What Has Been Completed") |
 | **Currently working on** | — (Phase 2 code done; waiting for browser check + Phase 3 go-ahead) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1 + 2 sections); Phase 3 start decision |
