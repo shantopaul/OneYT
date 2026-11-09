@@ -605,7 +605,7 @@ ambient mode (parked, branch `feature/disable-ambient-mode`
 with no commits). v1.6.0 assumed 1.5.0 merges first —
 it did.
 
-## Phase 15 — Hide Live / Mixes / News Shelves (v1.7) ✅ CODE COMPLETE (2026-11-09)
+## Phase 15 — Hide Live / Mixes / News Shelves (v1.7) ✅ MERGED (2026-11-09)
 
 **Goal:** three separate toggles that hide the Live, Mixes,
 and News rows from the home feed — the same treatment the
@@ -658,13 +658,11 @@ row does not hide. If a hidden shelf leaves an empty gap
 (the section wrapper `ytd-rich-section-renderer` stays),
 the fix is to hide the wrapper too.
 Numbering note: this phase takes Phase 15 because Phase
-12 is hide topic chips (unmerged branch
-`feature/hide-topic-chips`), Phase 13 is disable ambient
-mode (parked, branch `feature/disable-ambient-mode` with
-no commits), and Phase 14 is default theater (unmerged
-branch `feature/default-theater`). v1.7.0 assumes 1.5.0
-and 1.6.0 merge first; renumber at rebase if the order
-flips.
+12 is hide topic chips (merged) and Phase 14 is default
+theater (merged); Phase 13 is disable ambient mode
+(parked, branch `feature/disable-ambient-mode` with no
+commits). v1.7.0 assumed 1.5.0 and 1.6.0 merge first —
+they did.
 
 ## Future (v1.1+, not in scope now)
 
