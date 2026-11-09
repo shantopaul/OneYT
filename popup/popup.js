@@ -53,7 +53,21 @@
     return { onYouTube: true, label: 'YouTube' };
   }
 
-  var api = { parsePageStatus: parsePageStatus };
+  // Pure: resolve the dashboard theme setting to the
+  // theme the popup actually shows. 'dark'/'light' force
+  // one; anything else ('system' or a bad stored value)
+  // follows the OS (prefers-color-scheme). Same logic as
+  // the dashboard's resolveDashboardTheme and the
+  // onboarding page's copy (Phase 19) — the codebase
+  // keeps this 4-line function local rather than sharing
+  // it across the three pages.
+  function resolvePopupTheme(setting, prefersDark) {
+    if (setting === 'dark') return 'dark';
+    if (setting === 'light') return 'light';
+    return prefersDark ? 'dark' : 'light';
+  }
+
+  var api = { parsePageStatus: parsePageStatus, resolvePopupTheme: resolvePopupTheme };
   var ns = (globalThis.OneYT = globalThis.OneYT || {});
   ns.popup = api;
   if (typeof module !== 'undefined' && module.exports) {
@@ -91,7 +105,24 @@
     themeEl.appendChild(option);
   });
 
+  // Apply the dashboard theme (Phase 19): the popup
+  // follows ui.dashboardTheme, same as the dashboard.
+  // Applied in render(), so it follows live storage
+  // changes too (dashboard theme changed elsewhere).
+  function applyPopupTheme(settings) {
+    var theme = resolvePopupTheme(
+      settings && settings.ui && settings.ui.dashboardTheme,
+      typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }
+
   function render(settings) {
+    applyPopupTheme(settings);
     var enabled = !!settings.enabled;
     enabledEl.checked = enabled;
     focusEl.checked = !!(settings.productivity && settings.productivity.focusMode);
@@ -253,6 +284,15 @@
           renderPresetOptions();
         });
       }
+    });
+  }
+
+  // Follow the OS theme while the setting is 'system'
+  // (Phase 19, same as the dashboard): if the user
+  // flips the OS theme with the popup open, re-render.
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      load().then(render);
     });
   }
 

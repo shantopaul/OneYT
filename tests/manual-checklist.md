@@ -578,3 +578,16 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 19 — Popup Theme + Channel-Page Shorts Tab (v1.11) — live in Chrome
+
+- [ ] Dashboard → General → Dashboard theme → Light: open the popup — it is light (white background, dark text), including the toggles and buttons
+- [ ] Dashboard theme → Dark: the popup is dark again, immediately (no extension reload)
+- [ ] Dashboard theme → System: the popup follows the OS — flip the OS dark/light setting with the popup open and it follows
+- [ ] On a channel page with Block Shorts ON: the Shorts tab is gone from the tab bar (Home / Videos / Shorts / Live / Playlists — no Shorts). Turn Block Shorts OFF and reload: the tab is back
+- [ ] On a channel page with Block Shorts OFF: the Shorts tab is untouched
+- [ ] Dashboard → Health, after visiting a channel page: channel page checked time shown, "Shorts tab (channel)" row "Working" (channel has a Shorts tab) or "Not seen on this visit" (channel has none) — never "Not working" just because the channel has no tab
+- [ ] Non-English YouTube UI: if the Shorts tab does not hide, note the real tab title from DevTools — the selector uses the English `tab-title="Shorts"`
+
+Notes / failures:
+- _…_

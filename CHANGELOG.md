@@ -9,7 +9,21 @@ phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 default theater), 1.7.0 (Phase 15 hide live / mixes /
 news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.9.0 (Phase 17 onboarding),
-1.10.0 (Phase 18 selector health check).
+1.10.0 (Phase 18 selector health check),
+1.11.0 (Phase 19 popup theme + channel Shorts tab).
+
+## 1.11.0 — 2026-11-09 (Popup Theme + Channel-Page Shorts Tab, Phase 19)
+
+- The popup now follows the dashboard theme (System /
+  Dark / Light) — same setting, live when it changes.
+  No new setting.
+- Block Shorts also hides the Shorts tab on channel
+  pages. No new setting — the Block Shorts toggle
+  covers it.
+- Fixed: the health summary could report "all OK"
+  for a record that only checked sometimes-selectors
+  (nothing was actually verified); it now reports
+  "unknown" in that case.
 
 ## 1.10.0 — 2026-11-09 (Selector Health Check, Phase 18)
 

@@ -1,7 +1,76 @@
 /* OneYT — popup/popup.css
  * Dark-first, minimal. System font stack only, no webfonts.
  * Tokens from Design.md §2.2. Spacing scale: 4/8/12/16/24px.
+ *
+ * The popup follows ui.dashboardTheme (Phase 19): JS sets
+ * data-theme on <html> and the attribute rules below are
+ * the source of truth, exactly like the dashboard
+ * (options/options.css) and the onboarding page. The
+ * prefers-color-scheme block is only the pre-JS fallback
+ * (first paint, before the script runs), so its light
+ * tokens must stay in sync with the [data-theme='light']
+ * block. The light tokens are the Phase 9 measured ones:
+ * warning/success/danger/accent darkened for AA 4.5+
+ * contrast on the light surface. color-scheme keeps
+ * native controls (select dropdown, scrollbars) in the
+ * right scheme.
  */
+:root {
+  color-scheme: dark;
+  --ui-bg: #0f0f0f;
+  --ui-surface: #181818;
+  --ui-surface-hover: #212121;
+  --ui-border: #2a2a2a;
+  --ui-border-strong: #3d3d3d;
+  --ui-text: #f1f1f1;
+  --ui-text-secondary: #aaaaaa;
+  --ui-text-muted: #9a9a9a; /* AA 4.5+ on bg/surface (was #717171, 3.9 — Phase 6 a11y) */
+  --ui-accent: #ff0033;
+  --ui-accent-hover: #e6002e;
+  --ui-accent-soft: rgba(255, 0, 51, 0.12);
+  --ui-success: #22c55e;
+  --ui-radius: 12px;
+  --ui-radius-sm: 8px;
+}
+
+@media (prefers-color-scheme: light) {
+  /* Pre-JS fallback only. Skipped when the user forced dark,
+   * so a light OS never flashes light over a dark choice. */
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --ui-bg: #ffffff;
+    --ui-surface: #f9f9f9;
+    --ui-surface-hover: #f0f0f0;
+    --ui-border: #e5e5e5;
+    --ui-border-strong: #cccccc;
+    --ui-text: #0f0f0f;
+    --ui-text-secondary: #606060;
+    --ui-text-muted: #6b6b6b; /* AA 4.5+ on white (was #909090, 3.2 — Phase 6 a11y) */
+    --ui-accent: #e6002e; /* darker than dark-mode #ff0033: 4.53 on surface (was 3.76) */
+    --ui-accent-hover: #cc0027; /* white on it 5.84 */
+    --ui-accent-soft: rgba(230, 0, 46, 0.08);
+    --ui-success: #15803d; /* 4.76 on surface (was #22c55e, 2.16) */
+  }
+}
+
+/* Explicit choice wins over the OS (same specificity as the
+ * media-query rule, later in the file, so it takes over once
+ * JS sets the attribute). */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ui-bg: #ffffff;
+  --ui-surface: #f9f9f9;
+  --ui-surface-hover: #f0f0f0;
+  --ui-border: #e5e5e5;
+  --ui-border-strong: #cccccc;
+  --ui-text: #0f0f0f;
+  --ui-text-secondary: #606060;
+  --ui-text-muted: #6b6b6b;
+  --ui-accent: #e6002e;
+  --ui-accent-hover: #cc0027;
+  --ui-accent-soft: rgba(230, 0, 46, 0.08);
+  --ui-success: #15803d;
+}
 
 * {
   box-sizing: border-box;
@@ -11,8 +80,8 @@ body {
   width: 380px;
   margin: 0;
   padding: 0;
-  background: #0f0f0f;
-  color: #f1f1f1;
+  background: var(--ui-bg);
+  color: var(--ui-text);
   font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   font-size: 14px;
   line-height: 1.5;
@@ -23,7 +92,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .logo {
@@ -33,14 +102,14 @@ body {
 
 .status {
   font-size: 12px;
-  color: #aaaaaa;
+  color: var(--ui-text-secondary);
 }
 
 .status.on {
-  color: #22c55e;
+  color: var(--ui-success);
 }
 .status.off {
-  color: #9a9a9a; /* AA 4.5+ on dark bg (was #717171, 3.9 - Phase 6 a11y) */
+  color: var(--ui-text-muted);
 }
 
 main {
@@ -56,9 +125,9 @@ main {
   justify-content: space-between;
   gap: 16px;
   padding: 12px;
-  background: #181818;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
   cursor: pointer;
 }
 
@@ -72,13 +141,13 @@ main {
 }
 .row-desc {
   font-size: 13px;
-  color: #aaaaaa;
+  color: var(--ui-text-secondary);
 }
 
 .hint {
   margin: 0;
   font-size: 12px;
-  color: #9a9a9a; /* AA 4.5+ on dark bg (was #717171, 3.9 - Phase 6 a11y) */
+  color: var(--ui-text-muted);
 }
 
 .section-title {
@@ -87,15 +156,15 @@ main {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #9a9a9a; /* AA 4.5+ on dark bg (was #717171, 3.9 - Phase 6 a11y) */
+  color: var(--ui-text-muted);
 }
 
 .theme-select {
   padding: 6px 8px;
-  background: #0f0f0f;
-  color: #f1f1f1;
-  border: 1px solid #3d3d3d;
-  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius-sm);
   font: inherit;
   font-size: 13px;
   cursor: pointer;
@@ -127,7 +196,7 @@ main {
 .slider {
   position: absolute;
   inset: 0;
-  background: #3d3d3d;
+  background: var(--ui-border-strong);
   border-radius: 20px;
   transition: background 0.2s ease;
 }
@@ -143,13 +212,13 @@ main {
   transition: transform 0.2s ease;
 }
 .switch input:checked + .slider {
-  background: #ff0033;
+  background: var(--ui-accent);
 }
 .switch input:checked + .slider::before {
   transform: translateX(16px);
 }
 .switch input:focus-visible + .slider {
-  outline: 2px solid #ff0033;
+  outline: 2px solid var(--ui-accent);
   outline-offset: 2px;
 }
 
@@ -157,27 +226,27 @@ main {
   font: inherit;
   font-weight: 500;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
 }
 .btn-secondary {
   background: transparent;
-  color: #f1f1f1;
-  border: 1px solid #3d3d3d;
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border-strong);
 }
 .btn-primary {
-  background: #ff0033;
+  background: var(--ui-accent);
   color: #ffffff;
-  border: 1px solid #ff0033;
+  border: 1px solid var(--ui-accent);
 }
 .btn-primary:hover {
-  background: #e6002e;
+  background: var(--ui-accent-hover);
 }
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 .btn:focus-visible {
-  outline: 2px solid #ff0033;
+  outline: 2px solid var(--ui-accent);
   outline-offset: 2px;
 }

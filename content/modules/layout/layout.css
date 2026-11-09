@@ -68,6 +68,17 @@ html.oneyt-enabled.oneyt-block-shorts ytd-video-renderer:has(a[href^='/shorts/']
   display: none;
 }
 
+/* Channel-page Shorts tab (layout.blockShorts, v1.11): the
+ * "Shorts" tab on a channel page. Same class as above —
+ * it is already set on every page type, including channel,
+ * so no module change was needed. The tab-title hook is
+ * English UI text (same caveat as the shelf titles), and
+ * the tab only exists on channels that have Shorts, so
+ * the health check treats it as 'sometimes'. Verify live. */
+html.oneyt-enabled.oneyt-block-shorts yt-tab-shape[tab-title='Shorts'] {
+  display: none;
+}
+
 html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer {
   --ytd-rich-grid-items-per-row: var(--oneyt-home-columns);
 }

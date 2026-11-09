@@ -78,6 +78,11 @@
     mixesShelf: { pages: ['home'], feature: 'Mixes shelf', presence: 'sometimes' },
     mixesItem: { pages: ['home'], feature: 'Mixes items', presence: 'sometimes' },
     newsShelf: { pages: ['home'], feature: 'News shelf', presence: 'sometimes' },
+    channelShortsTab: {
+      pages: ['channel'],
+      feature: 'Shorts tab (channel)',
+      presence: 'sometimes',
+    },
     guide: {
       pages: ['home', 'watch', 'search', 'subscriptions'],
       feature: 'Guide (sidebar menu)',
@@ -165,9 +170,12 @@
 
   // Summarize a (validated) record for the dashboard.
   // Returns { status, checked: {...}, features: [...] }:
-  // - status: 'unknown' (no record yet), 'ok' (every
-  //   always-selector matched), or 'broken' (at least one
-  //   always-selector missing).
+  // - status: 'unknown' (no record yet, or only pages
+  //   whose selectors are all 'sometimes' were checked),
+  //   'ok' (every always-selector matched), or 'broken'
+  //   (at least one always-selector missing). A page
+  //   with no always-selector cannot say "all OK" —
+  //   nothing was actually verified there.
   // - checked: the last checkedAt per page type.
   // - features: one row per feature label, in metadata
   //   order, with status 'working' | 'broken' |
@@ -178,8 +186,8 @@
   //   match; 'working' when at least one selector
   //   matched and none of its always-selectors is
   //   missing.
-  function summarizeHealth(record) {
-    var clean = validateHealthRecord(record);
+  function summarizeHealth(record, now) {
+    var clean = validateHealthRecord(record, now);
     var checked = {};
     var brokenKeys = [];
     var seenKeys = {};
@@ -231,9 +239,19 @@
       features.push({ feature: meta.feature, status: 'not-seen' });
     });
 
+    var anyAlwaysChecked = false;
+    Object.keys(clean).forEach(function (pageType) {
+      Object.keys(clean[pageType].results).forEach(function (key) {
+        if (SELECTOR_HEALTH[key] && SELECTOR_HEALTH[key].presence === 'always') {
+          anyAlwaysChecked = true;
+        }
+      });
+    });
     var status = 'unknown';
-    if (Object.keys(clean).length > 0) {
-      status = brokenKeys.length > 0 ? 'broken' : 'ok';
+    if (brokenKeys.length > 0) {
+      status = 'broken';
+    } else if (anyAlwaysChecked) {
+      status = 'ok';
     }
     return { status: status, checked: checked, features: features };
   }
