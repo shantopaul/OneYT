@@ -269,6 +269,15 @@
           return;
         }
         applyCaptionSize(settings);
+        if (video && typeof video.isConnected === 'boolean' && !video.isConnected) {
+          // YouTube swapped the <video> element (SPA navigation):
+          // drop the stale reference so the waitFor path below
+          // finds the new element instead of applying prefs to
+          // a detached one forever.
+          detachListeners(video);
+          video = null;
+          lastApplied = '';
+        }
         if (!dom || video) {
           if (video) {
             loadRemembered().then(function () {
