@@ -998,11 +998,60 @@ format, `c0e7e05` version 1.12.0, docs (this commit).
 **Browser verification still open** — the live DOM is
 the proof (`tests/manual-checklist.md` Phase 20).
 
+## Phase 21 — Saved Themes + Export/Share (v1.13) 🔄 IN PROGRESS (2026-11-09)
+
+(PRD PL-21 + plan), engine, dashboard wiring, tests,
+checklist, version, docs.
+- Pure engine `shared/savedThemes.js`: a saved theme
+  is theme-only — `{ name, createdAt, theme, colors }`
+  (base preset name + the custom-colour overrides),
+  unlike a Profile, which snapshots all settings.
+  Helpers `createSavedTheme` / `applySavedTheme` /
+  `validateSavedThemeName` / `validateSavedThemes` /
+  `renameSavedTheme` / `deleteSavedTheme` (mirroring
+  `shared/profiles.js`: max 10, names 1–40 chars,
+  case-insensitive duplicates rejected, built-in theme
+  names reserved) + `exportSavedTheme` (JSON
+  `{ oneytTheme: 1, name, theme, colors }`, filename
+  `oneyt-theme-<slug>.json`) / `parseSavedThemeImport`
+  (rejects bad JSON, wrong version marker, unknown
+  base theme, unknown colour keys, invalid hex, and
+  duplicate names — a corrupt import never touches
+  the stored list). Storage key
+  `oneyt.themes.v1` (`SAVED_THEMES_STORAGE_KEY` in
+  `shared/constants.js`), local-only, never synced —
+  export/share is the sharing path, not sync.
+- Dashboard: Appearance section tool-box
+  (`renderSavedThemeTools` in `options.js`, mirroring
+  `renderProfilesTools` — `el()` only, no innerHTML):
+  save the current theme by name; one row per saved
+  theme (name + base preset + custom-colour count +
+  Apply / Export / Rename / Delete); import box (file
+  input or pasted JSON → validate + preview → Add
+  theme only on confirm, mirroring the Advanced
+  import flow). Applying writes `appearance.theme` +
+  `appearance.colors` only — everything else stays —
+  and the theme select + colour inputs refresh in
+  place. `options.html` gains `shared/savedThemes.js`
+  (script count 21 → 22, pin updated in
+  `tests/dashboard.test.js`).
+- No content-script change (apply rides the existing
+  storage onChanged path into the appearance module),
+  no new setting, no new permission, no new selector.
+  **Honest limits:** a saved theme carries colours
+  only — radius, spacing, typography and custom CSS
+  are not part of it (that is what Profiles are for);
+  an exported file applies on any device, but the
+  theme itself never syncs. **Browser verification
+  still open** — the live page is the proof
+  (`tests/manual-checklist.md` Phase 21).
+**Status 2026-11-09:** started on branch
+`feature/saved-themes` (from `main` `81201fb`).
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
 - Channel-page Shorts tab hiding (follow-up to Block Shorts)
-- Multiple saved themes + community theme sharing (exportable presets)
 - Advanced layout editor
 - Optional cloud sync / cross-device backup (opt-in, explicit)
 - More player controls (per user demand)
