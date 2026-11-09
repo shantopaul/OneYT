@@ -662,10 +662,12 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
 - Selectors: 20 → 21 keys (`reelShelf`); usage enforced by
   the Phase 6 audit tests.
 - Version 1.1.0 (new feature = minor bump) + CHANGELOG.
-  Note: the professional README rewrite on branch
-  `docs/all-phases-complete` still carries a 1.0.0 version
-  badge — it needs the same 1.1.0 bump when that branch
-  merges.
+  Note: the professional README rewrite (PR #8) merged to
+  `main` (`713cf6c`) while Phase 8 was in progress, so this
+  branch was rebased onto it — the README version badge,
+  package zip name and roadmap line were bumped to 1.1.0
+  during the rebase (conflict resolved in favour of the
+  rewritten README).
 - Verification here: `npm test` **123/123 pass** (121 + 2
   new), `npm run lint` clean, `npm run format` clean,
   manifest valid, `npm run package` builds a clean
