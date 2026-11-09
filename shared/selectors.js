@@ -100,6 +100,14 @@
     // Subscriber count: next to the channel name.
     subscriberCount: 'ytd-video-owner-renderer #subscriber-count',
 
+    // --- Player accent (Phase 23) ---
+    // Played portion of the progress bar + the scrubber
+    // knob. Well-known hooks, used by several independent
+    // userstyles (Youtube Cybercore, Gura, Acheron, YouTube
+    // Custom Color, Youtube Retouch, xlvxlv, V3-2011 player).
+    playProgress: '.ytp-play-progress',
+    scrubberButton: '.ytp-scrubber-button',
+
     // --- Focus Mode targets (Phase 4) ---
     chat: '#chat', // Live chat container on watch pages
     actions: '#actions', // Like/share/download row under the player
