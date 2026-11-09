@@ -1,0 +1,14 @@
+/* OneYT — typography module styles (Phase 3).
+ * Only video titles, descriptions and comment text are
+ * restyled; every property falls back to `inherit` so a
+ * partial setting (e.g. only size) leaves the rest alone.
+ * Player, captions and navigation are never touched. */
+
+html.oneyt-enabled.oneyt-typography #video-title,
+html.oneyt-enabled.oneyt-typography #description,
+html.oneyt-enabled.oneyt-typography #content-text {
+  font-family: var(--oneyt-font-family, inherit);
+  font-size: calc(1em * var(--oneyt-font-scale, 1));
+  font-weight: var(--oneyt-font-weight, inherit);
+  line-height: var(--oneyt-line-height, inherit);
+}

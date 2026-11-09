@@ -8,7 +8,8 @@
         "content/modules/sidebar/sidebar.css",
         "content/modules/player/player.css",
         "content/modules/layout/layout.css",
-        "content/modules/appearance/appearance.css"
+        "content/modules/appearance/appearance.css",
+        "content/modules/typography/typography.css"
       ],
       "js": [
         "shared/constants.js",
@@ -27,6 +28,7 @@
         "content/modules/player/player.js",
         "content/modules/layout/layout.js",
         "content/modules/appearance/appearance.js",
+        "content/modules/typography/typography.js",
         "content/core/app.js",
         "content/index.js"
       ],
