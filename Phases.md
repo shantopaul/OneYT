@@ -520,7 +520,7 @@ exists (no commits yet) with the research done —
 `#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 12
 when resumed.
 
-## Phase 15 — Hide Live / Mixes / News Shelves (v1.7) ⏳ IN PROGRESS (2026-11-09)
+## Phase 15 — Hide Live / Mixes / News Shelves (v1.7) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** three separate toggles that hide the Live, Mixes,
 and News rows from the home feed — the same treatment the
@@ -552,13 +552,21 @@ comes from a HideYouTubeShorts userscript; the
   target them this way).
 - News: `ytd-rich-shelf-renderer[title*="News" i]` — the
   "Breaking news" shelf (also catches a plain "News" shelf).
-Selector count 26 → 30. No new permission, no JS
+Selector count 25 → 29. No new permission, no JS
 observer — class-only hiding like the other shelf rules.
 Dashboard: three toggles in the Layout section; module
-tests + manual checklist item. **Browser verification
-still open** — the title attributes are the risky part:
-they are English UI text (a non-English YouTube UI may
-use different titles), and YouTube may rename the shelf
+tests + manual checklist item. **Done (8 commits):**
+`254d359` start (PRD PL-15 + plan, Memory.md corrected
+to Phase 11 merged as PR #13), `b2c1dea` settings,
+`1e7c51c` selectors (count 25 → 29), `76aff04` layout
+module + CSS (incl. the Prettier quote fix: CSS
+attribute quotes are single, so the selector values
+use single quotes inside), `488a8b0` dashboard toggles,
+`679efe6` tests (137/137) + checklist, `20bf400`
+version 1.7.0. **Browser verification still open** —
+the title attributes are the risky part: they are
+English UI text (a non-English YouTube UI may use
+different titles), and YouTube may rename the shelf
 titles; the live check on Shanto's PC is the proof, and
 the checklist asks for the real title from DevTools if a
 row does not hide. If a hidden shelf leaves an empty gap
