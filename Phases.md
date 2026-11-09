@@ -664,7 +664,7 @@ theater (merged); Phase 13 is disable ambient mode
 commits). v1.7.0 assumed 1.5.0 and 1.6.0 merge first —
 they did.
 
-## Phase 16 — Presets / Profiles (v1.8) ✅ CODE COMPLETE (2026-11-09)
+## Phase 16 — Presets / Profiles (v1.8) ✅ MERGED (2026-11-09)
 
 **Goal:** one click to a whole YouTube setup — four built-in
 presets (Stock YouTube, Focus, Clean, Cinema) plus named
@@ -676,8 +676,10 @@ section and from the popup.
 
 **Status 2026-11-09:** code complete on branch
 `feature/presets` (7 part-by-part commits on top of
-`main` `4440b49`, pushed after completion, `main`
-untouched). `npm test` 162/162 pass (146 baseline + 16
+`main` `4440b49`, pushed after completion) and **merged
+to `main` — merge `1077140`, `main` now `1077140`** (per
+the standing rule: feature complete → merge to main).
+`npm test` 162/162 pass (146 baseline + 16
 new), lint + format clean, manifest valid, `npm run
 package` builds a clean `oneyt-1.8.0.zip` (114 KB,
 runtime files only — zero test/doc files inside).
@@ -687,8 +689,8 @@ corrected to Phase 15 merged), `f7149bc` profiles engine
 `56961c5` dashboard Profiles section
 (`renderProfilesTools`, like `renderAdvancedTools`),
 `0cdd99e` popup preset picker, `cb8c893` tests (16 new)
-+ checklist, `26eaa0e` format, `d2fc584` version 1.8.0.
-**Browser verification still open** — the dashboard
++ checklist, `26eaa0e` format, `d2fc584` version 1.8.0,
+`639f9a1` docs. **Browser verification still open** — the dashboard
 section, popup picker and live apply need a real browser
 on Shanto's PC (`tests/manual-checklist.md` Phase 16).
 Numbering note: this phase takes Phase 16 because Phase
