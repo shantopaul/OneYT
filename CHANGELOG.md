@@ -14,7 +14,27 @@ news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.12.0 (Phase 20 custom CSS templates),
 1.13.0 (Phase 21 saved themes + export/share),
 1.14.0 (Phase 22 advanced layout editor),
-1.15.0 (Phase 23 player accent color).
+1.15.0 (Phase 23 player accent color),
+1.16.0 (Phase 24 custom font).
+
+## 1.16.0 — 2026-11-09 (Custom Font, Phase 24)
+
+- One text setting `appearance.typography.customFont`
+  applies any font installed on this device, typed by
+  name (e.g. `Hind Siliguri`, `Noto Sans Bengali`).
+  Empty = use the Font family select; a valid custom
+  name wins over it.
+- Appearance-section text box right after "Font
+  family". Same scope as typography today — video
+  titles, descriptions and comments only; player,
+  captions and navigation untouched.
+- No download, no Google Fonts: the extension stays
+  fully local. A font the device lacks falls back to
+  sans-serif; an invalid name (quotes, commas,
+  semicolons) is warned about and falls back to the
+  select — the raw text never reaches the page.
+- Profiles snapshot the setting automatically; saved
+  themes are theme-only, so they do not carry it.
 
 ## 1.15.0 — 2026-11-09 (Player Accent Color, Phase 23)
 
