@@ -375,8 +375,36 @@ Shanto merged PR #6 himself during Phase 7 (`main`
 
 ---
 
+## Phase 8 — Block Shorts (v1.1) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** one master toggle that blocks Shorts fully — hide
+them everywhere and do not show them.
+
+**Deliverable:** v1.1.0.
+
+**Status 2026-11-09:** code complete on branch
+`feature/shorts-block` (7 part-by-part commits on top of
+`main` `4ca8a88`, pushed after completion, nothing merged).
+`npm test` 123/123 pass, lint + format clean, manifest valid,
+`npm run package` builds a clean 100 KB `oneyt-1.1.0.zip`.
+Delivered: new setting `layout.blockShorts` (default off,
+additive); layout module sets `oneyt-block-shorts` on every
+page type and redirects `/shorts/VIDEOID` to
+`/watch?v=VIDEOID` (pure helper `shortsWatchUrl`, injectable
+redirect); CSS hides rich shelves, reel shelves (search /
+subscriptions), guide + mini-guide Shorts entries, and
+Shorts video cards in grids and search; master toggle at the
+top of the Layout section; selector count 20 → 21
+(`reelShelf`); version 1.1.0 + CHANGELOG. The three older
+per-page Shorts toggles are unchanged. **Browser
+verification still open** — the new selectors and the
+redirect need a real YouTube page on Shanto's PC. Known
+limit: the Shorts tab on channel pages is not hidden yet
+(v1.1 follow-up).
+
 ## Future (v1.1+, not in scope now)
 
+- Channel-page Shorts tab hiding (follow-up to Block Shorts)
 - Workspace presets / saved profiles (per-page profiles)
 - Multiple saved themes + community theme sharing (exportable presets)
 - Advanced layout editor

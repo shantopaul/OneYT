@@ -629,6 +629,54 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   RELEASE_CHECKLIST) were updated the same day to record
   full completion.
 
+### 2026-11-09 — Phase 8: Block Shorts DONE (code, branch only)
+
+- User instruction: add one new feature — block Shorts
+  fully, hide them, do not show them — plan and implement
+  the code.
+- Gap found first: Shorts hiding existed only as 3 separate
+  toggles (Home shelf, Watch shelf, guide entry). Nothing
+  hid the shelf on search/subscriptions, nothing hid Shorts
+  video cards, and nothing stopped the `/shorts/` player
+  page from playing.
+- Branch `feature/shorts-block` from `main` (`4ca8a88`).
+  **7 part-by-part commits, pushed only when Phase 8 was
+  fully complete** (same rule — no intermediate push, no
+  merge to `main`).
+- New setting `layout.blockShorts: false` (additive default
+  off — existing users see no change until they turn it on).
+  Layout module sets `oneyt-block-shorts` on `<html>` on
+  every page type (set after the page branches so cleanup()
+  cannot strip it) and redirects `/shorts/VIDEOID` to
+  `/watch?v=VIDEOID` via `location.replace` (no history
+  entry, so Back does not return to Shorts). Pure helper
+  `shortsWatchUrl` (11-char IDs only, anything else → null);
+  redirect injectable for tests.
+- CSS (layout.css): rich shelf `[is-shorts]`, reel shelf
+  (search/subscriptions), guide + mini-guide Shorts entries,
+  Shorts video cards in grids/search (`:has(a[href^=
+  '/shorts/'])` — precise, only renderers containing a
+  Shorts link).
+- Dashboard: master toggle "Block Shorts everywhere" first
+  in the Layout section. The 3 older toggles are unchanged.
+- Selectors: 20 → 21 keys (`reelShelf`); usage enforced by
+  the Phase 6 audit tests.
+- Version 1.1.0 (new feature = minor bump) + CHANGELOG.
+  Note: the professional README rewrite on branch
+  `docs/all-phases-complete` still carries a 1.0.0 version
+  badge — it needs the same 1.1.0 bump when that branch
+  merges.
+- Verification here: `npm test` **123/123 pass** (121 + 2
+  new), `npm run lint` clean, `npm run format` clean,
+  manifest valid, `npm run package` builds a clean
+  `oneyt-1.1.0.zip` (100 KB). One test needed a fix during
+  the work: the selector-count assertion (20 → 21).
+- **Not verified here (needs Chrome on Shanto's PC):** the
+  new selectors against the live YouTube DOM and the
+  `/shorts/` → `/watch` redirect on a real page. Known
+  limit: the Shorts tab on channel pages is not hidden yet
+  (v1.1 follow-up, logged in Phases.md).
+
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
 - What was done / decided / verified.
