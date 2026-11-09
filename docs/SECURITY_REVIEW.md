@@ -47,7 +47,8 @@ oversized input before `JSON.parse`.
 - **Permissions** (`manifest.json`): `storage` + `activeTab`
   only. `activeTab` (Phase 5) is used solely for the popup's
   page status (active tab URL, on user click). Host:
-  `https://www.youtube.com/*` only. No other host, no
+  `https://*.youtube.com/*` + `https://youtube.com/*` (all
+  YouTube hosts) only. No other host, no
   `web_accessible_resources`, no CSP override (MV3 default
   `script-src 'self'` applies).
 - **Network**: no `fetch`, `XMLHttpRequest`, `WebSocket`,

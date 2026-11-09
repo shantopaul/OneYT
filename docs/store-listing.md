@@ -102,8 +102,8 @@ the user's device.
   `chrome.storage.sync` only when the user opts into sync).
 - `activeTab` — the popup reads the active tab's URL only,
   to show which YouTube page the user is on.
-- Host `https://www.youtube.com/*` — the extension runs on
-  YouTube pages only, nowhere else.
+- Host `https://*.youtube.com/*` + `https://youtube.com/*` — the extension runs on
+  all YouTube pages only, nowhere else.
 
 ## Assets
 

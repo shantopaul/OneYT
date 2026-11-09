@@ -23,10 +23,20 @@
       return { onYouTube: false, label: 'Not on YouTube' };
     }
     var host = parsed.hostname || '';
-    // Only the host the content script runs on counts — e.g.
-    // music.youtube.com is not a OneYT page.
-    if (host !== 'www.youtube.com' && host !== 'youtube.com') {
+    // Only a host the content script runs on counts — the
+    // manifest covers *.youtube.com, so every YouTube
+    // subdomain counts, not just www. The '.youtube.com'
+    // suffix check (not a plain endsWith('youtube.com'))
+    // keeps fakeyoutube.com out.
+    var isYouTube = host === 'youtube.com' || host.endsWith('.youtube.com');
+    if (!isYouTube) {
       return { onYouTube: false, label: 'Not on YouTube' };
+    }
+    // YouTube Music is a different app: the extension runs
+    // there, but OneYT's modules target youtube.com's DOM,
+    // so the path labels below don't apply to it.
+    if (host === 'music.youtube.com') {
+      return { onYouTube: true, label: 'YouTube Music' };
     }
     var path = parsed.pathname || '/';
     if (path === '/watch') return { onYouTube: true, label: 'Watch page' };
