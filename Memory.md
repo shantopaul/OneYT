@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 — Planning ✅ done · **Phase 1 — Foundation ⬜ not started** |
+| **Phase** | Phase 0 — Planning ✅ done, pushed · **Phase 1 — Foundation ⬜ not started** |
 | **Version** | Planning v1.0 (no code, no release) |
-| **Repo** | Not created yet — `shantopaul/OneYT` proposed, awaiting user decision |
-| **Code written** | None. Workspace contains planning docs only. |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5e608e1`, verified on remote 2026-11-09 |
+| **Code written** | None. Repo contains planning docs only (7 files, 1,995 lines). |
 | **Currently working on** | — (nothing — waiting for user to approve Phase 1 start) |
-| **Blocked on** | User decisions in "Decisions needed" below |
-| **Last verified** | 2026-11-09 — six planning docs created in `~/workspace/oneyt/` |
+| **Blocked on** | Phase 1 start decision (D-02 below) |
+| **Last verified** | 2026-11-09 — remote HEAD `5e608e1` confirmed via `git ls-remote` + GitHub API |
 
 ---
 
@@ -47,8 +47,13 @@
     7 YouTube presets), fonts, type scale, popup/dashboard
     layout, control specs, spacing/radius scales
   - `Memory.md` — this file
-- **Nothing pushed, nothing coded.** No GitHub repo exists yet
-  for OneYT. No extension code, no manifest, no icons.
+- **Nothing coded.** No extension code, no manifest, no icons.
+- **Pushed 2026-11-09:** local git init (`main`), remote
+  `https://github.com/shantopaul/OneYT.git`, commit `5e608e1`
+  "docs: OneYT planning docs — PRD, architecture, rules, phases,
+  design, memory (Phase 0)" — 7 files, 1,995 lines. Pushed to
+  `main`, verified remote HEAD = `5e608e1` (private repo,
+  default branch `main`).
 
 ---
 
@@ -71,7 +76,7 @@
 
 | # | Question | Options / recommendation | Status |
 |---|----------|--------------------------|--------|
-| D-01 | Create GitHub repo `shantopaul/OneYT` now, or later at Phase 1? | Recommend: create at Phase 1 start, `main` = stable | ⬜ Awaiting user |
+| D-01 | Create GitHub repo `shantopaul/OneYT` now, or later at Phase 1? | Recommend: create at Phase 1 start, `main` = stable | ✅ Done 2026-11-09 — user created the (private) repo; planning docs pushed as `5e608e1` on `main` |
 | D-02 | Start Phase 1 (Foundation) coding now? | Recommend: yes, after D-01 | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
@@ -138,6 +143,14 @@ verifying in the browser):
   Memory) from the user's All-in-One YouTube Customizer spec.
   Project named **OneYT**. No code written, nothing pushed.
 - Waiting on user: repo creation (D-01) and Phase 1 start (D-02).
+
+### 2026-11-09 — repo connected + planning docs pushed
+- User created private repo `shantopaul/OneYT` (screenshot).
+  Connected local `~/workspace/oneyt/` via HTTPS + `gh` credential
+  helper (`gh auth setup-git`), `git init -b main`, remote `origin`.
+- First commit `5e608e1` pushed to `main` and verified on remote
+  (HEAD = `5e608e1`, 7 files, 1,995 lines). **No coding started.**
+- D-01 done. Waiting on user: Phase 1 start (D-02).
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
