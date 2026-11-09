@@ -72,9 +72,21 @@
       wheelHandler = null;
     }
 
+    function clampSensitivity(value) {
+      // A stored value is only type-checked by migration, so an
+      // out-of-range number (e.g. 99 from a hand-edited import)
+      // must never reach the wheel handler. Range matches the
+      // dashboard control (0.5–3).
+      if (typeof value !== 'number' || !isFinite(value)) return 1;
+      if (value < 0.5) return 0.5;
+      if (value > 3) return 3;
+      return value;
+    }
+
     function bindWheel(el, sensitivity) {
       unbindWheel();
       if (!el || typeof el.addEventListener !== 'function') return;
+      sensitivity = clampSensitivity(sensitivity);
       if (sensitivity === 1) return; // native scrolling is fine
       wheelHandler = function (event) {
         try {

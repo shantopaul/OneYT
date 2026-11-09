@@ -71,7 +71,10 @@ test('migration: corrupt fixture is repaired, unknown keys kept', () => {
   assert.equal(migrated.playback.defaultSpeed, 1);
   assert.deepEqual(migrated.playback.speedPresets, [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]);
   assert.equal(migrated.sidebar.customWidth, 402);
-  assert.equal(migrated.sidebar.scrollSensitivity, 1);
+  // Migration repairs types, not ranges: 99 survives migration
+  // (it is a number). The sidebar module clamps it at apply
+  // time — see the wheel-clamp test in modules.test.js.
+  assert.equal(migrated.sidebar.scrollSensitivity, 99);
   assert.deepEqual(migrated.player.customWidth, 0);
   assert.deepEqual(migrated.futureFeature, { x: 1 });
   assert.equal(migrated.schemaVersion, 1);
