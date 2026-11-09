@@ -273,7 +273,11 @@ test('navigation: hide entries, compact, guide width; disable restores', () => {
   assert.equal(doc._root._classes.has('oneyt-nav-hide-home'), true);
   assert.equal(doc._root._classes.has('oneyt-nav-hide-shorts'), true);
   assert.equal(doc._root._classes.has('oneyt-nav-compact'), true);
-  assert.equal(doc._root._vars.get('--oneyt-guide-width'), '300px');
+  // Compact wins over wide: the old code set the 300px
+  // guide width too, and the wide rule won on equal
+  // specificity — a wide guide with hidden titles.
+  assert.equal(doc._root._classes.has('oneyt-nav-wide'), false);
+  assert.equal(doc._root._vars.has('--oneyt-guide-width'), false);
   mod.apply(settingsWith({ navigation: { guideWidth: 50 } }), 'home');
   assert.equal(doc._root._classes.has('oneyt-nav-wide'), false);
   mod.disable();
