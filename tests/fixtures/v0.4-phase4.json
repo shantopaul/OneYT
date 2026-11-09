@@ -1,0 +1,111 @@
+{
+  "appearance": {
+    "borderRadius": 12,
+    "colors": { "accent": "#ff0033" },
+    "customCSS": "",
+    "customCSSEnabled": false,
+    "spacing": 16,
+    "theme": "dark",
+    "typography": { "fontFamily": "", "fontSize": 110, "fontWeight": 0, "lineHeight": 0 }
+  },
+  "enabled": true,
+  "keyboard": {
+    "shortcuts": {
+      "resetSpeed": "Shift+R",
+      "speedDown": "Shift+<",
+      "speedUp": "Shift+>",
+      "toggleFocus": "Shift+F",
+      "togglePlayerPosition": "Shift+P",
+      "toggleSidebar": "Shift+S",
+      "toggleTheater": "Shift+T"
+    }
+  },
+  "layout": {
+    "cardSpacing": 0,
+    "hideComments": true,
+    "hideShortsHome": true,
+    "hideShortsWatch": false,
+    "homeColumns": 4,
+    "thumbnailSize": 0,
+    "watchSpacing": 12
+  },
+  "modules": {
+    "appearance": true,
+    "focus": true,
+    "keyboard": true,
+    "layout": true,
+    "navigation": true,
+    "playback": true,
+    "player": true,
+    "recommendations": true,
+    "sidebar": true,
+    "typography": true
+  },
+  "navigation": {
+    "compact": true,
+    "guideWidth": 0,
+    "hideHistory": false,
+    "hideHome": false,
+    "hideLibrary": false,
+    "hideShorts": true,
+    "hideSubscriptions": false
+  },
+  "playback": {
+    "autoplay": null,
+    "captionFontSize": 130,
+    "captions": null,
+    "defaultQuality": "720p",
+    "defaultSpeed": 1.5,
+    "defaultVolume": 80,
+    "rememberSpeed": true,
+    "rememberVolume": true,
+    "speedPresets": [0.5, 1, 1.5, 2]
+  },
+  "player": {
+    "alignment": "center",
+    "border": "none",
+    "borderRadius": 12,
+    "customWidth": 1000,
+    "maxWidth": 1280,
+    "miniPlayer": {
+      "borderRadius": 12,
+      "offsetX": 10,
+      "offsetY": 10,
+      "position": "bottom-left",
+      "shadow": "none",
+      "size": 400
+    },
+    "position": "sticky",
+    "shadow": "none",
+    "spacing": 0,
+    "sticky": true
+  },
+  "productivity": {
+    "focusHideButtons": true,
+    "focusHideChat": true,
+    "focusHideComments": true,
+    "focusHideMetadata": true,
+    "focusHideNav": true,
+    "focusHideRecommendations": true,
+    "focusHideShorts": true,
+    "focusMode": true
+  },
+  "recommendations": {
+    "cardSize": 200,
+    "density": "compact",
+    "hideSidebar": false,
+    "showMetadata": true
+  },
+  "schemaVersion": 1,
+  "sidebar": {
+    "customWidth": 500,
+    "independentScroll": true,
+    "keepPlayerVisible": true,
+    "maxHeight": "calc(100vh - 100px)",
+    "playerOffset": 0,
+    "scrollSensitivity": 1,
+    "scrollbarVisible": true,
+    "scrollbarWidth": 8,
+    "smoothScroll": true
+  }
+}

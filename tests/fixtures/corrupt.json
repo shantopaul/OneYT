@@ -1,0 +1,9 @@
+{
+  "appearance": { "theme": 42 },
+  "enabled": "yes",
+  "futureFeature": { "x": 1 },
+  "playback": { "defaultSpeed": "fast", "speedPresets": "all" },
+  "player": "not-an-object",
+  "schemaVersion": "one",
+  "sidebar": { "customWidth": "wide", "scrollSensitivity": 99 }
+}
