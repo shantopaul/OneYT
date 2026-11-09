@@ -94,3 +94,17 @@ test('onboarding: preset ids come from the presets module when passed', () => {
   // Without the API the built-in list is the fallback.
   assert.equal(onboarding.onboardingPresetId('cinema'), 'cinema');
 });
+
+test('onboarding: re-open applies the theme before showing done; missing APIs show an error', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'onboarding', 'onboarding.js'), 'utf8');
+  // B8: the already-finished branch must theme the page.
+  const doneBranch = src.slice(src.indexOf("showStep('done')") - 400, src.indexOf("showStep('done')"));
+  assert.ok(doneBranch.includes('applyTheme();'), 'applyTheme runs before showStep(done)');
+  // B16: a failed script load explains itself instead of a blank page.
+  assert.ok(
+    src.includes('OneYT could not load its setup scripts'),
+    'missing APIs render a plain error message'
+  );
+});
