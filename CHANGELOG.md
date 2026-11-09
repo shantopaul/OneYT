@@ -7,7 +7,18 @@ phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts),
 1.5.0 (Phase 12 hide topic chips bar), 1.6.0 (Phase 14
 default theater), 1.7.0 (Phase 15 hide live / mixes /
-news shelves), 1.8.0 (Phase 16 presets / profiles).
+news shelves), 1.8.0 (Phase 16 presets / profiles),
+1.9.0 (Phase 17 onboarding).
+
+## 1.9.0 — 2026-11-09 (Onboarding, Phase 17)
+
+- A 3-step welcome setup on first install: pick a preset
+  (Stock / Focus / Clean / Cinema, or keep YouTube as it
+  is), pick the dashboard theme, done. Choices apply
+  immediately; Skip and Finish both mark the setup done
+  so the page never opens on its own again. Re-openable
+  any time from the popup ("Welcome setup"). No new
+  permission, no new host.
 
 ## 1.8.0 — 2026-11-09 (Presets / Profiles, Phase 16)
 

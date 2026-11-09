@@ -145,6 +145,7 @@ and must work flawlessly before anything else ships.
 | PL-14 | Default theater mode | Toggle; every video opens in theater mode automatically; watch page only |
 | PL-15 | Hide live / mixes / news shelves | Three toggles; the "Live now" shelf, Mixes (shelf + mix cards), and the "Breaking news" shelf are hidden on the home feed; live apply |
 | PL-16 | Presets / Profiles | Four built-in presets (Stock YouTube, Focus, Clean, Cinema) applied in one click, plus named custom profiles that save the current settings as a snapshot and restore them exactly; dashboard Profiles section + popup picker; live apply; profiles stay on this device (never synced) |
+| PL-17 | Onboarding | A 3-step welcome setup on first install: pick a preset, pick the dashboard theme, done — the dashboard tour is the settings page itself; re-openable from the popup; never shown again once finished or skipped |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.

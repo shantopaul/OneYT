@@ -78,9 +78,13 @@ test('dashboard: every setting is reachable from a section control', () => {
   });
 
   // Every leaf in defaults (except schemaVersion, which is not
-  // user-editable) must have a control — except appearance.colors.*,
-  // whose ten keys are covered by the ten colour controls.
-  const leaves = leafPaths(defaults.DEFAULT_SETTINGS).filter((p) => p !== 'schemaVersion');
+  // user-editable, and ui.onboarded, which the welcome page
+  // sets itself — Phase 17) must have a control — except
+  // appearance.colors.*, whose ten keys are covered by the
+  // ten colour controls.
+  const leaves = leafPaths(defaults.DEFAULT_SETTINGS).filter(
+    (p) => p !== 'schemaVersion' && p !== 'ui.onboarded'
+  );
   const colorKeys = Object.keys(themes.CUSTOM_COLOR_KEYS);
   const missing = leaves.filter(function (p) {
     if (p.indexOf('appearance.colors.') === 0) {

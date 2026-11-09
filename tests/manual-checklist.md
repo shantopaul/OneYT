@@ -550,3 +550,18 @@ the dashboard — check the list updates after saving one.
 
 Notes / failures:
 - _…_
+
+## Phase 17 — Onboarding (v1.9) — live on a real Chrome install
+
+- [ ] Fresh install (remove the extension, Load unpacked again): the welcome page opens once, on its own, in a new tab
+- [ ] Step 1: pick Focus — the card highlights; Continue enables; click it and open YouTube — Focus Mode is on, recommendations and Shorts are hidden
+- [ ] Step 1: pick "Keep YouTube as it is" — Continue enables; YouTube is unchanged
+- [ ] Step 2: pick Light — the welcome page itself turns light immediately; pick Dark — it turns dark again
+- [ ] Step 3: "Open full dashboard" opens the settings dashboard and closes the welcome tab
+- [ ] Skip on step 1: the page closes and never opens again on its own (reload the extension — it must NOT reopen)
+- [ ] Update the extension (reload, no reinstall): the welcome page does NOT open
+- [ ] Popup → "Welcome setup": the page opens again, and since the setup is done it shows the last step ("You're set") instead of restarting
+- [ ] The welcome page on a light OS with the theme set to System follows the OS; with Dark forced, it stays dark
+
+Notes / failures:
+- _…_

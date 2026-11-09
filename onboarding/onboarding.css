@@ -1,0 +1,212 @@
+/* OneYT — onboarding/onboarding.css (welcome setup, Phase 17).
+ *
+ * Same design tokens as the dashboard (options/options.css):
+ * dark-first, flat surfaces, no gradients, no glassmorphism,
+ * accent used sparingly. The theme is user-selectable
+ * (ui.dashboardTheme): JS sets data-theme on <html> and the
+ * attribute rules below are the source of truth, exactly like
+ * the dashboard. The prefers-color-scheme block is only the
+ * pre-JS fallback, so its light tokens must stay in sync with
+ * the [data-theme='light'] block.
+ */
+:root {
+  color-scheme: dark;
+  --ui-bg: #0f0f0f;
+  --ui-surface: #181818;
+  --ui-surface-hover: #212121;
+  --ui-border: #2a2a2a;
+  --ui-border-strong: #3d3d3d;
+  --ui-text: #f1f1f1;
+  --ui-text-secondary: #aaaaaa;
+  --ui-text-muted: #9a9a9a;
+  --ui-accent: #ff0033;
+  --ui-accent-hover: #e6002e;
+  --ui-accent-soft: rgba(255, 0, 51, 0.12);
+  --ui-radius: 12px;
+  --ui-radius-sm: 8px;
+}
+
+@media (prefers-color-scheme: light) {
+  /* Pre-JS fallback only. Skipped when the user forced dark. */
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --ui-bg: #ffffff;
+    --ui-surface: #f9f9f9;
+    --ui-surface-hover: #f0f0f0;
+    --ui-border: #e5e5e5;
+    --ui-border-strong: #cccccc;
+    --ui-text: #0f0f0f;
+    --ui-text-secondary: #606060;
+    --ui-text-muted: #6b6b6b;
+    --ui-accent: #e6002e;
+    --ui-accent-hover: #cc0027;
+    --ui-accent-soft: rgba(230, 0, 46, 0.08);
+  }
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ui-bg: #ffffff;
+  --ui-surface: #f9f9f9;
+  --ui-surface-hover: #f0f0f0;
+  --ui-border: #e5e5e5;
+  --ui-border-strong: #cccccc;
+  --ui-text: #0f0f0f;
+  --ui-text-secondary: #606060;
+  --ui-text-muted: #6b6b6b;
+  --ui-accent: #e6002e;
+  --ui-accent-hover: #cc0027;
+  --ui-accent-soft: rgba(230, 0, 46, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.onboarding-root {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+}
+
+.onboarding-header {
+  margin-bottom: 8px;
+}
+
+.onboarding-logo {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.onboarding-tagline {
+  margin: 4px 0 0;
+  color: var(--ui-text-secondary);
+}
+
+.onboarding-steps {
+  margin: 24px 0 16px;
+  color: var(--ui-text-muted);
+  font-size: 13px;
+}
+
+.onboarding-step h1 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+
+.onboarding-lead {
+  margin: 0 0 20px;
+  color: var(--ui-text-secondary);
+}
+
+.onboarding-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.onboarding-card {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  text-align: left;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  cursor: pointer;
+  font: inherit;
+}
+
+.onboarding-card:hover {
+  background: var(--ui-surface-hover);
+}
+
+.onboarding-card:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.onboarding-card[aria-checked='true'] {
+  border-color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+}
+
+.onboarding-card-title {
+  display: block;
+  font-weight: 700;
+}
+
+.onboarding-card-desc {
+  display: block;
+  margin-top: 2px;
+  color: var(--ui-text-secondary);
+  font-size: 14px;
+}
+
+.onboarding-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-border-strong);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--ui-accent-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+}
+
+.btn-secondary:hover {
+  background: var(--ui-surface-hover);
+}
+
+.onboarding-fineprint {
+  margin: 20px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 13px;
+  text-align: center;
+}

@@ -221,6 +221,25 @@
     }
   });
 
+  // Welcome setup (Phase 17): re-open the onboarding page
+  // any time. If the setup was already finished, the page
+  // shows its last step (open the dashboard) instead of
+  // restarting.
+  var onboardingBtn = document.getElementById('open-onboarding');
+  if (onboardingBtn) {
+    onboardingBtn.addEventListener('click', function () {
+      if (
+        typeof chrome !== 'undefined' &&
+        chrome.tabs &&
+        chrome.tabs.create &&
+        chrome.runtime &&
+        chrome.runtime.getURL
+      ) {
+        chrome.tabs.create({ url: chrome.runtime.getURL('onboarding/onboarding.html') });
+      }
+    });
+  }
+
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener(function (changes, areaName) {
       if (areaName !== 'local') return;
