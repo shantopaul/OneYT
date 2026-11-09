@@ -259,6 +259,16 @@
       if (name.length === 0 || name.length > MAX_PROFILE_NAME_LENGTH) continue;
       var lower = name.toLowerCase();
       if (seen[lower]) continue;
+      // Create/rename reject built-in preset names — repair
+      // must too, or a hand-edited list could shadow one.
+      var isBuiltin = false;
+      for (var k = 0; k < BUILTIN_PRESETS.length; k++) {
+        if (BUILTIN_PRESETS[k].id === lower || BUILTIN_PRESETS[k].name.toLowerCase() === lower) {
+          isBuiltin = true;
+          break;
+        }
+      }
+      if (isBuiltin) continue;
       seen[lower] = true;
       out.push({
         name: name,

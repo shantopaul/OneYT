@@ -201,3 +201,15 @@ test('health: wiring — manifest, index, dashboard section and scripts', () => 
   assert.equal(section.title, 'Health');
   assert.deepEqual(section.controls, []);
 });
+
+test('health: validateHealthRecord drops unknown page types', () => {
+  const now = Date.now();
+  const clean = health.validateHealthRecord(
+    {
+      watch: { checkedAt: now, results: { player: 'ok' } },
+      nowhere: { checkedAt: now, results: { player: 'ok' } },
+    },
+    now
+  );
+  assert.deepEqual(clean, { watch: { checkedAt: now, results: { player: 'ok' } } });
+});

@@ -54,6 +54,19 @@
   // rather than showing a week-old "all OK".
   var HEALTH_RECORD_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
+  // Only page types the page detector can return are kept;
+  // a hand-edited record must not invent new ones.
+  var KNOWN_PAGE_TYPES = [
+    'home',
+    'watch',
+    'search',
+    'subscriptions',
+    'channel',
+    'playlist',
+    'shorts',
+    'other',
+  ];
+
   // Per-selector metadata. Every key here must exist in
   // shared/selectors.js (enforced by tests/health.test.js);
   // a key missing from this map is simply not checked.
@@ -154,6 +167,7 @@
     var at = typeof now === 'number' ? now : Date.now();
     var out = {};
     Object.keys(stored).forEach(function (pageType) {
+      if (KNOWN_PAGE_TYPES.indexOf(pageType) === -1) return;
       var entry = stored[pageType];
       if (!isPlainObject(entry)) return;
       if (typeof entry.checkedAt !== 'number') return;

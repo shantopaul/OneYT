@@ -197,3 +197,18 @@ test('profiles: deleteProfile removes by name, case-insensitively', () => {
   );
   assert.equal(profiles.deleteProfile(list, 'Missing', defaults).length, 2);
 });
+
+test('profiles: validateProfiles drops names that shadow built-in presets', () => {
+  const cleaned = profiles.validateProfiles(
+    [
+      { name: 'Focus', createdAt: 1, settings: {} },
+      { name: 'cinema', createdAt: 2, settings: {} },
+      { name: 'My setup', createdAt: 3, settings: {} },
+    ],
+    defaults
+  );
+  assert.deepEqual(
+    cleaned.map((p) => p.name),
+    ['My setup']
+  );
+});
