@@ -13,7 +13,8 @@
 
   function createPageDetector(deps) {
     var constants = (deps && deps.constants) || (globalThis.OneYT && globalThis.OneYT.constants);
-    var logger = (deps && deps.logger) || (globalThis.OneYT && globalThis.OneYT.logger) || { debug: function () {} };
+    var logger = (deps && deps.logger) ||
+      (globalThis.OneYT && globalThis.OneYT.logger) || { debug: function () {} };
     var PAGE_TYPES = (constants && constants.PAGE_TYPES) || {
       HOME: 'home',
       WATCH: 'watch',
@@ -42,7 +43,7 @@
           return PAGE_TYPES.OTHER;
         }
         path = parsed.pathname;
-      } catch (err) {
+      } catch {
         return PAGE_TYPES.OTHER;
       }
       if (path === '/watch') return PAGE_TYPES.WATCH;
@@ -50,11 +51,7 @@
       if (path === '/playlist') return PAGE_TYPES.PLAYLIST;
       if (path.indexOf('/shorts/') === 0) return PAGE_TYPES.SHORTS;
       if (path === '/feed/subscriptions') return PAGE_TYPES.SUBSCRIPTIONS;
-      if (
-        path === '/' ||
-        path === '/feed/trending' ||
-        path.indexOf('/feed/') === 0
-      ) {
+      if (path === '/' || path === '/feed/trending' || path.indexOf('/feed/') === 0) {
         return PAGE_TYPES.HOME;
       }
       if (

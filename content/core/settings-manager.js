@@ -21,10 +21,13 @@
     var storage = deps.storage;
     var defaultsApi = deps.defaults || (globalThis.OneYT && globalThis.OneYT.defaults);
     var constants = deps.constants || (globalThis.OneYT && globalThis.OneYT.constants);
-    var logger = deps.logger || (globalThis.OneYT && globalThis.OneYT.logger) || { debug: function () {}, error: function () {} };
+    var logger = deps.logger ||
+      (globalThis.OneYT && globalThis.OneYT.logger) || {
+        debug: function () {},
+        error: function () {},
+      };
     var STORAGE_KEY = (constants && constants.STORAGE_KEY) || 'oneyt.settings.v1';
-    var DEBOUNCE_MS =
-      (constants && constants.DEBOUNCE && constants.DEBOUNCE.STORAGE_WRITE) || 150;
+    var DEBOUNCE_MS = (constants && constants.DEBOUNCE && constants.DEBOUNCE.STORAGE_WRITE) || 150;
 
     var current = defaultsApi.cloneDefaults();
     var listeners = [];
@@ -47,11 +50,9 @@
       if (writeTimer) clearTimeout(writeTimer);
       writeTimer = setTimeout(function () {
         writeTimer = null;
-        storage
-          .set({ [STORAGE_KEY]: defaultsApi.deepClone(current) })
-          .catch(function (err) {
-            logger.error('settings: failed to save', err);
-          });
+        storage.set({ [STORAGE_KEY]: defaultsApi.deepClone(current) }).catch(function (err) {
+          logger.error('settings: failed to save', err);
+        });
       }, DEBOUNCE_MS);
     }
 
@@ -70,9 +71,7 @@
         .get(STORAGE_KEY)
         .then(function (stored) {
           var migrated = defaultsApi.migrateSettings(stored);
-          var changed =
-            stored === undefined ||
-            JSON.stringify(stored) !== JSON.stringify(migrated);
+          var changed = stored === undefined || JSON.stringify(stored) !== JSON.stringify(migrated);
           current = migrated;
           loaded = true;
           if (changed) {

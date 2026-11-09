@@ -74,8 +74,7 @@
       if (expected[key] === 'any') continue;
       if (typeOf(data[key]) !== expected[key]) {
         errors.push(
-          'Setting "' + key + '" must be ' + expected[key] +
-          ' but got ' + typeOf(data[key]) + '.'
+          'Setting "' + key + '" must be ' + expected[key] + ' but got ' + typeOf(data[key]) + '.'
         );
       }
     }
@@ -94,10 +93,7 @@
 
   function validateCustomCSS(css, maxLength) {
     var errors = [];
-    var limit =
-      typeof maxLength === 'number'
-        ? maxLength
-        : 50000;
+    var limit = typeof maxLength === 'number' ? maxLength : 50000;
     if (typeof css !== 'string') {
       return { valid: false, errors: ['Custom CSS must be text.'] };
     }

@@ -24,20 +24,16 @@
     },
     debug: function () {
       if (!debugEnabled) return;
-      // eslint-disable-next-line no-console
       console.log.apply(console, [prefix('debug')].concat(Array.prototype.slice.call(arguments)));
     },
     info: function () {
       if (!debugEnabled) return;
-      // eslint-disable-next-line no-console
       console.info.apply(console, [prefix('info')].concat(Array.prototype.slice.call(arguments)));
     },
     warn: function () {
-      // eslint-disable-next-line no-console
       console.warn.apply(console, [prefix('warn')].concat(Array.prototype.slice.call(arguments)));
     },
     error: function () {
-      // eslint-disable-next-line no-console
       console.error.apply(console, [prefix('error')].concat(Array.prototype.slice.call(arguments)));
     },
   };

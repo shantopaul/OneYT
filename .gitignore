@@ -1,6 +1,5 @@
-# Dependencies / tooling
+# Dependencies / tooling (lockfile IS committed for reproducible dev installs)
 node_modules/
-package-lock.json
 
 # OS / editor
 .DS_Store

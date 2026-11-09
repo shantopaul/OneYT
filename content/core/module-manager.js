@@ -24,7 +24,11 @@
   'use strict';
 
   function createModuleManager(deps) {
-    var logger = (deps && deps.logger) || (globalThis.OneYT && globalThis.OneYT.logger) || { debug: function () {}, error: function () {} };
+    var logger = (deps && deps.logger) ||
+      (globalThis.OneYT && globalThis.OneYT.logger) || {
+        debug: function () {},
+        error: function () {},
+      };
     var modules = new Map();
     var enabledIds = new Set();
     var ctx = null;

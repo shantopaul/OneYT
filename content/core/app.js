@@ -26,7 +26,8 @@
   function createApp(deps) {
     deps = deps || {};
     var ns = globalThis.OneYT || {};
-    var logger = deps.logger || ns.logger || { debug: function () {}, info: function () {}, error: function () {} };
+    var logger = deps.logger ||
+      ns.logger || { debug: function () {}, info: function () {}, error: function () {} };
     var constants = deps.constants || ns.constants || {};
     var settingsManager = deps.settingsManager;
     var pageDetector = deps.pageDetector;
@@ -36,8 +37,7 @@
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
     var win = deps.window || (typeof window !== 'undefined' ? window : null);
 
-    var DEBOUNCE_MS =
-      (constants.DEBOUNCE && constants.DEBOUNCE.RESIZE) || 150;
+    var DEBOUNCE_MS = (constants.DEBOUNCE && constants.DEBOUNCE.RESIZE) || 150;
 
     var started = false;
     var currentPage = 'other';

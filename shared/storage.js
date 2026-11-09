@@ -18,11 +18,7 @@
   'use strict';
 
   function defaultArea() {
-    if (
-      typeof chrome !== 'undefined' &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       return chrome.storage.local;
     }
     return null;

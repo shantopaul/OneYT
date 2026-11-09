@@ -18,11 +18,14 @@
   function createDomManager(deps) {
     var selectors = (deps && deps.selectors) || (globalThis.OneYT && globalThis.OneYT.selectors);
     var constants = (deps && deps.constants) || (globalThis.OneYT && globalThis.OneYT.constants);
-    var logger = (deps && deps.logger) || (globalThis.OneYT && globalThis.OneYT.logger) || { debug: function () {}, error: function () {} };
+    var logger = (deps && deps.logger) ||
+      (globalThis.OneYT && globalThis.OneYT.logger) || {
+        debug: function () {},
+        error: function () {},
+      };
     var doc = (deps && deps.document) || (typeof document !== 'undefined' ? document : null);
     var SELECTORS = selectors ? selectors.SELECTORS : {};
-    var OBSERVER_TIMEOUT =
-      (constants && constants.OBSERVER_TIMEOUT) || 10000;
+    var OBSERVER_TIMEOUT = (constants && constants.OBSERVER_TIMEOUT) || 10000;
 
     function resolveSelector(keyOrSelector) {
       return SELECTORS[keyOrSelector] || keyOrSelector;
@@ -43,9 +46,7 @@
       if (!doc) return [];
       try {
         var scope = root || doc;
-        return Array.prototype.slice.call(
-          scope.querySelectorAll(resolveSelector(keyOrSelector))
-        );
+        return Array.prototype.slice.call(scope.querySelectorAll(resolveSelector(keyOrSelector)));
       } catch (err) {
         logger.debug('dom: bad selector', keyOrSelector, err);
         return [];
@@ -87,9 +88,7 @@
     // or null when there is no document (Node tests).
     function ensureStyleTag(moduleId) {
       if (!doc) return null;
-      var existing = doc.querySelector(
-        'style[data-oneyt-module="' + moduleId + '"]'
-      );
+      var existing = doc.querySelector('style[data-oneyt-module="' + moduleId + '"]');
       if (existing) return existing;
       var tag = doc.createElement('style');
       tag.setAttribute('data-oneyt-module', moduleId);

@@ -16,7 +16,6 @@
 try {
   importScripts('../shared/constants.js', '../shared/defaults.js', '../shared/storage.js');
 } catch (err) {
-  // eslint-disable-next-line no-console
   console.error('[OneYT:error] service worker failed to load shared files', err);
 }
 
@@ -57,7 +56,6 @@ try {
         return undefined;
       })
       .catch(function (err) {
-        // eslint-disable-next-line no-console
         console.error('[OneYT:error] failed to seed settings', err);
       });
   });
@@ -79,10 +77,16 @@ try {
       storage()
         .get(STORAGE_KEY)
         .then(function (stored) {
-          var settings = setByPath(defaultsApi.migrateSettings(stored), message.path, message.value);
-          return storage().set({ [STORAGE_KEY]: settings }).then(function () {
-            sendResponse({ ok: true, settings: settings });
-          });
+          var settings = setByPath(
+            defaultsApi.migrateSettings(stored),
+            message.path,
+            message.value
+          );
+          return storage()
+            .set({ [STORAGE_KEY]: settings })
+            .then(function () {
+              sendResponse({ ok: true, settings: settings });
+            });
         })
         .catch(function (err) {
           sendResponse({ ok: false, error: String(err) });

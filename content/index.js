@@ -17,7 +17,6 @@
 
   function fail(message) {
     if (logger) logger.error(message);
-    // eslint-disable-next-line no-console
     else console.error('[OneYT:error]', message);
   }
 
@@ -44,9 +43,7 @@
       constants: ns.constants,
       logger: logger,
     });
-    var eventBus = ns.eventBus
-      ? ns.eventBus.createEventBus(logger)
-      : null;
+    var eventBus = ns.eventBus ? ns.eventBus.createEventBus(logger) : null;
 
     var app = ns.app.createApp({
       logger: logger,
