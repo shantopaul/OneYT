@@ -1263,8 +1263,7 @@
           setValue('appearance.customCSSEnabled', true);
           saveNow().then(function () {
             refreshValues();
-            templatesNotice =
-              'Applied template "' + template.name + '" — custom CSS is now on.';
+            templatesNotice = 'Applied template "' + template.name + '" — custom CSS is now on.';
             renderSection(currentSection);
           });
         });

@@ -47,8 +47,7 @@
     {
       id: 'fade-watched-videos',
       name: 'Fade watched videos',
-      description:
-        'Videos you already started watching look faded in the home feed and Up next.',
+      description: 'Videos you already started watching look faded in the home feed and Up next.',
       css:
         'ytd-rich-item-renderer:has(ytd-thumbnail-overlay-resume-playback-renderer), ' +
         'ytd-compact-video-renderer:has(ytd-thumbnail-overlay-resume-playback-renderer) { opacity: 0.45; }',
