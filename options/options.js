@@ -341,10 +341,12 @@
     var PROFILES_KEY = constants.PROFILES_STORAGE_KEY || 'oneyt.profiles.v1';
     var healthApi = deps.healthApi || null;
     var HEALTH_KEY = constants.HEALTH_STORAGE_KEY || 'oneyt.health.v1';
+    var cssTemplatesApi = deps.cssTemplatesApi || null;
 
     var state = defaultsApi.cloneDefaults();
     var profiles = [];
     var profilesNotice = '';
+    var templatesNotice = '';
     var healthRecord = {};
     var saveTimer = null;
     var navEl = doc.getElementById('options-nav');
@@ -1204,6 +1206,74 @@
       sectionEl.appendChild(listBox);
     }
 
+    // CSS templates (Phase 20, PL-20). Mirrors
+    // renderProfilesTools: one tool-box, built with el(),
+    // no innerHTML. A template appends its CSS to the
+    // Custom CSS box below and turns custom CSS on;
+    // applying twice is a no-op — the engine checks the
+    // marker comment (see shared/cssTemplates.js).
+    // Removal is manual: delete the template's block
+    // from the Custom CSS box.
+    function renderCssTemplateTools(sectionEl) {
+      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
+      if (templatesNotice) {
+        msgEl.textContent = templatesNotice;
+        msgEl.style.display = 'block';
+        templatesNotice = '';
+      }
+      sectionEl.appendChild(msgEl);
+      if (!cssTemplatesApi) {
+        sectionEl.appendChild(
+          el(doc, 'p', {
+            text: 'CSS templates are unavailable — the templates module did not load.',
+          })
+        );
+        return;
+      }
+      var box = el(doc, 'div', { class: 'tool-box' });
+      box.appendChild(el(doc, 'h3', { text: 'CSS templates' }));
+      box.appendChild(
+        el(doc, 'p', {
+          text: 'Ready-made CSS snippets. Applying one adds it to the Custom CSS box below and turns custom CSS on. Applying the same template twice does nothing — to remove one, delete its block from the Custom CSS box.',
+        })
+      );
+      var currentCss = getPath(state, 'appearance.customCSS') || '';
+      cssTemplatesApi.listCssTemplates().forEach(function (template) {
+        var row = el(doc, 'div', { class: 'profile-row' });
+        row.appendChild(el(doc, 'strong', { text: template.name }));
+        row.appendChild(el(doc, 'p', { text: template.description }));
+        var applied = cssTemplatesApi.isCssTemplateApplied(currentCss, template.id);
+        var applyBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn',
+          text: applied ? 'Applied' : 'Apply',
+        });
+        if (applied) applyBtn.disabled = true;
+        applyBtn.addEventListener('click', function () {
+          var result = cssTemplatesApi.applyCssTemplate(
+            getPath(state, 'appearance.customCSS') || '',
+            template.id
+          );
+          if (!result.applied) {
+            templatesNotice = 'Template "' + template.name + '" is already applied.';
+            renderSection(currentSection);
+            return;
+          }
+          setValue('appearance.customCSS', result.css);
+          setValue('appearance.customCSSEnabled', true);
+          saveNow().then(function () {
+            refreshValues();
+            templatesNotice =
+              'Applied template "' + template.name + '" — custom CSS is now on.';
+            renderSection(currentSection);
+          });
+        });
+        row.appendChild(applyBtn);
+        box.appendChild(row);
+      });
+      sectionEl.appendChild(box);
+    }
+
     function renderSection(sectionId) {
       var section = sectionById(sectionId);
       if (!section) return;
@@ -1240,6 +1310,7 @@
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);
       if (section.id === 'health') renderHealthTools(mainEl);
+      if (section.id === 'appearance') renderCssTemplateTools(mainEl);
       checkShortcutWarnings();
     }
 
@@ -1640,6 +1711,7 @@
       themes: ns.themes,
       profilesApi: ns.profiles,
       healthApi: ns.health,
+      cssTemplatesApi: ns.cssTemplates,
       keyboardApi: ns.modules && ns.modules.keyboard,
       sections: sections,
       constants: ns.constants,
