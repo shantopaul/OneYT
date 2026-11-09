@@ -16,11 +16,11 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · **Phase 7 ✅ (merged, PR #7) — all phases complete** |
-| **Version** | 1.0.0 — public release, in `main` |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `4ca8a88` (Phases 1–7 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · **Phase 8 — Block Shorts (v1.1) in progress** |
+| **Version** | 1.0.0 in `main`; 1.1.0 in progress (Block Shorts) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `4ca8a88` (Phases 1–7 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`); branch `feature/shorts-block` in progress |
 | **Code written** | Phases 1–7: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | — (all phases merged; waiting for browser check + screenshots + tag/release + store submission) |
+| **Currently working on** | Phase 8 — Block Shorts (branch `feature/shorts-block`) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
@@ -362,7 +362,7 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
 ### 2026-11-09 — Phase 2: Core Layout DONE (code, branch only)
 
 - Branch `feature/core` from `feature/foundation` (`6385ad3`).
-  **7 part-by-part commits, pushed only when Phase 2 was fully
+  **8 part-by-part commits, pushed only when Phase 2 was fully
   complete** (same rule as Phase 1 — no intermediate push,
   no merge to `main` or to `feature/foundation`).
 - Built: sidebar module (independent scroll, width, scrollbar,
@@ -628,6 +628,56 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   plan files (PRD, Architecture, Design, Memory, Phases,
   RELEASE_CHECKLIST) were updated the same day to record
   full completion.
+
+### 2026-11-09 — Phase 8: Block Shorts DONE (code, branch only)
+
+- User instruction: add one new feature — block Shorts
+  fully, hide them, do not show them — plan and implement
+  the code.
+- Gap found first: Shorts hiding existed only as 3 separate
+  toggles (Home shelf, Watch shelf, guide entry). Nothing
+  hid the shelf on search/subscriptions, nothing hid Shorts
+  video cards, and nothing stopped the `/shorts/` player
+  page from playing.
+- Branch `feature/shorts-block` from `main` (`4ca8a88`).
+  **8 part-by-part commits, pushed only when Phase 8 was
+  fully complete** (same rule — no intermediate push, no
+  merge to `main`).
+- New setting `layout.blockShorts: false` (additive default
+  off — existing users see no change until they turn it on).
+  Layout module sets `oneyt-block-shorts` on `<html>` on
+  every page type (set after the page branches so cleanup()
+  cannot strip it) and redirects `/shorts/VIDEOID` to
+  `/watch?v=VIDEOID` via `location.replace` (no history
+  entry, so Back does not return to Shorts). Pure helper
+  `shortsWatchUrl` (11-char IDs only, anything else → null);
+  redirect injectable for tests.
+- CSS (layout.css): rich shelf `[is-shorts]`, reel shelf
+  (search/subscriptions), guide + mini-guide Shorts entries,
+  Shorts video cards in grids/search (`:has(a[href^=
+  '/shorts/'])` — precise, only renderers containing a
+  Shorts link).
+- Dashboard: master toggle "Block Shorts everywhere" first
+  in the Layout section. The 3 older toggles are unchanged.
+- Selectors: 20 → 21 keys (`reelShelf`); usage enforced by
+  the Phase 6 audit tests.
+- Version 1.1.0 (new feature = minor bump) + CHANGELOG.
+  Note: the professional README rewrite (PR #8) merged to
+  `main` (`713cf6c`) while Phase 8 was in progress, so this
+  branch was rebased onto it — the README version badge,
+  package zip name and roadmap line were bumped to 1.1.0
+  during the rebase (conflict resolved in favour of the
+  rewritten README).
+- Verification here: `npm test` **123/123 pass** (121 + 2
+  new), `npm run lint` clean, `npm run format` clean,
+  manifest valid, `npm run package` builds a clean
+  `oneyt-1.1.0.zip` (100 KB). One test needed a fix during
+  the work: the selector-count assertion (20 → 21).
+- **Not verified here (needs Chrome on Shanto's PC):** the
+  new selectors against the live YouTube DOM and the
+  `/shorts/` → `/watch` redirect on a real page. Known
+  limit: the Shorts tab on channel pages is not hidden yet
+  (v1.1 follow-up, logged in Phases.md).
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

@@ -16,6 +16,16 @@
  * - Thumbnail size (layout.thumbnailSize, px width, 0 = default).
  * - Hide Shorts shelf (layout.hideShortsHome).
  *
+ * Every page (v1.1 Block Shorts):
+ * - Block Shorts (layout.blockShorts) — one class on <html>
+ *   on every page type (see apply(): it is set after the
+ *   page branches so cleanup() cannot strip it), plus a
+ *   redirect off the Shorts player page: /shorts/VIDEOID
+ *   becomes /watch?v=VIDEOID. The redirect target is a pure
+ *   function (shortsWatchUrl) so it is unit-testable, and the
+ *   actual navigation is injectable (deps.redirect) so tests
+ *   never navigate.
+ *
  * All are class + variable toggles; disabling removes them.
  * The grid variables are YouTube's own — if YouTube renames
  * them, the rule silently does nothing instead of breaking
@@ -26,9 +36,28 @@
 (function () {
   'use strict';
 
+  // Pure: /shorts/VIDEOID -> /watch?v=VIDEOID, anything else -> null.
+  // Video IDs are 11 chars [A-Za-z0-9_-]; anything that does not
+  // match is left alone (safe fallback — no redirect).
+  function shortsWatchUrl(pathname) {
+    if (typeof pathname !== 'string') return null;
+    var m = pathname.match(/^\/shorts\/([A-Za-z0-9_-]{11})(?:\/|$)/);
+    if (!m) return null;
+    return '/watch?v=' + m[1];
+  }
+
   function createLayoutModule(deps) {
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
+    var loc = deps.location || (typeof location !== 'undefined' ? location : null);
+    // Default redirect: location.replace (no history entry, so
+    // Back does not return to the Shorts page). Overridden in
+    // tests with a recorder.
+    var redirectFn =
+      deps.redirect ||
+      function (url) {
+        if (loc && typeof loc.replace === 'function') loc.replace(url);
+      };
 
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -60,9 +89,20 @@
       setClass('oneyt-card-spaced', false);
       setClass('oneyt-thumb-sized', false);
       setClass('oneyt-hide-shorts-home', false);
+      setClass('oneyt-block-shorts', false);
       setVar('--oneyt-home-columns', null);
       setVar('--oneyt-card-spacing', null);
       setVar('--oneyt-thumb-width', null);
+    }
+
+    // Off the Shorts player page: /shorts/VIDEOID -> /watch?v=VIDEOID.
+    // No loop: after the redirect the pathname is /watch, so
+    // shortsWatchUrl returns null on the next apply().
+    function redirectShorts() {
+      var path = loc && loc.pathname ? loc.pathname : '';
+      var url = shortsWatchUrl(path);
+      if (!url) return;
+      redirectFn(url);
     }
 
     function applyWatch(layout) {
@@ -89,6 +129,10 @@
     function apply(settings, page) {
       if (!settings || !settings.layout) return;
       var layout = settings.layout;
+      // Block Shorts: redirect off the Shorts player page first.
+      if (page === 'shorts' && layout.blockShorts === true) {
+        redirectShorts();
+      }
       if (page === 'watch') {
         applyWatch(layout);
         // Home rules must not linger after a watch -> home -> watch
@@ -109,6 +153,12 @@
       } else {
         cleanup();
       }
+      // Block Shorts applies on EVERY page type (watch, home,
+      // search, subscriptions, channel, shorts) — set after
+      // the page branches so cleanup() in the else branch
+      // cannot strip it. disable()/destroy() still remove it
+      // via cleanup().
+      setClass('oneyt-block-shorts', layout.blockShorts === true);
     }
 
     return {
@@ -126,7 +176,7 @@
     };
   }
 
-  var api = { createLayoutModule: createLayoutModule };
+  var api = { createLayoutModule: createLayoutModule, shortsWatchUrl: shortsWatchUrl };
 
   var ns = (globalThis.OneYT = globalThis.OneYT || {});
   ns.modules = ns.modules || {};

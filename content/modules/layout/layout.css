@@ -20,6 +20,21 @@ html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts] {
   display: none;
 }
 
+/* Block Shorts everywhere (layout.blockShorts, v1.1): one class,
+ * every page. Shelves on home/watch (rich shelf) and on search /
+ * subscriptions (reel shelf), the Shorts entries in the guide and
+ * the mini-guide, and Shorts video cards in grids and search
+ * results. Verify live — YouTube renames these elements
+ * sometimes, and the Phase 6 selector audit covers them. */
+html.oneyt-enabled.oneyt-block-shorts ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-block-shorts ytd-reel-shelf-renderer,
+html.oneyt-enabled.oneyt-block-shorts ytd-guide-entry-renderer:has(a[href='/shorts']),
+html.oneyt-enabled.oneyt-block-shorts ytd-mini-guide-entry-renderer:has(a[href='/shorts']),
+html.oneyt-enabled.oneyt-block-shorts ytd-rich-item-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts ytd-video-renderer:has(a[href^='/shorts/']) {
+  display: none;
+}
+
 html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer {
   --ytd-rich-grid-items-per-row: var(--oneyt-home-columns);
 }

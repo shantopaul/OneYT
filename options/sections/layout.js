@@ -9,6 +9,14 @@
     description: 'Watch page, homepage grid and guide navigation.',
     controls: [
       {
+        key: 'layout.blockShorts',
+        type: 'toggle',
+        label: 'Block Shorts everywhere',
+        description:
+          'Hide Shorts shelves on every page, remove Shorts from the guide, hide Shorts videos in grids and search, and open Shorts links as normal videos instead.',
+        keywords: ['shorts', 'block', 'hide', 'remove'],
+      },
+      {
         key: 'layout.hideShortsHome',
         type: 'toggle',
         label: 'Hide Shorts on Home',

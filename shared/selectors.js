@@ -36,6 +36,8 @@
 
     // --- Home / Shorts (Phase 3) ---
     shortsShelf: 'ytd-rich-shelf-renderer[is-shorts]',
+    // Shorts shelf on search / subscriptions (v1.1 Block Shorts).
+    reelShelf: 'ytd-reel-shelf-renderer',
     richGrid: 'ytd-rich-grid-renderer',
 
     // --- Navigation (Phase 4) ---

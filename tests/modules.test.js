@@ -5,7 +5,7 @@ const defaults = require('../shared/defaults');
 const { createFakeElement, createFakeDocument, createFakeDom, quietLogger } = require('./fake-dom');
 const { createSidebarModule } = require('../content/modules/sidebar/sidebar');
 const { createPlayerModule } = require('../content/modules/player/player');
-const { createLayoutModule } = require('../content/modules/layout/layout');
+const { createLayoutModule, shortsWatchUrl } = require('../content/modules/layout/layout');
 
 function settingsWith(patch) {
   const s = defaults.cloneDefaults();
@@ -193,6 +193,43 @@ test('player: non-watch page applies nothing', () => {
 });
 
 // ---------- Layout ----------
+
+test('layout: shortsWatchUrl maps /shorts/VIDEOID to watch, nothing else', () => {
+  assert.equal(shortsWatchUrl('/shorts/dQw4w9WgXcQ'), '/watch?v=dQw4w9WgXcQ');
+  assert.equal(shortsWatchUrl('/shorts/dQw4w9WgXcQ/'), '/watch?v=dQw4w9WgXcQ');
+  assert.equal(shortsWatchUrl('/shorts'), null);
+  assert.equal(shortsWatchUrl('/shorts/'), null);
+  assert.equal(shortsWatchUrl('/shorts/abc'), null); // not an 11-char video ID
+  assert.equal(shortsWatchUrl('/watch?v=dQw4w9WgXcQ'), null);
+  assert.equal(shortsWatchUrl('/'), null);
+  assert.equal(shortsWatchUrl(null), null);
+});
+
+test('layout: blockShorts sets the class on every page type and redirects off /shorts/', () => {
+  const doc = createFakeDocument();
+  const redirected = [];
+  const mod = createLayoutModule({
+    document: doc,
+    location: { pathname: '/shorts/dQw4w9WgXcQ' },
+    redirect: (url) => redirected.push(url),
+  });
+  // On a search page (the cleanup branch) the block class still applies.
+  mod.apply(settingsWith({ layout: { blockShorts: true } }), 'search');
+  assert.equal(doc._root._classes.has('oneyt-block-shorts'), true);
+  assert.deepEqual(redirected, []); // not a shorts page: no redirect
+  // On a shorts page it redirects to the normal watch URL.
+  mod.apply(settingsWith({ layout: { blockShorts: true } }), 'shorts');
+  assert.deepEqual(redirected, ['/watch?v=dQw4w9WgXcQ']);
+  assert.equal(doc._root._classes.has('oneyt-block-shorts'), true);
+  // Off: no class, no redirect.
+  mod.apply(settingsWith({ layout: { blockShorts: false } }), 'shorts');
+  assert.equal(doc._root._classes.has('oneyt-block-shorts'), false);
+  assert.deepEqual(redirected, ['/watch?v=dQw4w9WgXcQ']);
+  // disable() removes the class.
+  mod.apply(settingsWith({ layout: { blockShorts: true } }), 'watch');
+  mod.disable();
+  assert.equal(doc._root._classes.has('oneyt-block-shorts'), false);
+});
 
 test('layout: hide comments + watch spacing on watch; cleanup elsewhere', () => {
   const doc = createFakeDocument();
