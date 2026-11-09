@@ -191,6 +191,26 @@ test('options: getPath/setPath round-trip', () => {
 
 // ---------- Import / export ----------
 
+test('options: clampSettingsToControls clamps imports to control ranges', () => {
+  const settings = defaults.cloneDefaults();
+  settings.player.customWidth = 99999;
+  settings.playback.captionFontSize = 999;
+  settings.player.maxWidth = -50;
+  settings.sidebar.customWidth = 500; // in range: untouched
+  const result = options.clampSettingsToControls(settings, loadSections());
+  assert.equal(result.settings.player.customWidth, 2000);
+  assert.equal(result.settings.playback.captionFontSize, 200);
+  assert.equal(result.settings.player.maxWidth, 0);
+  assert.equal(result.settings.sidebar.customWidth, 500);
+  assert.deepEqual(result.clamped.map((c) => c.key).sort(), [
+    'playback.captionFontSize',
+    'player.customWidth',
+    'player.maxWidth',
+  ]);
+  // The input is not mutated.
+  assert.equal(settings.player.customWidth, 99999);
+});
+
 test('dashboard: export → import round-trip reproduces the same settings', () => {
   const settings = defaults.cloneDefaults();
   settings.player.customWidth = 900;
