@@ -107,3 +107,73 @@ Selector sanity (live YouTube DOM):
 
 Notes / failures:
 - _…_
+
+---
+
+# Phase 3 Manual Checklist (browser) — Appearance
+
+Run on Home + a watch page, after loading the `feature/appearance`
+branch unpacked. Change settings via the extension's storage
+(`chrome.storage.local`, key `oneyt.settings.v1`) until the
+Phase 5 dashboard exists. Tick only after verifying in the browser.
+
+Themes (set `appearance.theme`):
+- [ ] `dark` — Home, Watch, Search, Channel all dark; masthead,
+      guide, grid background, menus, chips and buttons follow
+- [ ] `light` — everything light, readable, no dark leftovers
+- [ ] `midnight` / `amoled` / `minimal` — each applies cleanly
+- [ ] Switching presets is instant (no reload), no leftover
+      colours from the previous preset
+- [ ] `default` — YouTube's own theme returns exactly
+
+Custom colours (set `appearance.colors`, e.g. `{ accent: "#00ff00" }`):
+- [ ] Accent override changes buttons/links without breaking
+      contrast of native controls
+- [ ] Low-contrast pair (e.g. grey text on grey bg) — extension
+      still works, warning only (check console for the warning)
+
+Radius / spacing:
+- [ ] `appearance.borderRadius: 0` — thumbnails sharp; `12` —
+      rounded again
+- [ ] `appearance.spacing` — filter-chip gaps change
+
+Custom CSS (set `appearance.customCSS` + `customCSSEnabled: true`):
+- [ ] Valid CSS applies instantly; toggle off — page returns,
+      theme untouched
+- [ ] Invalid CSS (unbalanced braces / HTML tags) — rejected,
+      page never breaks
+
+Typography (set `appearance.typography`):
+- [ ] `fontFamily: "Georgia"` — titles/descriptions/comments
+      change font; player and captions unchanged
+- [ ] `fontSize: 120` — titles/descriptions/comments grow;
+      layout does not break (no overlap, no clipped text)
+- [ ] `fontWeight` / `lineHeight` — same, no layout breakage
+- [ ] All back to 0 / "" — YouTube defaults return
+
+Homepage layout (set `layout.*` on the Home page):
+- [ ] `homeColumns: 4` — grid shows 4 columns; `0` — default
+- [ ] `cardSpacing: 12` — gap between cards changes
+- [ ] `thumbnailSize: 320` — thumbnails shrink, centred
+- [ ] `hideShortsHome: true` — Shorts shelf disappears on Home
+- [ ] `hideShortsWatch: true` — Shorts shelf disappears on Watch
+- [ ] Watch → Home navigation — home rules apply, watch rules
+      do not leak onto the homepage
+
+Disable:
+- [ ] Disable the appearance module — YouTube's own theme
+      returns exactly (all variables gone)
+- [ ] Disable the typography module — fonts return exactly
+- [ ] Disable the layout module — grid/Shorts return exactly
+
+Selector / variable sanity (live YouTube DOM):
+- [ ] If a theme surface stays unthemed, note which one here —
+      it may be a renamed `--yt-spec-*` variable:
+      - _notes:_
+- [ ] If `homeColumns`/`cardSpacing` have no effect, note it —
+      `--ytd-rich-grid-items-per-row` / `--ytd-rich-grid-item-margin`
+      may have been renamed:
+      - _notes:_
+
+Notes / failures:
+- _…_
