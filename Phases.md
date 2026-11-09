@@ -1064,7 +1064,7 @@ format, `5f6ad2a` version 1.13.0, docs (this commit).
 **Browser verification still open** — the live page
 is the proof (`tests/manual-checklist.md` Phase 21).
 
-## Phase 22 — Advanced Layout Editor (v1.14) 🔄 IN PROGRESS (2026-11-09)
+## Phase 22 — Advanced Layout Editor (v1.14) ✅ MERGED (2026-11-09)
 
 (PRD PL-22 + plan), setting + engine, module, dashboard
 wiring, tests, checklist, version, docs.
@@ -1114,7 +1114,10 @@ wiring, tests, checklist, version, docs.
   (`tests/manual-checklist.md` Phase 22).
 **Status 2026-11-09:** code complete on branch
 `feature/layout-editor` (9 part-by-part commits on top
-of `main` `1324f15`, pushed after completion).
+of `main` `1324f15`, pushed after completion) and
+**merged to `main` — merge `e581692`, `main` now
+`e581692`** (per the standing rule: feature complete →
+merge to main).
 `npm test` 214/214 pass (203 baseline + 11 new),
 lint + format clean, manifest valid,
 `npm run package` builds a clean `oneyt-1.14.0.zip`
