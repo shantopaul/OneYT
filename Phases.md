@@ -1132,6 +1132,51 @@ format, `6e0f71f` version 1.14.0, docs (this commit).
 **Browser verification still open** — the live page
 is the proof (`tests/manual-checklist.md` Phase 22).
 
+## Phase 23 — Player Accent Color (v1.15) ⬜ IN PROGRESS (2026-11-09)
+
+**Goal:** the red progress bar is YouTube's colour, not the
+user's. One colour setting recolours the played portion
+of the progress bar and the scrubber knob, so the player
+matches the user's theme instead of always shouting red.
+
+**Deliverable:** v1.15.0.
+
+**Plan (part-by-part, push only when complete):** one new
+setting `player.accentColor` (string, default `''` —
+empty means YouTube's default red; a `#rrggbb` value
+overrides it; additive, old settings migrate with the
+default). Two selector keys in `shared/selectors.js`
+(count 31 → 33) — `playProgress: '.ytp-play-progress'`
+(the played portion) and `scrubberButton:
+'.ytp-scrubber-button'` (the knob) — sourced from
+several independent userstyles (Youtube Cybercore,
+Gura, Acheron, YouTube Custom Color, Youtube Retouch,
+xlvxlv, V3-2011 player all recolour these two hooks);
+health metadata for both (watch, `always`, feature
+'Player accent color'). The player module sets class
+`oneyt-player-accent` + variable
+`--oneyt-player-accent` in the theater-safe Appearance
+section of `apply()` (so it works in theater too, and
+is cleared off watch pages and in fullscreen like every
+player class); an invalid hex (e.g. from a hand-edited
+import) is treated as empty — no var, no class, the
+page keeps YouTube's red. `player.css` recolours only
+those two elements under `#movie_player`; the buffered
+portion (`.ytp-load-progress`) is deliberately left
+alone so played vs buffered stays readable. Dashboard:
+one `color` control in the Player section (the existing
+picker + text + Clear control type) after "Player
+spacing". Module tests + manual checklist item.
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 23).
+**Honest limits:** the volume slider is out of scope
+(its fill hook appears in only one source, not enough
+to trust); if YouTube renames `.ytp-play-progress` /
+`.ytp-scrubber-button`, the accent silently does
+nothing and the Health section reports it; the accent
+is independent of the appearance theme accent — it
+recolours the player only, not the page.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
