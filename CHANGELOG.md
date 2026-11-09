@@ -7,7 +7,21 @@ phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts),
 1.5.0 (Phase 12 hide topic chips bar), 1.6.0 (Phase 14
 default theater), 1.7.0 (Phase 15 hide live / mixes /
-news shelves).
+news shelves), 1.8.0 (Phase 16 presets / profiles).
+
+## 1.8.0 — 2026-11-09 (Presets / Profiles, Phase 16)
+
+- **Presets / Profiles** (`shared/profiles.js`, PL-16):
+  four built-in presets — Stock YouTube, Focus, Clean,
+  Cinema — applied in one click from a new dashboard
+  Profiles section or from the popup picker. A preset
+  changes only the settings it names; everything else
+  you set stays. Named custom profiles (up to 10) save
+  the current settings as a snapshot and restore them
+  exactly when applied; rename and delete included.
+  Profiles stay on this device and are never synced.
+  See `tests/manual-checklist.md` Phase 16 for the live
+  checks (dashboard section, popup picker, live apply).
 
 ## 1.7.0 — 2026-11-09 (Hide Live / Mixes / News Shelves, Phase 15)
 
