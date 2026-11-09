@@ -16,12 +16,12 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · **Phase 6 — Optimisation & Testing ✅ code complete, pushed to branch** (browser check still open) |
-| **Version** | 0.9.0 — release candidate (Phase 6) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (code complete, pushed to branch — PR #6 still open) · **Phase 7 — Public Release ✅ code complete, pushed to branch** (browser check + screenshots + submission still open) |
+| **Version** | 1.0.0 — public release (Phase 7) |
 | **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`; PR #6 `feature/Optimisation` still open — not merged yet); branch `feature/Release` in progress (based on `feature/Optimisation`, so it carries Phase 6) |
 | **Code written** | Phases 1–6: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + tests (see "What Has Been Completed") |
-| **Currently working on** | Phase 7 — Public Release (branch `feature/Release`) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3) and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
+| **Currently working on** | — (Phase 7 code done; waiting for browser check + screenshots + submission) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
@@ -121,6 +121,7 @@
 | 2026-11-09 | Phase 5 same rule: branch `feature/Settings` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Shanto merged PR #5 (`feature/Settings` → `main`, `5b44c9e`) himself | GitHub API (remote `main` HEAD) |
 | 2026-11-09 | Phase 6 same rule: branch `feature/Optimisation` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
+| 2026-11-09 | Phase 7 same rule: branch `feature/Release`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -135,7 +136,7 @@
 | D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 4 start", branch `feature/Productivity` from `main` (`d49ac19`, PR #3 merged), same part-by-part rule, push only when complete |
 | D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 5 start", branch `feature/Settings` from `main` (`33d9e08`, PR #4 merged), same part-by-part rule, push only when complete |
 | D-12 | Phase 6 start? | Recommend: after the Phase 5 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 6 start", branch `feature/Optimisation` from `main` (`5b44c9e`, PR #5 merged), same part-by-part rule, push only when complete |
-| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
+| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 7 start", branch `feature/Release` (based on `feature/Optimisation` because PR #6 is still open — see log below), same part-by-part rule, push only when complete |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -268,8 +269,34 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
       selectors, memory) — see Phase 6 checklist in
       `tests/manual-checklist.md`
 
-**Phase 7 — Public Release** (not started; awaiting user
-go-ahead): see `Phases.md` Phase 7 checklist.
+**Phase 7 — Public Release** (code complete 2026-11-09;
+✅ = verified here in Node, ⬜ = needs Shanto):
+
+- [x] Final branding: original Y mark (replaces the Phase 1
+  placeholder play button — that was literally YouTube's
+  play button, which Design.md forbids), icons 16/48/128 +
+  512 master, tagline confirmed
+- [x] Promo tiles 440×280 / 920×680 / 1400×560 (branded
+  tiles only — no fake UI)
+- [x] Store listing copy (`docs/store-listing.md`): every
+  claim is a shipped feature, no invented statistics
+- [x] Privacy policy (`docs/PRIVACY.md`): no collection, no
+  network, no third parties; sync opt-in only
+- [x] README final + CHANGELOG + MIT LICENSE
+- [x] `npm run package` builds a clean submission zip
+  (100 KB, no test/doc/script files inside)
+- [x] Version 1.0.0; PRD §12 Definition of Done checked
+  (`docs/RELEASE_CHECKLIST.md`) — code column complete,
+  browser column open
+- [ ] Real screenshots (5, 1280×800) — Shanto's PC
+  (`docs/SCREENSHOTS.md`)
+- [ ] Privacy-policy URL decision (repo-public vs
+  shantopaul.com) — Shanto
+- [ ] Browser checklists Phases 1–6 — Shanto's PC
+- [ ] Tag `v1.0.0` + GitHub release — AFTER the release PR
+  is merged (tag must point at main)
+- [ ] Chrome Web Store submission — Shanto's account
+  (`docs/SUBMISSION.md`)
 
 ---
 
@@ -530,6 +557,69 @@ go-ahead): see `Phases.md` Phase 7 checklist.
   walkthrough. All listed in the new Phase 6 section of
   `tests/manual-checklist.md`. Phase 6 is code-complete,
   not browser-verified.
+
+### 2026-11-09 — Phase 7: Public Release DONE (code, branch only)
+
+- PR #6 (`feature/Optimisation` → `main`) was **still open**
+  when Phase 7 started, so the release branch was based on
+  `feature/Optimisation` (`4ddac3d`) instead of `main` —
+  otherwise v1.0.0 would have shipped without sync and all
+  Phase 6 fixes. Consequence: when Shanto merges the release
+  PR, Phase 6 arrives in `main` with it, and PR #6 needs no
+  separate merge (close it after).
+- Branch `feature/Release`. **11 part-by-part commits,
+  pushed only when Phase 7 was fully complete** (same rule —
+  no intermediate push, no merge to `main`).
+- Final branding: the Phase 1 placeholder icon was a red
+  square + white play triangle — literally YouTube's play
+  button, which Design.md forbids as the logo. The final
+  mark is original: a bold white geometric "Y" on a dark
+  rounded square, small red dot below the stem (red as
+  accent only), drawn with PIL (`scripts/generate-icons.py`).
+  Verified by eye at 128 and 16 px. Tagline confirmed
+  (already in Design.md): "Your YouTube. Your Layout. Your
+  Rules."
+- Promo tiles 440×280 / 920×680 / 1400×560
+  (`scripts/generate-promo.py`): branded tiles only, minimal
+  text, no Chrome/Google branding, no fake UI.
+- Store listing copy (`docs/store-listing.md`): title 37
+  chars, short description 126/132, detailed 2,561/16,000 —
+  limits verified against the Chrome Web Store spec. Every
+  claim is a shipped v1.0.0 feature; no invented statistics.
+- Privacy policy (`docs/PRIVACY.md`): matches the code —
+  no collection, no network, no third parties, sync opt-in
+  only. Contact is the public GitHub repo (support email is
+  Shanto's to add if he wants one).
+- README final + CHANGELOG (0.1.0 / 0.9.0 / 1.0.0) + MIT
+  LICENSE (the README already referenced a LICENSE that did
+  not exist).
+- `npm run package` builds `oneyt-1.0.0.zip` (100 KB) with
+  runtime files only — verified zero test/doc/script/promo/
+  screenshot files inside; zips are gitignored artefacts.
+- Screenshots: **not captured here** — a real browser is
+  required. `docs/SCREENSHOTS.md` has the shot list (5 shots
+  at 1280×800) and the honest rule: real captures only, no
+  mockups, no edited UI presented as real.
+- Version 1.0.0. Tag `v1.0.0` + GitHub release are
+  **deliberately not done here** — a tag must point at
+  `main`, so they happen after the release PR is merged
+  (steps in `docs/RELEASE_CHECKLIST.md`).
+- PRD §12 Definition of Done checked box by box
+  (`docs/RELEASE_CHECKLIST.md`): code column complete,
+  browser column open for items 2–9, 11–14 — the same open
+  browser checks carried since Phase 1.
+- Verification here: `npm test` **121/121 pass**, `npm run
+  lint` clean, `npm run format` clean, every JS file
+  `node --check` clean, manifest valid with all files
+  present, grep: no polling / network / eval in extension
+  code (one hit is a comment in `validators.js` saying
+  "no eval").
+- **Open, all Shanto's:** browser checklists Phases 1–6,
+  5 real screenshots, privacy-policy URL decision
+  (repo-public vs shantopaul.com — the store needs a public
+  URL and the repo is private), tag + GitHub release after
+  the merge, Chrome Web Store submission ($5 account,
+  1–3 day review).
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
