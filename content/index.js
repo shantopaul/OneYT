@@ -56,6 +56,9 @@
         ns.modules.player.createPlayerModule({ dom: domManager, logger: logger })
       );
     }
+    if (ns.modules && ns.modules.layout) {
+      moduleManager.register(ns.modules.layout.createLayoutModule({}));
+    }
 
     var app = ns.app.createApp({
       logger: logger,

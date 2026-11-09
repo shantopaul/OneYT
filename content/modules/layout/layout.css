@@ -1,0 +1,14 @@
+/* OneYT — content/modules/layout/layout.css
+ *
+ * Static rules for the layout module (part 1: watch page).
+ * They only take effect when the module adds its classes to
+ * <html> (see layout.js).
+ */
+
+html.oneyt-enabled.oneyt-hide-comments #comments {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-watch-spaced #below {
+  margin-top: var(--oneyt-watch-spacing, 0px);
+}

@@ -6,7 +6,8 @@
       "css": [
         "content/styles/base.css",
         "content/modules/sidebar/sidebar.css",
-        "content/modules/player/player.css"
+        "content/modules/player/player.css",
+        "content/modules/layout/layout.css"
       ],
       "js": [
         "shared/constants.js",
@@ -22,6 +23,7 @@
         "content/core/module-manager.js",
         "content/modules/sidebar/sidebar.js",
         "content/modules/player/player.js",
+        "content/modules/layout/layout.js",
         "content/core/app.js",
         "content/index.js"
       ],
