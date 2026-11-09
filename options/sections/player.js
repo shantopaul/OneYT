@@ -54,6 +54,14 @@
         keywords: ['player', 'sticky'],
       },
       {
+        key: 'player.defaultTheater',
+        type: 'toggle',
+        label: 'Default theater mode',
+        description:
+          'Open every video in theater mode automatically. Turning it on enters theater right away; turning it off never exits theater.',
+        keywords: ['theater', 'default', 'wide', 'player'],
+      },
+      {
         key: 'player.borderRadius',
         type: 'number',
         label: 'Player corner radius',
