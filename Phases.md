@@ -765,7 +765,7 @@ Phase 13 is disable ambient mode (parked, branch
 Phase 16 is presets (merged). v1.9.0 is unambiguous:
 1.8.0 is in `main` now.
 
-## Phase 18 — Selector Health Check (v1.10) ⏳ IN PROGRESS (2026-11-09)
+## Phase 18 — Selector Health Check (v1.10) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** a YouTube DOM change stops failing silently.
 Today a renamed selector means a feature quietly does
@@ -808,6 +808,28 @@ Module tests for the engine + the module's check
 timing + the record repair + manual checklist item.
 **Browser verification still open** — the live DOM is
 the proof (`tests/manual-checklist.md` Phase 18).
+**Status 2026-11-09:** code complete on branch
+`feature/selector-health` (11 part-by-part commits on
+top of `main` `f4c31c6`, pushed after completion).
+`npm test` 179/179 pass (170 baseline + 9 new), lint +
+format clean, manifest valid, `npm run package` builds
+a clean `oneyt-1.10.0.zip` (runtime files only).
+**Done:** `c221755` start (PRD PL-18 + plan),
+`d3bbd69` storage key `oneyt.health.v1`, `fcf6c08`
+pure health engine, `9fcea41` health module +
+manifest + index wiring, `d82185e` dashboard Health
+section, `0da817a` fix — script-count pin 18 → 20
+(the dashboard commit landed with 169/170: the pin
+was stale, fixed by the next commit), `d0c3341` tests
+(9 new), `a301b8d` checklist, `c706784` version
+1.10.0, `3cb979a` fix — lint + format in
+shared/health.js (the version commit's
+"lint/format clean" claim was wrong: the full-repo
+check ran after it in the same command and its
+output was not read before committing),
+`d68c266` docs. **Browser
+verification still open** — the live DOM is the
+proof (`tests/manual-checklist.md` Phase 18).
 Numbering note: this phase takes Phase 18 because
 Phase 13 is disable ambient mode (parked, branch
 `feature/disable-ambient-mode` with no commits) and
