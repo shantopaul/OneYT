@@ -273,12 +273,30 @@ here); no sync toggle ships in Phase 5 (no dead controls).
 
 ---
 
-## Phase 6 — Optimisation & Testing
+## Phase 6 — Optimisation & Testing ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** stable release candidate. No new features in this phase
 unless a Phase 1–5 checklist item forces one.
 
 **Deliverable:** release candidate, v0.9.0.
+
+**Status 2026-11-09:** code complete on branch
+`feature/Optimisation` (15 part-by-part commits on top of
+`main` `5b44c9e`, pushed after completion, nothing merged).
+`npm test` 121/121 pass, lint + format clean, manifest valid,
+no polling/network. The one feature this phase was allowed:
+AD-08 sync wiring (opt-in toggle, mirror minus Custom CSS,
+seed + merge, failure-safe). Audits produced 11 fixes
+(`docs/BUG_BASH.md`): mini-player observer gating, wheel
+sensitivity clamp, remote `url()` in custom CSS blocked, dead
+service-worker relay removed, import size enforced, WCAG AA
+contrast, focus rings, Tab capture trap, Tab/Escape
+unbindable shortcuts, import number clamping, dead selector
+removed. Version bumped to 0.9.0. **Browser verification
+still open** — cross-browser (6.2), viewports (6.3),
+fullscreen/theater (6.5), two-profile sync, live selectors
+and memory need Chrome/Edge/Brave on Shanto's PC
+(`tests/manual-checklist.md` Phase 6 section).
 
 ### Tasks
 

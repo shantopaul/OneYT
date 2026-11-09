@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · **Phase 5 — Settings Dashboard ✅ code complete, pushed to branch** (browser check still open) |
-| **Version** | 0.1.0 (foundation + layout + appearance + playback/productivity + dashboard, sync still Phase 6) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`); branch `feature/Optimisation` in progress |
-| **Code written** | Phases 1–5: all modules + dashboard (9 sections, 96 controls) + final popup + tests (see "What Has Been Completed") |
-| **Currently working on** | Phase 6 — Optimisation & Testing (branch `feature/Optimisation`) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–5 sections) — cross-browser (6.2), viewport (6.3), fullscreen/theater (6.5) and the full manual checklist are browser-only and stay open |
-| **Last verified** | 2026-11-09 — `npm test` 93/93 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · **Phase 6 — Optimisation & Testing ✅ code complete, pushed to branch** (browser check still open) |
+| **Version** | 0.9.0 — release candidate (Phase 6) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`); branch `feature/Optimisation` pushed 2026-11-09, **not merged** |
+| **Code written** | Phases 1–6: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + tests (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 6 code done; waiting for browser check + Phase 7 go-ahead) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open |
+| **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
 
@@ -119,6 +119,8 @@
 | 2026-11-09 | Shanto merged PR #4 (`feature/Productivity` → `main`, `33d9e08`) himself | GitHub API (remote `main` HEAD) |
 | 2026-11-09 | AD-08 decided: sync scope — opt-in; everything syncs except `appearance.customCSS` (local-only, sync size limits); remembered playback never syncs | `Architecture.md` AD-08 |
 | 2026-11-09 | Phase 5 same rule: branch `feature/Settings` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
+| 2026-11-09 | Shanto merged PR #5 (`feature/Settings` → `main`, `5b44c9e`) himself | GitHub API (remote `main` HEAD) |
+| 2026-11-09 | Phase 6 same rule: branch `feature/Optimisation` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -132,7 +134,8 @@
 | D-09 | Default player radius 12px — keep, or 0 (YouTube sharp corners)? | Recommend: keep 12px unless Shanto prefers stock look | ⬜ Awaiting user — note: radius is now a setting (`appearance.borderRadius`), default stays 12 per schema; changeable without code |
 | D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 4 start", branch `feature/Productivity` from `main` (`d49ac19`, PR #3 merged), same part-by-part rule, push only when complete |
 | D-11 | Phase 5 start? | Recommend: after the Phase 4 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 5 start", branch `feature/Settings` from `main` (`33d9e08`, PR #4 merged), same part-by-part rule, push only when complete |
-| D-12 | Phase 6 start? | Recommend: after the Phase 5 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
+| D-12 | Phase 6 start? | Recommend: after the Phase 5 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 6 start", branch `feature/Optimisation` from `main` (`5b44c9e`, PR #5 merged), same part-by-part rule, push only when complete |
+| D-13 | Phase 7 start? | Recommend: after the Phase 6 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -227,8 +230,46 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   toggles work (parsePageStatus unit-tested; live popup is
   browser-open)
 
-**Phase 6 — Optimisation & Testing** (not started; awaiting user
-go-ahead): see `Phases.md` Phase 6 checklist.
+**Phase 6 — Optimisation & Testing** (code complete 2026-11-09;
+✅ = verified here in Node, ⬜ = needs Chrome on Shanto's PC):
+
+- [x] AD-08 sync wired: opt-in toggle in Advanced; settings
+  mirror to `chrome.storage.sync` except Custom CSS and
+  remembered speed/volume; first-run seeds from sync; sync
+  changes merge in (local CSS kept); sync failure never
+  breaks the local save; turning sync off removes the stale
+  sync copy (unit-tested incl. no-loop)
+- [x] Performance audit 6.1: every observer/listener/timer
+  inventoried (`docs/PERFORMANCE_AUDIT.md`) — one real fix
+  (mini-player observer now only runs when configured)
+- [x] SPA stress 6.4: 20 navigations + back/forward + modules
+  off/on 10× — no duplicate listeners, style tags, classes
+  or vars (Node test; live confirmation is browser-open)
+- [x] Migration 6.6: v0.1 + v0.4 + corrupt fixtures
+  (`tests/fixtures/`) — user values preserved, new keys
+  filled, corrupt types repaired
+- [x] Selector audit 6.7: 20 keys, all used; dead
+  `sidebarSection` removed; no module JS hard-codes a
+  YouTube selector (live DOM check is browser-open)
+- [x] Security review 6.8 (`docs/SECURITY_REVIEW.md`): remote
+  `url()` in custom CSS blocked, dead service-worker relay
+  removed, import size enforced; permissions minimal
+  (`storage` + `activeTab`, youtube.com only), no network
+  calls, no eval/innerHTML
+- [x] Accessibility 6.9: muted text now passes WCAG AA,
+  visible focus rings everywhere, shortcut capture no
+  longer swallows Tab (live keyboard/screen-reader
+  walkthrough is browser-open)
+- [x] Bug bash 6.10 (`docs/BUG_BASH.md`): 11 fixes logged,
+  7 minors deferred to v1.1 (all browser-only checks)
+- [x] Version bumped to 0.9.0 (release candidate)
+- [ ] Browser-only items (6.2 cross-browser, 6.3 viewports,
+      6.5 fullscreen/theater, two-profile sync, live
+      selectors, memory) — see Phase 6 checklist in
+      `tests/manual-checklist.md`
+
+**Phase 7 — Public Release** (not started; awaiting user
+go-ahead): see `Phases.md` Phase 7 checklist.
 
 ---
 
@@ -443,6 +484,52 @@ go-ahead): see `Phases.md` Phase 6 checklist.
   YouTube tab, module toggles isolating correctly. All listed
   in the new Phase 5 section of `tests/manual-checklist.md`.
   Phase 5 is code-complete, not browser-verified.
+
+### 2026-11-09 — Phase 6: Optimisation & Testing DONE (code, branch only)
+
+- Shanto merged PR #5 (`feature/Settings` → `main`, `5b44c9e`)
+  himself before Phase 6 started, so Phase 6 branched from
+  `main` (`5b44c9e`).
+- Branch `feature/Optimisation`. **15 part-by-part commits,
+  pushed only when Phase 6 was fully complete** (same rule —
+  no intermediate push, no merge to `main`).
+- The one feature this phase was allowed: AD-08 sync wiring.
+  Opt-in toggle in Advanced; `storage.set()` mirrors the
+  syncable subset (everything except Custom CSS) to
+  `chrome.storage.sync`; first run seeds from sync; sync
+  changes merge in (local Custom CSS kept); identical merges
+  skipped (no loop); sync failure never breaks the local
+  save; turning sync off removes the stale sync copy.
+- Audits (each with its own doc + regression tests): 6.1
+  performance (mini-player observer gated — it used to run
+  on every page with nothing configured), 6.4 SPA stress
+  (20 navigations, no duplicates), 6.6 migration fixtures
+  (v0.1/v0.4/corrupt), 6.7 selector audit (dead
+  `sidebarSection` removed), 6.8 security (remote `url()` in
+  custom CSS blocked, dead service-worker relay removed,
+  import size enforced), 6.9 accessibility (muted text now
+  WCAG AA, focus rings, Tab capture trap), 6.10 bug bash
+  (Tab/Escape unbindable shortcuts, import number clamping;
+  11 fixes total, 7 minors deferred to v1.1 — all
+  browser-only checks).
+- One process correction this phase: a commit message
+  claimed "107 pass" when one test was actually failing —
+  the pipeline (`npm test | tail`) hid the exit code; from
+  then on the pass/fail lines were checked before every
+  commit, and the follow-up commit corrected the record.
+- Version bumped to 0.9.0 (release candidate).
+- Verification here: `npm test` **121/121 pass** (93 Phase
+  1–5 + 28 new), `npm run lint` clean, `npm run format`
+  clean, every JS file `node --check` clean, manifest valid
+  with all files present, grep: no polling / network / eval
+  in extension code.
+- **Not verified here (needs Chrome/Edge/Brave on Shanto's
+  PC):** cross-browser (6.2), viewports (6.3), fullscreen +
+  theater (6.5), two-profile sync, live selectors, real
+  memory measurement, live keyboard/screen-reader
+  walkthrough. All listed in the new Phase 6 section of
+  `tests/manual-checklist.md`. Phase 6 is code-complete,
+  not browser-verified.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title
