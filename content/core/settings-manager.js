@@ -35,6 +35,32 @@
     var loaded = false;
     var unsubscribeStorage = null;
 
+    // Key-order-insensitive deep equality. JSON.stringify
+    // compares key order, so a stored object with the same
+    // keys in a different order used to look "changed" and
+    // trigger a spurious persist on every load.
+    function deepEqual(a, b) {
+      if (a === b) return true;
+      if (typeof a !== typeof b) return false;
+      if (a === null || b === null) return false;
+      if (Array.isArray(a) || Array.isArray(b)) {
+        if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+        for (var i = 0; i < a.length; i++) {
+          if (!deepEqual(a[i], b[i])) return false;
+        }
+        return true;
+      }
+      if (typeof a !== 'object') return false;
+      var keysA = Object.keys(a);
+      var keysB = Object.keys(b);
+      if (keysA.length !== keysB.length) return false;
+      for (var j = 0; j < keysA.length; j++) {
+        if (!Object.prototype.hasOwnProperty.call(b, keysA[j])) return false;
+        if (!deepEqual(a[keysA[j]], b[keysA[j]])) return false;
+      }
+      return true;
+    }
+
     function notify() {
       var snapshot = defaultsApi.deepClone(current);
       listeners.slice().forEach(function (fn) {
@@ -83,7 +109,7 @@
         .then(function (stored) {
           var migrated = defaultsApi.migrateSettings(stored);
           var changed =
-            seeded || stored === undefined || JSON.stringify(stored) !== JSON.stringify(migrated);
+            seeded || stored === undefined || !deepEqual(stored, migrated);
           current = migrated;
           loaded = true;
           if (changed) {
@@ -160,7 +186,7 @@
           var localCSS = current && current.appearance ? current.appearance.customCSS || '' : '';
           if (!merged.appearance) merged.appearance = {};
           merged.appearance.customCSS = localCSS;
-          if (JSON.stringify(merged) === JSON.stringify(current)) return;
+          if (deepEqual(merged, current)) return;
           current = merged;
           storage.set({ [STORAGE_KEY]: defaultsApi.deepClone(current) }).catch(function (err) {
             logger.error('settings: failed to save merged sync settings', err);
@@ -168,7 +194,14 @@
           notify();
           return;
         }
-        current = defaultsApi.migrateSettings(change.newValue);
+        // The sync branch above writes the merged settings back
+        // to local storage, and that write echoes back here as
+        // a local change. Skip it when nothing actually
+        // changed, or every sync merge ran a second full
+        // module re-apply.
+        var next = defaultsApi.migrateSettings(change.newValue);
+        if (deepEqual(next, current)) return;
+        current = next;
         notify();
       });
     }

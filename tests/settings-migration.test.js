@@ -114,3 +114,63 @@ test('a preset applies onto a repaired null section', () => {
   assert.equal(next.player.defaultTheater, true);
   assert.equal(next.player.maxWidth, 0);
 });
+
+test('settings-manager load does not persist when only key order differs', async () => {
+  // Same values as the defaults, but stored with the top-level
+  // keys in reverse order. JSON.stringify would call this
+  // "changed" and rewrite storage on every load.
+  const full = defaults.cloneDefaults();
+  const reversed = {};
+  Object.keys(full).reverse().forEach((k) => {
+    reversed[k] = full[k];
+  });
+  let sets = 0;
+  const storage = {
+    get: () => Promise.resolve(reversed),
+    set: () => {
+      sets++;
+      return Promise.resolve();
+    },
+    onChanged: () => () => {},
+  };
+  const sm = require('../content/core/settings-manager').createSettingsManager({
+    storage,
+    defaults,
+    constants: require('../shared/constants'),
+  });
+  await sm.load();
+  assert.equal(sm.getPath('sidebar.customWidth'), 402);
+  assert.equal(sets, 0);
+});
+
+test('settings-manager ignores an external change identical to current state', async () => {
+  let handler = null;
+  const storage = {
+    get: () => Promise.resolve(undefined),
+    set: () => Promise.resolve(),
+    onChanged: (fn) => {
+      handler = fn;
+      return () => {};
+    },
+  };
+  const sm = require('../content/core/settings-manager').createSettingsManager({
+    storage,
+    defaults,
+    constants: require('../shared/constants'),
+  });
+  await sm.load();
+  sm.watchExternalChanges();
+  let notified = 0;
+  sm.onChange(() => {
+    notified++;
+  });
+  // A local change carrying the current value — e.g. the echo
+  // of our own sync-merge write — must not notify.
+  handler({ 'oneyt.settings.v1': { newValue: sm.get() } }, 'local');
+  assert.equal(notified, 0);
+  const changed = defaults.cloneDefaults();
+  changed.enabled = false;
+  handler({ 'oneyt.settings.v1': { newValue: changed } }, 'local');
+  assert.equal(notified, 1);
+  assert.equal(sm.get().enabled, false);
+});
