@@ -92,6 +92,13 @@
         keywords: ['player', 'spacing', 'margin'],
       },
       {
+        key: 'player.hideEndscreen',
+        type: 'toggle',
+        label: 'Hide endscreen cards',
+        description: 'Hide the video suggestions shown at the end of a video, so it ends cleanly.',
+        keywords: ['player', 'endscreen', 'end screen', 'suggestions', 'up next'],
+      },
+      {
         key: 'player.miniPlayer.size',
         type: 'number',
         label: 'Mini-player width',
