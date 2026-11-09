@@ -116,7 +116,7 @@ and must work flawlessly before anything else ships.
 |------|-------------|
 | Browsers | Chrome, Microsoft Edge, Brave, other Chromium browsers with MV3 |
 | Manifest | Manifest V3 |
-| Target site | `https://www.youtube.com/*` only |
+| Target site | `https://*.youtube.com/*` + `https://youtube.com/*` (all YouTube hosts) |
 | Pages | Home, Watch, Search, Subscriptions, Channel, Playlist — full support. Shorts — optional / limited. Fullscreen & Theater — must not break. |
 | Languages | UI in English v1 |
 | Offline | Fully offline — no network dependency |
@@ -318,7 +318,8 @@ Example shape (illustrative — final schema in `Architecture.md`):
 5. No tracking.
 6. Validate imported JSON before applying.
 7. Minimum permissions: `storage` + host access to
-   `https://www.youtube.com/*` only. `scripting` only if proven
+   `https://*.youtube.com/*` + `https://youtube.com/*` (all
+   YouTube hosts) only. `scripting` only if proven
    necessary.
 8. Custom CSS processed locally only.
 

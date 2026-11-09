@@ -123,13 +123,13 @@ no duplicate listeners, no duplicate wrappers.
   "version": "1.0.0",
   "description": "Your YouTube. Your Layout. Your Rules. Customise player, layout, sidebar, themes, playback and focus — privately, locally.",
   "permissions": ["storage"],
-  "host_permissions": ["https://www.youtube.com/*"],
+  "host_permissions": ["https://*.youtube.com/*", "https://youtube.com/*"],
   "background": { "service_worker": "background/service-worker.js" },
   "action": { "default_popup": "popup/popup.html", "default_title": "OneYT" },
   "options_page": "options/options.html",
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
+      "matches": ["https://*.youtube.com/*", "https://youtube.com/*"],
       "js": ["content/index.js"],
       "css": ["content/styles/base.css"],
       "run_at": "document_idle"

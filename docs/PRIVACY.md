@@ -47,7 +47,7 @@ wherever you save it; OneYT does not upload it anywhere.
 | --- | --- |
 | `storage` | Save your settings locally (and to Chrome sync only when you opt in). |
 | `activeTab` | The popup reads the active tab's URL only, to show which YouTube page you are on. It is granted only while the popup is open. |
-| Host `https://www.youtube.com/*` | The extension runs on YouTube pages only, nowhere else. |
+| Host `https://*.youtube.com/*` + `https://youtube.com/*` | The extension runs on all YouTube pages only, nowhere else. |
 
 OneYT does not read the content of web pages beyond what it
 needs to apply your settings on YouTube (finding the player,

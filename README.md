@@ -88,7 +88,7 @@ backend**.
 | --- | --- |
 | `storage` | Save your settings locally (and to Chrome sync only when you opt in) |
 | `activeTab` | The popup reads the active tab's URL only, to show which YouTube page you are on |
-| Host `https://www.youtube.com/*` | The extension runs on YouTube pages only, nowhere else |
+| Host `https://*.youtube.com/*` + `https://youtube.com/*` | The extension runs on all YouTube pages only, nowhere else |
 
 Full policy: [`docs/PRIVACY.md`](docs/PRIVACY.md) ·
 Security review: [`docs/SECURITY_REVIEW.md`](docs/SECURITY_REVIEW.md)
