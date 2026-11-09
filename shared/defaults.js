@@ -87,6 +87,7 @@
       blockShorts: false, // v1.1: hide Shorts everywhere + open /shorts/ links as normal videos
       hideShortsHome: false,
       hideShortsWatch: false,
+      hideTopicChips: false, // hide the topic filter chips row on the home feed
       homeColumns: 0, // 0 = default
       cardSpacing: 0, // px, 0 = default
       thumbnailSize: 0, // px width, 0 = default
