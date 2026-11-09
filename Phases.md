@@ -700,7 +700,7 @@ Phase 13 is disable ambient mode (parked, branch
 `feature/disable-ambient-mode` with no commits). v1.8.0
 assumes 1.7.0 is in `main` — it is.
 
-## Phase 17 — Onboarding (v1.9) ⏳ IN PROGRESS (2026-11-09)
+## Phase 17 — Onboarding (v1.9) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** a new user understands OneYT in under a minute
 instead of opening a dashboard with 106 controls and
@@ -741,6 +741,22 @@ verification still open** — the first-install open is a
 real Chrome behaviour (the worker's `tabs.create` needs
 a real install); the checklist covers it plus the
 skip/finish/re-open paths.
+**Status 2026-11-09:** code complete on branch
+`feature/onboarding` (11 part-by-part commits on top of
+`main` `fa95f0b`, pushed after completion).
+`npm test` 170/170 pass (162 baseline + 8 new), lint +
+format clean, manifest valid, `npm run package` builds
+a clean `oneyt-1.9.0.zip` (runtime files only). **Done:**
+`88c1282` start (PRD PL-17 + plan), `993da75` setting
+`ui.onboarded`, `b6ac636` dashboard coverage exemption,
+`23d4baf` shared step machine, `5a896ba` welcome page,
+`ce18f77` service worker install-only open, `c5ed22c`
+popup Welcome setup button, `25613b0` tests (8 new),
+`4a2f0e6` checklist, `d024566` version 1.9.0,
+`180b6ee` docs. **Browser
+verification still open** — the first-install open is a
+real Chrome behaviour (`tests/manual-checklist.md`
+Phase 17).
 Numbering note: this phase takes Phase 17 because
 Phase 13 is disable ambient mode (parked, branch
 `feature/disable-ambient-mode` with no commits) and
