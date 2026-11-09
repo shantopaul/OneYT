@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (code, pushed) · **Phase 2 — Core Layout ✅ code complete, pushed to branch** (browser check still open) |
-| **Version** | 0.1.0 (foundation + core layout, no dashboard yet) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `a52cd3e`; branches `feature/foundation` (`6385ad3`) and `feature/core` (pushed 2026-11-09), **neither merged to `main`** |
-| **Code written** | Phase 1 + Phase 2: sidebar, player, layout modules + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 2 code done; waiting for browser check + Phase 3 go-ahead) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1 + 2 sections); Phase 3 start decision |
-| **Last verified** | 2026-11-09 — `npm test` 51/51 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · **Phase 3 — Appearance ✅ code complete, pushed to branch** (browser check still open) |
+| **Version** | 0.1.0 (foundation + core layout + appearance, no dashboard yet) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `d6d2df1` (Phase 1 + Phase 2 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`); branch `feature/appearance` pushed 2026-11-09, **not merged** |
+| **Code written** | Phase 1 + Phase 2 + Phase 3: sidebar, player, layout, appearance, typography modules + themes + tests (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 3 code done; waiting for browser check + Phase 4 go-ahead) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–3 sections); Phase 4 start decision |
+| **Last verified** | 2026-11-09 — `npm test` 68/68 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
 
@@ -110,6 +110,9 @@
 | 2026-11-09 | Phase 1 commits part-by-part (one commit per file/feature), push branch only when Phase 1 fully complete, never merge to `main` | User instruction 2026-11-09; `Memory.md` log |
 | 2026-11-09 | AD-09: module static CSS via manifest + classes, vars for dynamic values | `Architecture.md` AD-09 |
 | 2026-11-09 | Phase 2 same rule as Phase 1: branch `feature/core`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
+| 2026-11-09 | Shanto merged PR #1 (`feature/foundation` → `main`, `79aa279`) and PR #2 (`feature/core` → `main`, `d6d2df1`) himself | GitHub API (remote `main` HEAD) |
+| 2026-11-09 | AD-10: themes map OneYT tokens onto YouTube `--yt-spec-*` vars + scoped CSS; custom colours override preset; contrast warn only | `Architecture.md` AD-10 |
+| 2026-11-09 | Phase 3 same rule: branch `feature/appearance` from `main`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -119,8 +122,9 @@
 | D-01 | Create GitHub repo `shantopaul/OneYT` now, or later at Phase 1? | Recommend: create at Phase 1 start, `main` = stable | ✅ Done 2026-11-09 — user created the (private) repo; planning docs pushed as `5e608e1` on `main` |
 | D-02 | Start Phase 1 (Foundation) coding now? | Recommend: yes, after D-01 | ✅ Done 2026-11-09 — user said "Phase 1 start", branch `feature/foundation`, part-by-part commits, push only when complete |
 | D-07 | Phase 2 start? | Recommend: after the Phase 1 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 2 start", branch `feature/core` from `feature/foundation`, same part-by-part rule, push only when complete |
-| D-08 | Phase 3 start? | Recommend: after the Phase 2 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
-| D-09 | Default player radius 12px — keep, or 0 (YouTube sharp corners)? | Recommend: keep 12px unless Shanto prefers stock look | ⬜ Awaiting user |
+| D-08 | Phase 3 start? | Recommend: after the Phase 2 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 3 start", branch `feature/appearance` from `main` (`d6d2df1`, PR #2 merged), same part-by-part rule, push only when complete |
+| D-09 | Default player radius 12px — keep, or 0 (YouTube sharp corners)? | Recommend: keep 12px unless Shanto prefers stock look | ⬜ Awaiting user — note: radius is now a setting (`appearance.borderRadius`), default stays 12 per schema; changeable without code |
+| D-10 | Phase 4 start? | Recommend: after the Phase 3 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -157,8 +161,24 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
 - [x] Disabling sidebar/player module restores YouTube exactly (unit-tested: classes + vars removed)
 - [x] Resize: debounced updates (app.js 150 ms debounce, re-apply re-measures; live check open)
 
-**Phase 3 — Appearance** (not started; awaiting user go-ahead):
-see `Phases.md` Phase 3 checklist.
+**Phase 3 — Appearance** (code complete 2026-11-09; ✅ = verified
+here in Node, ⬜ = needs Chrome on Shanto's PC):
+
+- [x] Every preset applies across Home/Watch/Search/Channel
+  (unit-tested variable mapping; live surface check open)
+- [x] Switching presets instant — variable swap, no reload
+  (unit-tested: old theme class + vars removed)
+- [x] Custom colours override preset (unit-tested); contrast
+  below WCAG AA logs a warning only, never blocks
+- [x] Custom CSS on/off instantly; invalid CSS rejected with a
+  warning, never reaches the page (unit-tested)
+- [x] Typography changes target only titles/descriptions/comments
+  (unit-tested; layout-breakage check open in browser)
+- [x] Disabling appearance/typography/layout restores YouTube's
+  own theme exactly (unit-tested: classes + vars removed)
+
+**Phase 4 — Playback & Productivity** (not started; awaiting
+user go-ahead): see `Phases.md` Phase 4 checklist.
 
 ---
 
@@ -256,6 +276,47 @@ see `Phases.md` Phase 3 checklist.
   schema (`Architecture.md` §7.1) — the player gets slightly
   rounded corners by default. If Shanto wants YouTube's sharp
   corners by default, change `player.borderRadius` to 0.
+
+### 2026-11-09 — Phase 3: Appearance DONE (code, branch only)
+
+- Shanto merged PR #1 (`feature/foundation` → `main`, `79aa279`)
+  and PR #2 (`feature/core` → `main`, `d6d2df1`) himself before
+  Phase 3 started, so Phase 3 branched from `main` (`d6d2df1`),
+  not from `feature/core`. The stale `main @ a52cd3e` reference
+  in this file was corrected in the first Phase 3 commit.
+- Branch `feature/appearance`. **6 part-by-part commits, pushed
+  only when Phase 3 was fully complete** (same rule — no
+  intermediate push, no merge to `main`).
+- Built: `shared/themes.js` (6 presets + custom, WCAG contrast),
+  appearance module (themes via `--oneyt-*` + `--yt-spec-*` vars,
+  custom colours override the preset, radius/spacing vars,
+  validated custom CSS in its own style tag), typography module
+  (family/size/weight/line-height for titles/descriptions/
+  comments only), layout part 2 (home columns, card spacing,
+  thumbnail size, hide Shorts home/watch).
+- **AD-10 decided:** themes map OneYT tokens onto YouTube
+  `--yt-spec-*` variables + scoped CSS; graceful degradation if
+  YouTube renames a variable. Recorded in `Architecture.md`.
+- Fixes found by the tests (real bugs, not style): (1)
+  `resolveThemeVars('custom')` returned empty vars instead of
+  the dark base — 'custom' is now a named theme; (2) invalid
+  typography values left stale variables behind — invalid now
+  removes the variable.
+- Verification here: `npm test` **68/68 pass** (51 Phase 1+2 +
+  17 new), `npm run lint` clean, `npm run format` clean, every
+  JS file `node --check` clean, manifest valid with all files
+  present, grep: no polling / network / eval in extension code.
+- **Not verified here (needs Chrome on Shanto's PC):** the
+  actual visual behaviour — presets across Home/Watch/Search/
+  Channel, instant switching, custom CSS on/off, typography
+  not breaking layouts, home grid columns/spacing, Shorts
+  hiding, live `--yt-spec-*` / `--ytd-rich-grid-*` variables.
+  All listed in the new Phase 3 section of
+  `tests/manual-checklist.md`. Phase 3 is code-complete, not
+  browser-verified.
+- Note: task 3.6's editor UI (edit/import/export) belongs to
+  the Phase 5 dashboard; Phase 3 ships the validated
+  apply/enable/disable engine underneath it.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

@@ -7,7 +7,9 @@
         "content/styles/base.css",
         "content/modules/sidebar/sidebar.css",
         "content/modules/player/player.css",
-        "content/modules/layout/layout.css"
+        "content/modules/layout/layout.css",
+        "content/modules/appearance/appearance.css",
+        "content/modules/typography/typography.css"
       ],
       "js": [
         "shared/constants.js",
@@ -15,6 +17,7 @@
         "shared/selectors.js",
         "shared/storage.js",
         "shared/validators.js",
+        "shared/themes.js",
         "content/core/logger.js",
         "content/core/event-bus.js",
         "content/core/dom-manager.js",
@@ -24,6 +27,8 @@
         "content/modules/sidebar/sidebar.js",
         "content/modules/player/player.js",
         "content/modules/layout/layout.js",
+        "content/modules/appearance/appearance.js",
+        "content/modules/typography/typography.js",
         "content/core/app.js",
         "content/index.js"
       ],

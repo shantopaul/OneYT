@@ -65,6 +65,7 @@
       hideShortsWatch: false,
       homeColumns: 0, // 0 = default
       cardSpacing: 0, // px, 0 = default
+      thumbnailSize: 0, // px width, 0 = default
       hideComments: false,
       watchSpacing: 0, // px gap between player and #below, 0 = default (Phase 2)
     },
@@ -80,6 +81,8 @@
       },
       customCSS: '',
       customCSSEnabled: false,
+      borderRadius: 12, // px, thumbnails/cards (0 = sharp corners)
+      spacing: 16, // px, UI gaps (filter chips)
     },
 
     playback: {

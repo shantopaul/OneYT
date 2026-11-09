@@ -1,8 +1,10 @@
 /* OneYT — content/modules/layout/layout.css
  *
- * Static rules for the layout module (part 1: watch page).
+ * Static rules for the layout module (watch page + homepage).
  * They only take effect when the module adds its classes to
- * <html> (see layout.js).
+ * <html> (see layout.js). The grid variables are YouTube's own
+ * (--ytd-rich-grid-*); if YouTube renames them, the rules do
+ * nothing instead of breaking the page. Verify live.
  */
 
 html.oneyt-enabled.oneyt-hide-comments #comments {
@@ -11,4 +13,23 @@ html.oneyt-enabled.oneyt-hide-comments #comments {
 
 html.oneyt-enabled.oneyt-watch-spaced #below {
   margin-top: var(--oneyt-watch-spacing, 0px);
+}
+
+html.oneyt-enabled.oneyt-hide-shorts-watch ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts] {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer {
+  --ytd-rich-grid-items-per-row: var(--oneyt-home-columns);
+}
+
+html.oneyt-enabled.oneyt-card-spaced ytd-rich-grid-renderer {
+  --ytd-rich-grid-item-margin: var(--oneyt-card-spacing);
+}
+
+html.oneyt-enabled.oneyt-thumb-sized ytd-rich-item-renderer ytd-thumbnail {
+  width: var(--oneyt-thumb-width);
+  margin-left: auto;
+  margin-right: auto;
 }

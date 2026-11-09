@@ -126,11 +126,28 @@ New additive default: `layout.watchSpacing: 0` (schema stays v1).
 
 ---
 
-## Phase 3 — Appearance System
+## Phase 3 — Appearance System ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** themes, colours, typography, custom CSS.
 
 **Deliverable:** advanced appearance customisation, v0.3.0.
+
+**Status 2026-11-09:** code complete on branch `feature/appearance`
+(6 part-by-part commits on top of `main` `d6d2df1`, pushed after
+completion, nothing merged). `npm test` 68/68 pass, lint + format
+clean, manifest valid, no polling/network. AD-10 decided (themes
+map OneYT tokens onto YouTube `--yt-spec-*` vars, graceful
+degradation if renamed). New defaults: `appearance.borderRadius:
+12`, `appearance.spacing: 16`, `layout.thumbnailSize: 0` (schema
+stays v1). **Browser verification still open** — the visual
+behaviour (presets across pages, instant switching, custom CSS,
+typography layout, home grid) needs Chrome on Shanto's PC
+(`tests/manual-checklist.md` Phase 3 section). Two real bugs
+were found and fixed by the tests: `resolveThemeVars('custom')`
+fell back to empty vars instead of the dark base, and invalid
+typography values left stale variables behind. Note: task 3.6's
+editor UI (edit/import/export) belongs to the Phase 5 dashboard;
+Phase 3 ships the validated apply/enable/disable engine.
 
 ### Tasks
 
