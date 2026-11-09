@@ -59,18 +59,27 @@ test('savedThemes: name validation — empty, too long, duplicate, built-in', ()
     savedThemes.validateSavedThemeName('  My Night  ', existing, themes),
     'A saved theme named "My Night" already exists.'
   );
-  assert.equal(
-    savedThemes.validateSavedThemeName('My Night', existing, themes, 'My Night'),
-    null
-  );
+  assert.equal(savedThemes.validateSavedThemeName('My Night', existing, themes, 'My Night'), null);
 });
 
 test('savedThemes: create rejects duplicates and caps at 10', () => {
   const existing = [{ name: 'My Night', theme: 'dark', colors: {} }];
-  const dup = savedThemes.createSavedTheme('my night', defaults.cloneDefaults(), existing, defaults, themes);
+  const dup = savedThemes.createSavedTheme(
+    'my night',
+    defaults.cloneDefaults(),
+    existing,
+    defaults,
+    themes
+  );
   assert.equal(dup.error, 'A saved theme named "My Night" already exists.');
   const full = Array.from({ length: 10 }, (_, i) => ({ name: 'T' + i, theme: 'dark', colors: {} }));
-  const over = savedThemes.createSavedTheme('One more', defaults.cloneDefaults(), full, defaults, themes);
+  const over = savedThemes.createSavedTheme(
+    'One more',
+    defaults.cloneDefaults(),
+    full,
+    defaults,
+    themes
+  );
   assert.equal(over.error, 'You already have 10 saved themes — delete one first.');
 });
 
@@ -171,18 +180,12 @@ test('savedThemes: import rejects bad files', () => {
       '{"oneytTheme":2,"name":"X","theme":"dark","colors":{}}',
       'This file is not a OneYT theme export (missing oneytTheme: 1).',
     ],
-    [
-      '{"oneytTheme":1,"theme":"dark","colors":{}}',
-      'Imported theme has no name.',
-    ],
+    ['{"oneytTheme":1,"theme":"dark","colors":{}}', 'Imported theme has no name.'],
     [
       '{"oneytTheme":1,"name":"X","theme":"nope","colors":{}}',
       'Imported theme uses unknown base theme "nope".',
     ],
-    [
-      '{"oneytTheme":1,"name":"X","theme":"dark","colors":[]}',
-      'Imported theme has no colours.',
-    ],
+    ['{"oneytTheme":1,"name":"X","theme":"dark","colors":[]}', 'Imported theme has no colours.'],
     [
       '{"oneytTheme":1,"name":"X","theme":"dark","colors":{"bogus":"#112233"}}',
       'Imported theme has unknown colour "bogus".',
@@ -204,6 +207,10 @@ test('savedThemes: import rejects bad files', () => {
     theme: 'dark',
     colors: {},
   });
-  const dup = savedThemes.parseSavedThemeImport(good, [{ name: 'dup', theme: 'dark', colors: {} }], themes);
+  const dup = savedThemes.parseSavedThemeImport(
+    good,
+    [{ name: 'dup', theme: 'dark', colors: {} }],
+    themes
+  );
   assert.equal(dup.error, 'A saved theme named "dup" already exists.');
 });

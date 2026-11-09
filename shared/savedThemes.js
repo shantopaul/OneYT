@@ -106,7 +106,9 @@
     var error = validateSavedThemeName(name, list, themesApi);
     if (error) return { error: error };
     if (list.length >= MAX_SAVED_THEMES) {
-      return { error: 'You already have ' + MAX_SAVED_THEMES + ' saved themes — delete one first.' };
+      return {
+        error: 'You already have ' + MAX_SAVED_THEMES + ' saved themes — delete one first.',
+      };
     }
     var appearance = (currentSettings && currentSettings.appearance) || {};
     var theme = {
