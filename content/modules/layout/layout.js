@@ -49,8 +49,7 @@
   function createLayoutModule(deps) {
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
-    var loc =
-      deps.location || (typeof location !== 'undefined' ? location : null);
+    var loc = deps.location || (typeof location !== 'undefined' ? location : null);
     // Default redirect: location.replace (no history entry, so
     // Back does not return to the Shorts page). Overridden in
     // tests with a recorder.

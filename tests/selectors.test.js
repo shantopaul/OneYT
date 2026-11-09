@@ -28,7 +28,7 @@ test('selectors: required watch selectors exist', () => {
     assert.equal(typeof SELECTORS[key], 'string');
     assert.ok(SELECTORS[key].length > 0);
   });
-  assert.equal(Object.keys(SELECTORS).length, 20);
+  assert.equal(Object.keys(SELECTORS).length, 21); // +reelShelf (v1.1 Block Shorts)
 });
 
 test('selectors: every key is used — by name in JS or raw value in CSS', () => {
