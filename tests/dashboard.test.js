@@ -302,3 +302,21 @@ test('dashboard: manifest declares the options page and every script exists', ()
     assert.ok(html.includes('id="' + id + '"'), 'missing id: ' + id);
   });
 });
+
+test('dashboard: state-replacing actions go through replaceState (theme follows)', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('function replaceState(next)'), 'replaceState helper exists');
+  assert.ok(src.includes('replaceState(defaultsApi.cloneDefaults())'), 'reset all uses it');
+  assert.ok(src.includes('replaceState(defaultsApi.deepClone(pendingImport))'), 'import uses it');
+  assert.ok(src.includes('replaceState(profilesApi.applyPreset('), 'preset apply uses it');
+  assert.ok(src.includes('replaceState(profilesApi.applyProfile('), 'profile apply uses it');
+  assert.ok(!src.includes('state = defaultsApi.cloneDefaults();'), 'no direct reset bypass');
+  assert.ok(
+    !src.includes('state = defaultsApi.deepClone(pendingImport);'),
+    'no direct import bypass'
+  );
+  // saveNow resolves a boolean so success notices are gated on a real write.
+  assert.ok(src.includes('return true;'), 'saveNow resolves true on success');
+  assert.ok(src.includes('return false;'), 'saveNow resolves false on failure');
+  assert.ok(src.includes('.then(function (saved)'), 'callers receive the boolean');
+});

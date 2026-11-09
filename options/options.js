@@ -377,9 +377,17 @@
     }
 
     function markSaved() {
-      if (savedEl) savedEl.textContent = 'Saved — live on YouTube tabs';
+      if (savedEl) {
+        savedEl.textContent = 'Saved — live on YouTube tabs';
+        savedEl.classList.remove('error');
+      }
     }
 
+    // Resolves true on a successful write, false on failure.
+    // Callers that claim success (import applied, preset
+    // applied) must gate their notice on the boolean — the
+    // old code resolved either way, so a failed write still
+    // showed a success message.
     function saveNow() {
       if (saveTimer) {
         clearTimeout(saveTimer);
@@ -387,15 +395,33 @@
       }
       return storage
         .set({ [STORAGE_KEY]: state })
-        .then(markSaved)
+        .then(function () {
+          markSaved();
+          return true;
+        })
         .catch(function () {
-          if (savedEl) savedEl.textContent = 'Save failed — try again';
+          if (savedEl) {
+            savedEl.textContent = 'Save failed — try again';
+            savedEl.classList.add('error');
+          }
+          return false;
         });
     }
 
     function saveSoon(delay) {
       if (saveTimer) clearTimeout(saveTimer);
       saveTimer = setTimeout(saveNow, delay || 150);
+    }
+
+    // State-replacing paths (import, reset all, preset/profile
+    // apply, per-section reset) all go through here so the
+    // dashboard theme follows the new state: a profile that
+    // sets ui.dashboardTheme to 'light' used to leave the
+    // dashboard on the old theme until reload.
+    function replaceState(next) {
+      state = next;
+      applyDashboardTheme();
+      return saveNow();
     }
 
     function setValue(key, value, delay) {
@@ -966,11 +992,12 @@
       });
       applyBtn.addEventListener('click', function () {
         if (!pendingImport) return;
-        state = defaultsApi.deepClone(pendingImport);
-        saveNow().then(function () {
+        replaceState(defaultsApi.deepClone(pendingImport)).then(function (saved) {
           renderSection(currentSection);
-          importMsg.textContent = 'Import applied.';
-          importMsg.style.display = 'block';
+          if (saved) {
+            importMsg.textContent = 'Import applied.';
+            importMsg.style.display = 'block';
+          }
         });
       });
       importBox.appendChild(exportBtn);
@@ -997,8 +1024,7 @@
       });
       resetAllBtn.addEventListener('click', function () {
         if (!window.confirm('Reset ALL OneYT settings to defaults?')) return;
-        state = defaultsApi.cloneDefaults();
-        saveNow().then(function () {
+        replaceState(defaultsApi.cloneDefaults()).then(function () {
           renderSection(currentSection);
         });
       });
@@ -1066,10 +1092,11 @@
           text: 'Apply ' + preset.name,
         });
         applyBtn.addEventListener('click', function () {
-          state = profilesApi.applyPreset(state, preset.id, defaultsApi);
-          saveNow().then(function () {
+          replaceState(profilesApi.applyPreset(state, preset.id, defaultsApi)).then(function (
+            saved
+          ) {
             refreshValues();
-            profilesNotice = 'Applied preset "' + preset.name + '".';
+            if (saved) profilesNotice = 'Applied preset "' + preset.name + '".';
             renderSection(currentSection);
           });
         });
@@ -1143,11 +1170,14 @@
           text: 'Apply',
         });
         applyBtn.addEventListener('click', function () {
-          state = profilesApi.applyProfile(state, profile, defaultsApi);
-          saveNow().then(function () {
+          replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(function (
+            saved
+          ) {
             refreshValues();
-            profilesNotice =
-              'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+            if (saved) {
+              profilesNotice =
+                'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+            }
             renderSection(currentSection);
           });
         });
@@ -1593,10 +1623,11 @@
           text: 'Reset this section',
         });
         resetSectionBtn.addEventListener('click', function () {
+          var next = defaultsApi.deepClone(state);
           section.controls.forEach(function (control) {
-            setPath(state, control.key, defaultsApi.deepClone(getDefault(control.key)));
+            setPath(next, control.key, defaultsApi.deepClone(getDefault(control.key)));
           });
-          saveNow().then(function () {
+          replaceState(next).then(function () {
             renderSection(sectionId);
           });
         });
