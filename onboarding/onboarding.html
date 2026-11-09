@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to OneYT</title>
+    <link rel="stylesheet" href="onboarding.css" />
+  </head>
+  <body>
+    <main class="onboarding-root">
+      <header class="onboarding-header">
+        <span class="onboarding-logo">OneYT</span>
+        <p class="onboarding-tagline">Your YouTube. Your Layout. Your Rules.</p>
+      </header>
+
+      <p class="onboarding-steps" id="onboarding-steps" aria-live="polite">Step 1 of 3</p>
+
+      <!-- Step 1: pick a preset -->
+      <section class="onboarding-step" id="step-preset" aria-label="Pick a preset">
+        <h1>How do you want YouTube to feel?</h1>
+        <p class="onboarding-lead">
+          Pick a starting point. You can change every setting later in the full dashboard — a preset
+          only sets the ones it names.
+        </p>
+        <div class="onboarding-cards" id="preset-cards" role="radiogroup" aria-label="Presets">
+          <button
+            type="button"
+            class="onboarding-card"
+            data-preset="stock"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Stock YouTube</span>
+            <span class="onboarding-card-desc">
+              OneYT stays on, but YouTube looks and behaves like stock YouTube: no hiding, no
+              reshaping.
+            </span>
+          </button>
+          <button
+            type="button"
+            class="onboarding-card"
+            data-preset="focus"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Focus</span>
+            <span class="onboarding-card-desc">
+              Distraction-free watching: Focus Mode on, recommendations and Shorts hidden, comments
+              hidden.
+            </span>
+          </button>
+          <button
+            type="button"
+            class="onboarding-card"
+            data-preset="clean"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Clean</span>
+            <span class="onboarding-card-desc">
+              A tidy home feed and watch page: Shorts, shelves and counts hidden, minimal theme,
+              compact rows.
+            </span>
+          </button>
+          <button
+            type="button"
+            class="onboarding-card"
+            data-preset="cinema"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Cinema</span>
+            <span class="onboarding-card-desc">
+              Every video opens in theater mode on a full-width player, with the recommendations
+              sidebar scrolling on its own.
+            </span>
+          </button>
+          <button
+            type="button"
+            class="onboarding-card"
+            data-preset="keep"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Keep YouTube as it is</span>
+            <span class="onboarding-card-desc">
+              Change nothing yet — set everything up yourself in the dashboard.
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 2: pick the dashboard theme -->
+      <section class="onboarding-step" id="step-theme" hidden aria-label="Pick a dashboard theme">
+        <h1>How should the settings look?</h1>
+        <p class="onboarding-lead">
+          This only changes the settings dashboard — YouTube itself is untouched. Pick one; the page
+          re-themes as you choose.
+        </p>
+        <div
+          class="onboarding-cards"
+          id="theme-cards"
+          role="radiogroup"
+          aria-label="Dashboard themes"
+        >
+          <button
+            type="button"
+            class="onboarding-card"
+            data-theme="system"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">System</span>
+            <span class="onboarding-card-desc">Follow your operating system.</span>
+          </button>
+          <button
+            type="button"
+            class="onboarding-card"
+            data-theme="dark"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Dark</span>
+            <span class="onboarding-card-desc">Always dark.</span>
+          </button>
+          <button
+            type="button"
+            class="onboarding-card"
+            data-theme="light"
+            role="radio"
+            aria-checked="false"
+          >
+            <span class="onboarding-card-title">Light</span>
+            <span class="onboarding-card-desc">Always light.</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 3: done -->
+      <section class="onboarding-step" id="step-done" hidden aria-label="Done">
+        <h1>You&rsquo;re set.</h1>
+        <p class="onboarding-lead">
+          Three things to know: presets live in the dashboard under Profiles, every setting there
+          applies live, and the popup (click the OneYT icon) holds the quick toggles.
+        </p>
+      </section>
+
+      <div class="onboarding-actions">
+        <button type="button" class="btn btn-secondary" id="onboarding-skip">Skip setup</button>
+        <button type="button" class="btn btn-primary" id="onboarding-next" disabled>
+          Continue
+        </button>
+      </div>
+      <p class="onboarding-fineprint">
+        OneYT stores everything on this device only. No account, no tracking, no data leaves your
+        browser.
+      </p>
+    </main>
+
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/defaults.js"></script>
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/validators.js"></script>
+    <script src="../shared/profiles.js"></script>
+    <script src="../shared/onboarding.js"></script>
+    <script src="onboarding.js"></script>
+  </body>
+</html>
