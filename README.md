@@ -8,9 +8,10 @@ recommendations, focus mode and keyboard shortcuts — with every
 feature independently toggleable. No backend, no account, no data
 leaves the device.
 
-**Status:** v1.0.0 — public release. Chrome Web Store submission
-is prepared (see `docs/SUBMISSION.md`); the listing is live once
-the store review passes.
+**Status:** v1.0.0 — public release, all phases complete and
+merged to `main` (PR #7, 2026-11-09). Chrome Web Store
+submission is prepared (see `docs/SUBMISSION.md`); the listing
+is live once the store review passes.
 
 ![OneYT](assets/promo/small-tile.png)
 

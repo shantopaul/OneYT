@@ -64,7 +64,7 @@ a feature branch.
 - [ ] Browser checklists (Phases 1–6) pass on Shanto's PC
 - [ ] 5 real screenshots captured (`docs/SCREENSHOTS.md`)
 - [ ] Privacy policy URL decided and publicly reachable
-- [ ] Release PR merged to `main`
+- [x] Release PR merged to `main` — PR #7, `main` `4ca8a88` (2026-11-09, Shanto)
 - [ ] Tag `v1.0.0` pushed + GitHub release published
 - [ ] Store submission sent
 - [ ] Listing live; README link updated
