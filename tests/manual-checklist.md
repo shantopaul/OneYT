@@ -591,3 +591,19 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 20 — Custom CSS Templates (v1.12) — live in Chrome
+
+- [ ] Dashboard → Appearance: a "CSS templates" box lists 6 templates (Hide duration badges, Fade watched videos, Hide video badges, Hide home metadata, Hide voice search, Hide channel banner), each with a description and an Apply button
+- [ ] Apply "Hide duration badges": the Custom CSS box below now contains `/* OneYT template: hide-duration-badges */` + the rule, "Enable custom CSS" is on, and the button reads "Applied" (disabled) — open a home page: no duration badge on any thumbnail
+- [ ] Apply the same template again (reload the dashboard first): the Custom CSS text is unchanged — no duplicated block
+- [ ] Apply "Fade watched videos": open the home feed — a video you have started watching looks faded; an unwatched video looks normal
+- [ ] Apply "Hide video badges": "New" / "LIVE" / "4K" badges are gone from thumbnails
+- [ ] Apply "Hide home metadata": the views + age line under home video titles is gone (watch-page view count is untouched — that is the separate Hide view count toggle)
+- [ ] Apply "Hide voice search": the microphone button next to the search box is gone
+- [ ] Apply "Hide channel banner": open a channel page — the banner art is gone and no empty gap is left where it was
+- [ ] Remove a template by hand: delete its block (marker comment + rule) from the Custom CSS box — the effect is gone on the next YouTube load, and the button reads "Apply" again
+- [ ] If a template does nothing on the live page, check the real element in DevTools (right-click → Inspect) and note the selector YouTube actually uses — template selectors are DOM hooks and YouTube renames them
+
+Notes / failures:
+- _…_
