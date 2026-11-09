@@ -664,7 +664,7 @@ theater (merged); Phase 13 is disable ambient mode
 commits). v1.7.0 assumed 1.5.0 and 1.6.0 merge first —
 they did.
 
-## Phase 16 — Presets / Profiles (v1.8) ⏳ IN PROGRESS (2026-11-09)
+## Phase 16 — Presets / Profiles (v1.8) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** one click to a whole YouTube setup — four built-in
 presets (Stock YouTube, Focus, Clean, Cinema) plus named
@@ -674,38 +674,23 @@ section and from the popup.
 
 **Deliverable:** v1.8.0.
 
-**Plan (part-by-part, push only when complete):** new pure
-module `shared/profiles.js` (`OneYT.profiles`, Node-testable):
-`BUILTIN_PRESETS` with partial `overrides` per preset,
-deep-merged onto the CURRENT settings (a preset changes
-only what it names — everything else the user set is kept);
-`applyPreset(current, id)` (unknown id → current unchanged);
-custom profiles `{name, createdAt, settings}` as full
-migrated snapshots — `createProfile` (name trimmed 1–40
-chars, no case-insensitive duplicates, not a built-in
-id/name, max 10 profiles), `applyProfile` (full replace —
-a profile restores exactly), `validateProfiles` (repairs /
-drops corrupt entries, caps at 10), `renameProfile`,
-`deleteProfile`. Storage key `oneyt.profiles.v1` (new
-`PROFILES_STORAGE_KEY` in `shared/constants.js`), local
-only, never synced (profiles hold full snapshots; the
-storage sync-mirror only acts on values with a `.sync`
-object, which a profiles value never has). Dashboard: new
-section `options/sections/profiles.js` (id `profiles`,
-after `general` in the options order, `controls: []` —
-profiles are not in `DEFAULT_SETTINGS`), rendered by a
-`renderProfilesTools` block in `options.js` called from
-`renderSection` exactly like `renderAdvancedTools`;
-preset buttons, save-name input, profile list with
-Apply / Rename / Delete. Popup: a preset picker `<select>`
-(built-ins + saved profile names) in `popup.html` /
-`popup.js`, applying on change via the shared helper.
-No content-script changes — applying only writes settings
-and the existing storage onChanged live-apply path does
-the rest. No new permission, no network, no new selector.
-Module tests + manual checklist item. **Browser
-verification still open** — the dashboard section and the
-popup picker need a real browser on Shanto's PC.
+**Status 2026-11-09:** code complete on branch
+`feature/presets` (7 part-by-part commits on top of
+`main` `4440b49`, pushed after completion, `main`
+untouched). `npm test` 162/162 pass (146 baseline + 16
+new), lint + format clean, manifest valid, `npm run
+package` builds a clean `oneyt-1.8.0.zip` (114 KB,
+runtime files only — zero test/doc files inside).
+**Done:** `2f5dba3` start (PRD PL-16 + plan, Memory.md
+corrected to Phase 15 merged), `f7149bc` profiles engine
+(`shared/profiles.js` pure + `PROFILES_STORAGE_KEY`),
+`56961c5` dashboard Profiles section
+(`renderProfilesTools`, like `renderAdvancedTools`),
+`0cdd99e` popup preset picker, `cb8c893` tests (16 new)
++ checklist, `26eaa0e` format, `d2fc584` version 1.8.0.
+**Browser verification still open** — the dashboard
+section, popup picker and live apply need a real browser
+on Shanto's PC (`tests/manual-checklist.md` Phase 16).
 Numbering note: this phase takes Phase 16 because Phase
 12 is hide topic chips (merged), Phase 14 is default
 theater (merged) and Phase 15 is hide shelves (merged);
