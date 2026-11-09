@@ -45,6 +45,21 @@
     });
     var eventBus = ns.eventBus ? ns.eventBus.createEventBus(logger) : null;
 
+    // Register feature modules (each guards itself by page/settings).
+    if (ns.modules && ns.modules.sidebar) {
+      moduleManager.register(
+        ns.modules.sidebar.createSidebarModule({ dom: domManager, logger: logger })
+      );
+    }
+    if (ns.modules && ns.modules.player) {
+      moduleManager.register(
+        ns.modules.player.createPlayerModule({ dom: domManager, logger: logger })
+      );
+    }
+    if (ns.modules && ns.modules.layout) {
+      moduleManager.register(ns.modules.layout.createLayoutModule({}));
+    }
+
     var app = ns.app.createApp({
       logger: logger,
       constants: ns.constants,

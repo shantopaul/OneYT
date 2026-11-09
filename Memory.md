@@ -16,13 +16,13 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ done · **Phase 1 — Foundation ✅ code complete, pushed to branch** (browser check still open) |
-| **Version** | 0.1.0 (extension shell, no features yet) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `a52cd3e`; branch `feature/foundation` pushed 2026-11-09, **never merged to `main`** |
-| **Code written** | Phase 1: 15 JS files + manifest + base.css + popup + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 1 code done; waiting for browser check + Phase 2 go-ahead) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md`); Phase 2 start decision |
-| **Last verified** | 2026-11-09 — `npm test` 38/38 pass, `npm run lint` clean, `npm run format` clean, manifest valid, no polling/network (grep) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (code, pushed) · **Phase 2 — Core Layout ✅ code complete, pushed to branch** (browser check still open) |
+| **Version** | 0.1.0 (foundation + core layout, no dashboard yet) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `a52cd3e`; branches `feature/foundation` (`6385ad3`) and `feature/core` (pushed 2026-11-09), **neither merged to `main`** |
+| **Code written** | Phase 1 + Phase 2: sidebar, player, layout modules + tests (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 2 code done; waiting for browser check + Phase 3 go-ahead) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1 + 2 sections); Phase 3 start decision |
+| **Last verified** | 2026-11-09 — `npm test` 51/51 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
 
@@ -108,6 +108,8 @@
 | 2026-11-09 | Player `position: absolute` supported as a user option | `PRD.md` §4.1, `Architecture.md` §6.3 |
 | 2026-11-09 | AD-06: content scripts = classic scripts, one `OneYT` global, manifest load order; no bundler, no ES modules | `Architecture.md` AD-06 |
 | 2026-11-09 | Phase 1 commits part-by-part (one commit per file/feature), push branch only when Phase 1 fully complete, never merge to `main` | User instruction 2026-11-09; `Memory.md` log |
+| 2026-11-09 | AD-09: module static CSS via manifest + classes, vars for dynamic values | `Architecture.md` AD-09 |
+| 2026-11-09 | Phase 2 same rule as Phase 1: branch `feature/core`, part-by-part commits, push only when fully complete | User instruction 2026-11-09 |
 | 2026-11-09 | Dark-first UI; no gradients / glassmorphism / fake stats | `Design.md` §2.6 |
 
 ## Decisions Needed (from user)
@@ -116,7 +118,9 @@
 |---|----------|--------------------------|--------|
 | D-01 | Create GitHub repo `shantopaul/OneYT` now, or later at Phase 1? | Recommend: create at Phase 1 start, `main` = stable | ✅ Done 2026-11-09 — user created the (private) repo; planning docs pushed as `5e608e1` on `main` |
 | D-02 | Start Phase 1 (Foundation) coding now? | Recommend: yes, after D-01 | ✅ Done 2026-11-09 — user said "Phase 1 start", branch `feature/foundation`, part-by-part commits, push only when complete |
-| D-07 | Phase 2 start? | Recommend: after the Phase 1 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
+| D-07 | Phase 2 start? | Recommend: after the Phase 1 browser checklist passes on Shanto's PC | ✅ Done 2026-11-09 — user said "Phase 2 start", branch `feature/core` from `feature/foundation`, same part-by-part rule, push only when complete |
+| D-08 | Phase 3 start? | Recommend: after the Phase 2 browser checklist passes on Shanto's PC | ⬜ Awaiting user |
+| D-09 | Default player radius 12px — keep, or 0 (YouTube sharp corners)? | Recommend: keep 12px unless Shanto prefers stock look | ⬜ Awaiting user |
 | D-03 | AD-06: ES-module loading strategy for content scripts | Decide in Phase 1 (single entry vs tiny bundler) | ⬜ Open — Phase 1 |
 | D-04 | AD-07: Focus Mode scope — global or per-tab? | Decide in Phase 4 | ⬜ Open — Phase 4 |
 | D-05 | AD-08: Which keys sync (opt-in)? | Decide in Phase 5 | ⬜ Open — Phase 5 |
@@ -140,8 +144,21 @@ Node, ⬜ = needs Chrome on Shanto's PC — see
 - [ ] No console errors on Home / Watch / Search
 - [x] No polling, no network requests (grep-verified: no `setInterval` / `fetch` / `eval` in extension code)
 
-**Phase 2 — Core Layout** (not started; awaiting user go-ahead):
-see `Phases.md` Phase 2 checklist.
+**Phase 2 — Core Layout** (code complete 2026-11-09; ✅ = verified
+here in Node, ⬜ = needs Chrome on Shanto's PC):
+
+- [ ] Player stays visible while sidebar scrolls (mouse wheel over sidebar only)
+- [ ] Video keeps playing during sidebar scroll
+- [x] Player width / alignment logic applies and survives SPA navigation (unit-tested; live browser check open)
+- [x] `position: absolute` geometry: container measured, height reserved (unit-tested; no-overlap check open in browser)
+- [ ] No overlap, no horizontal scrollbar at 1280 / 1440 / 1920 px
+- [x] Fullscreen: positioning suspended (unit-tested: all player classes removed)
+- [x] Theater: sizing/position skipped, appearance kept (unit-tested via theater attribute)
+- [x] Disabling sidebar/player module restores YouTube exactly (unit-tested: classes + vars removed)
+- [x] Resize: debounced updates (app.js 150 ms debounce, re-apply re-measures; live check open)
+
+**Phase 3 — Appearance** (not started; awaiting user go-ahead):
+see `Phases.md` Phase 3 checklist.
 
 ---
 
@@ -201,6 +218,44 @@ see `Phases.md` Phase 2 checklist.
   `main` untouched at `a52cd3e`, nothing merged.
 - Next: browser checklist on Shanto's PC
   (`tests/manual-checklist.md`), then Phase 2 decision (D-07).
+
+### 2026-11-09 — Phase 2: Core Layout DONE (code, branch only)
+
+- Branch `feature/core` from `feature/foundation` (`6385ad3`).
+  **7 part-by-part commits, pushed only when Phase 2 was fully
+  complete** (same rule as Phase 1 — no intermediate push,
+  no merge to `main` or to `feature/foundation`).
+- Built: sidebar module (independent scroll, width, scrollbar,
+  smooth scroll, wheel sensitivity), player module (width /
+  max-width / alignment, position default/sticky/fixed/absolute
+  with container measurement + height reservation, radius/border/
+  shadow/spacing, fullscreen + theater guards), layout module
+  part 1 (hide comments, watch spacing — new additive default
+  `layout.watchSpacing: 0`, schema stays v1).
+- **AD-09 decided:** module static CSS via manifest + html
+  classes; dynamic values via CSS variables; style tags only
+  for dynamic/custom CSS. Recorded in `Architecture.md`.
+- Fixes found during the work: waitFor retry would loop forever
+  when an element never appears (now re-applies only if the
+  element arrived); unused `ctx` storage removed from modules
+  (deps come through the factory); manifest `options_page`
+  already removed in Phase 1.
+- Verification here: `npm test` **51/51 pass** (38 Phase 1 + 13
+  new fake-DOM module tests), `npm run lint` clean,
+  `npm run format` clean, every JS file `node --check` clean,
+  manifest valid with all files present, grep: no polling /
+  network / eval in extension code.
+- **Not verified here (needs Chrome on Shanto's PC):** the
+  actual visual behaviour — player staying visible while the
+  sidebar scrolls, fixed/absolute geometry, no overlap at
+  1280/1440/1920, theater/fullscreen behaviour, live
+  `#primary #player` selector. All listed in the new Phase 2
+  section of `tests/manual-checklist.md`. Phase 2 is
+  code-complete, not browser-verified.
+- Known design note: default player radius is 12px per the
+  schema (`Architecture.md` §7.1) — the player gets slightly
+  rounded corners by default. If Shanto wants YouTube's sharp
+  corners by default, change `player.borderRadius` to 0.
 
 <!-- Add new entries above this line, newest first. Format:
 ### YYYY-MM-DD — short title

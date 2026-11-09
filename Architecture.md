@@ -240,11 +240,18 @@ export const SELECTORS = {
 
 - `content/styles/base.css` — injected via manifest; only the
   CSS variables + the few rules that must exist before JS runs.
-- Each module owns **one** `<style data-oneyt-module="sidebar">`
-  tag, created on `enable()`, removed on `disable()`. Never two
-  tags for one module; never inline `style` attributes scattered
-  across elements (use classes + variables instead, except for
-  truly per-element values like a user-chosen px width).
+- Each module's **static** CSS ships as one file
+  (`content/modules/<id>/<id>.css`), listed in the manifest's
+  `content_scripts.css` array. Its rules are scoped under
+  `html.oneyt-enabled` plus a module class (e.g.
+  `.oneyt-sidebar-scroll`), so enabling = adding the class,
+  disabling = removing it. Dynamic values (a user-chosen px
+  width) travel as CSS variables set by the module, never as
+  scattered inline `style` attributes. (AD-09, Phase 2.)
+- `dom.setStyle()` / `removeStyleTag()` remain for **dynamic**
+  CSS only — user custom CSS (Phase 3) — one
+  `<style data-oneyt-module="…">` tag per module, created on
+  `enable()`, removed on `disable()`.
 - Extension UI (popup/dashboard) styles live in `popup/` and
   `options/` only — **never** leak into YouTube pages, and
   YouTube-targeted CSS never leaks into the dashboard.
@@ -548,3 +555,4 @@ mid-phase.)
 | AD-06 | ES-module loading strategy for content scripts | 2026-11-09 | **Decided (Phase 1): classic scripts, no bundler.** Content scripts load in dependency order via `manifest.json` `content_scripts.js`, sharing one global namespace `window.OneYT`. Shared files use a UMD-style guard (`globalThis.OneYT` in the browser, `module.exports` in Node) so unit tests run without a build step. No ES `import`/`export` in content scripts, no dynamic `import()`, no `web_accessible_resources` needed. Revisit only if the file count forces a bundler. |
 | AD-07 | Focus Mode scope: global setting, per-tab toggle | — | **Open — decide in Phase 4** |
 | AD-08 | Sync scope (which keys sync) | — | **Open — decide in Phase 5** |
+| AD-09 | Module static CSS via manifest + html classes (not style tags); dynamic values via CSS variables; style tags only for dynamic/custom CSS | 2026-11-09 | **Decided (Phase 2).** Keeps zero build step and needs no `web_accessible_resources`/fetch; matches the §6.3 example. Disable = remove the class. |

@@ -66,6 +66,7 @@
       homeColumns: 0, // 0 = default
       cardSpacing: 0, // px, 0 = default
       hideComments: false,
+      watchSpacing: 0, // px gap between player and #below, 0 = default (Phase 2)
     },
 
     appearance: {

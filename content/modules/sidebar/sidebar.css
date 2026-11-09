@@ -1,0 +1,33 @@
+/* OneYT — content/modules/sidebar/sidebar.css
+ *
+ * Static rules for the sidebar module. They only take effect
+ * when the module adds its classes to <html> (see sidebar.js),
+ * so disabling the module removes them in one step.
+ * Dynamic values arrive as CSS variables, set by the module.
+ */
+
+/* Independent scrolling: the recommendation sidebar gets its own
+   scrollbar and the page no longer scrolls the player away. */
+html.oneyt-enabled.oneyt-sidebar-scroll #secondary {
+  max-height: var(--oneyt-sidebar-max-height, calc(100vh - 100px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  width: var(--oneyt-sidebar-width, auto);
+}
+
+html.oneyt-enabled.oneyt-sidebar-scroll #secondary::-webkit-scrollbar {
+  width: var(--oneyt-scrollbar-width, 8px);
+}
+
+html.oneyt-enabled.oneyt-sidebar-scroll.oneyt-sidebar-smooth #secondary {
+  scroll-behavior: smooth;
+}
+
+html.oneyt-enabled.oneyt-sidebar-scroll.oneyt-sidebar-hide-scrollbar #secondary {
+  scrollbar-width: none;
+}
+
+html.oneyt-enabled.oneyt-sidebar-scroll.oneyt-sidebar-hide-scrollbar #secondary::-webkit-scrollbar {
+  display: none;
+}

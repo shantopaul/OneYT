@@ -80,12 +80,23 @@ manifest until the Phase 5 dashboard exists.
 
 ---
 
-## Phase 2 — Core Layout (Flagship)
+## Phase 2 — Core Layout (Flagship) ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** the differentiator — independent sidebar scrolling +
 stationary player + player/sidebar sizing.
 
 **Deliverable:** functional layout customisation, v0.2.0.
+
+**Status 2026-11-09:** code complete on branch `feature/core`
+(7 part-by-part commits on top of `feature/foundation`, pushed
+after completion, `main` untouched). `npm test` 51/51 pass, lint
++ format clean, manifest valid, no polling/network. **Browser
+verification still open** — the visual behaviour (player staying
+visible, fixed/absolute geometry, no overlap at 1280/1440/1920,
+theater/fullscreen, live `#primary #player` selector) needs
+Chrome on Shanto's PC (`tests/manual-checklist.md` Phase 2
+section). AD-09 decided (module CSS via manifest + classes).
+New additive default: `layout.watchSpacing: 0` (schema stays v1).
 
 ### Tasks
 
