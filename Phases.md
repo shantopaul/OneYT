@@ -23,20 +23,30 @@ any code exists.
 | 0.5 | Write `Phases.md` (this file) | ✅ Done |
 | 0.6 | Write `Design.md` (colours, themes, fonts) | ⬜ Next |
 | 0.7 | Write `Memory.md` (progress tracker) | ⬜ Next |
-| 0.8 | Create GitHub repo `shantopaul/OneYT` (user decision) | ⬜ Awaiting user |
+| 0.8 | Create GitHub repo `shantopaul/OneYT` (user decision) | ✅ Done 2026-11-09 — private repo, planning docs pushed to `main` (`5e608e1` + `a52cd3e`) |
 
 **Exit criteria:** all six docs exist, user has read them, repo
 decision made. **No code in Phase 0.**
 
 ---
 
-## Phase 1 — Foundation
+## Phase 1 — Foundation ✅ CODE COMPLETE (2026-11-09)
 
 **Goal:** a working MV3 extension shell that loads on YouTube,
 stores settings, detects pages, and manages modules — with no
 visible features yet except a master on/off.
 
 **Deliverable:** loadable unpacked extension, v0.1.0.
+
+**Status 2026-11-09:** code complete on branch
+`feature/foundation` (22 part-by-part commits, pushed after
+completion, `main` untouched). `npm test` 38/38 pass, lint +
+format clean, manifest valid, no polling/network. **Browser
+verification still open** — load unpacked, SPA navigation,
+console errors and live selectors need Chrome on Shanto's PC
+(`tests/manual-checklist.md`). AD-06 decided (classic scripts,
+`OneYT` global, no bundler). `options_page` removed from the
+manifest until the Phase 5 dashboard exists.
 
 ### Tasks
 

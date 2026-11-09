@@ -1,0 +1,4 @@
+# Planning docs are hand-formatted; Prettier must not reflow them.
+*.md
+package-lock.json
+node_modules/

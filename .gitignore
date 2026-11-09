@@ -1,0 +1,13 @@
+# Dependencies / tooling (lockfile IS committed for reproducible dev installs)
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Release artefacts (built zips, not source)
+*.zip
+dist/
+build/

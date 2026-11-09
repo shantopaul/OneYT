@@ -1,0 +1,140 @@
+/* OneYT — shared/validators.js
+ *
+ * Pure validation for imported settings JSON and user custom CSS.
+ * No chrome.*, no DOM, no eval, no new Function — imported data
+ * is treated as untrusted text and only ever checked, never run.
+ *
+ * validateSettings(data):
+ *   Returns { valid, errors[], warnings[], cleaned }.
+ *   - valid=false when the top level is not a plain object, or a
+ *     known key has the wrong type. Nothing is applied then.
+ *   - Unknown keys are dropped from `cleaned` with a warning.
+ *   - Known keys with wrong types are dropped with an error and
+ *     the import is rejected (valid=false) — a half-applied
+ *     import is worse than a rejected one.
+ *   - `cleaned` is the migrated settings object when valid.
+ *
+ * validateCustomCSS(css):
+ *   Basic sanity only: length cap, balanced braces/parens,
+ *   no HTML tags, no `expression(`, no `@import` of remote URLs.
+ *   Returns { valid, errors[] }.
+ */
+(function () {
+  'use strict';
+
+  function isPlainObject(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  // Expected type for each top-level settings key, by the type of
+  // its default value. Nested keys are checked by the migration
+  // type-repair in defaults.js; this validator guards the shape
+  // an import must have before migration runs.
+  function expectedTopLevelTypes(defaults) {
+    var out = {};
+    for (var key in defaults) {
+      if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+        out[key] = Array.isArray(defaults[key])
+          ? 'array'
+          : defaults[key] === null
+            ? 'any'
+            : typeof defaults[key];
+      }
+    }
+    return out;
+  }
+
+  function typeOf(value) {
+    if (Array.isArray(value)) return 'array';
+    if (value === null) return 'null';
+    return typeof value;
+  }
+
+  function validateSettings(data, defaultsApi) {
+    var errors = [];
+    var warnings = [];
+    if (!isPlainObject(data)) {
+      return {
+        valid: false,
+        errors: ['Imported settings must be a JSON object.'],
+        warnings: warnings,
+        cleaned: null,
+      };
+    }
+
+    var defaults = defaultsApi.DEFAULT_SETTINGS;
+    var expected = expectedTopLevelTypes(defaults);
+
+    for (var key in data) {
+      if (!Object.prototype.hasOwnProperty.call(data, key)) continue;
+      if (!(key in expected)) {
+        warnings.push('Unknown setting "' + key + '" will be ignored.');
+        continue;
+      }
+      if (expected[key] === 'any') continue;
+      if (typeOf(data[key]) !== expected[key]) {
+        errors.push(
+          'Setting "' + key + '" must be ' + expected[key] + ' but got ' + typeOf(data[key]) + '.'
+        );
+      }
+    }
+
+    if (errors.length > 0) {
+      return { valid: false, errors: errors, warnings: warnings, cleaned: null };
+    }
+
+    return {
+      valid: true,
+      errors: errors,
+      warnings: warnings,
+      cleaned: defaultsApi.migrateSettings(data),
+    };
+  }
+
+  function validateCustomCSS(css, maxLength) {
+    var errors = [];
+    var limit = typeof maxLength === 'number' ? maxLength : 50000;
+    if (typeof css !== 'string') {
+      return { valid: false, errors: ['Custom CSS must be text.'] };
+    }
+    if (css.length > limit) {
+      errors.push('Custom CSS is too long (max ' + limit + ' characters).');
+    }
+    if (/<\/?[a-z][\s\S]*>/i.test(css)) {
+      errors.push('Custom CSS must not contain HTML tags.');
+    }
+    if (/expression\s*\(/i.test(css)) {
+      errors.push('Custom CSS must not use expression().');
+    }
+    if (/@import/i.test(css)) {
+      errors.push('Custom CSS must not use @import (no remote code).');
+    }
+    if (/javascript\s*:/i.test(css)) {
+      errors.push('Custom CSS must not contain javascript: URLs.');
+    }
+    var depth = 0;
+    var parenDepth = 0;
+    for (var i = 0; i < css.length; i++) {
+      var ch = css[i];
+      if (ch === '{') depth++;
+      if (ch === '}') depth--;
+      if (ch === '(') parenDepth++;
+      if (ch === ')') parenDepth--;
+      if (depth < 0 || parenDepth < 0) break;
+    }
+    if (depth !== 0) errors.push('Custom CSS has unbalanced braces { }.');
+    if (parenDepth !== 0) errors.push('Custom CSS has unbalanced parentheses ( ).');
+    return { valid: errors.length === 0, errors: errors };
+  }
+
+  var api = {
+    validateSettings: validateSettings,
+    validateCustomCSS: validateCustomCSS,
+  };
+
+  var ns = (globalThis.OneYT = globalThis.OneYT || {});
+  ns.validators = api;
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = api;
+  }
+})();
