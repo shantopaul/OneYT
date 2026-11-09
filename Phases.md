@@ -1262,8 +1262,6 @@ the proof (`tests/manual-checklist.md` Phase 24).
 
 ## Future (v1.1+, not in scope now)
 
-- Popup dark/light theme to match the dashboard (follow-up to Phase 9)
-- Channel-page Shorts tab hiding (follow-up to Block Shorts)
 - Optional cloud sync / cross-device backup (opt-in, explicit)
 - More player controls (per user demand)
 
