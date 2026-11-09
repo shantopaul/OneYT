@@ -12,7 +12,20 @@ news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.10.0 (Phase 18 selector health check),
 1.11.0 (Phase 19 popup theme + channel Shorts tab),
 1.12.0 (Phase 20 custom CSS templates),
-1.13.0 (Phase 21 saved themes + export/share).
+1.13.0 (Phase 21 saved themes + export/share),
+1.14.0 (Phase 22 advanced layout editor).
+
+## 1.14.0 — 2026-11-09 (Advanced Layout Editor, Phase 22)
+
+- A Layout-section editor: three one-click layout
+  presets (Compact, Balanced, Spacious) that set the
+  home grid numbers together, plus a live preview of
+  the current grid (columns · gap · max-width).
+- New setting `layout.homeMaxWidth` — cap the home
+  feed width and centre it (the ultrawide fix).
+  0 = YouTube default (full width).
+- Presets change only the five layout numbers;
+  hiding toggles, theme and everything else stay.
 
 ## 1.13.0 — 2026-11-09 (Saved Themes + Export/Share, Phase 21)
 
