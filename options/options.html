@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OneYT Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div id="options-root" class="options-root">
+      <header class="options-topbar">
+        <span class="options-logo">OneYT</span>
+        <span class="options-title">Settings</span>
+        <input
+          type="search"
+          id="options-search"
+          class="options-search"
+          placeholder="Search settings… (e.g. speed, focus, theme)"
+          aria-label="Search settings"
+        />
+        <span id="saved-indicator" class="saved-indicator"></span>
+        <div id="search-results" class="search-results" style="display: none"></div>
+      </header>
+
+      <div class="options-body">
+        <nav id="options-nav" class="options-nav" aria-label="Settings sections"></nav>
+        <main id="options-main" class="options-main"></main>
+      </div>
+    </div>
+
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/defaults.js"></script>
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/validators.js"></script>
+    <script src="../shared/themes.js"></script>
+    <script src="../content/modules/keyboard/keyboard.js"></script>
+    <script src="sections/general.js"></script>
+    <script src="sections/player.js"></script>
+    <script src="sections/sidebar.js"></script>
+    <script src="sections/layout.js"></script>
+    <script src="sections/appearance.js"></script>
+    <script src="sections/playback.js"></script>
+    <script src="sections/productivity.js"></script>
+    <script src="sections/keyboard.js"></script>
+    <script src="sections/advanced.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
