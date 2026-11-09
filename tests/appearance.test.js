@@ -302,3 +302,13 @@ test('phase 3 modules register and run through the manager', () => {
   mm.destroy();
   assert.equal(doc._root._classes.size, 0);
 });
+
+test('appearance: radius and spacing are clamped to the dashboard ranges', () => {
+  const { doc, mod } = appearanceSetup();
+  mod.apply(settingsWith({ appearance: { borderRadius: -5, spacing: 999 } }), 'home');
+  assert.equal(doc._root._vars.get('--oneyt-radius'), '0px');
+  assert.equal(doc._root._vars.get('--oneyt-spacing'), '64px');
+  mod.apply(settingsWith({ appearance: { borderRadius: 99, spacing: 10 } }), 'home');
+  assert.equal(doc._root._vars.get('--oneyt-radius'), '32px');
+  assert.equal(doc._root._vars.get('--oneyt-spacing'), '10px');
+});

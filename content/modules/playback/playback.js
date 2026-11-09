@@ -190,8 +190,12 @@
       if (!el) return;
       var size = (settings.playback || {}).captionFontSize;
       if (typeof size === 'number' && size > 0) {
+        // Clamp to the dashboard control's max (200%): a
+        // hand-edited import bypasses the dashboard inputs,
+        // and 10000% captions would fill the screen.
+        var clamped = size > 200 ? 200 : size;
         el.classList.add('oneyt-caption-sized');
-        el.style.setProperty('--oneyt-caption-font-size', size + '%');
+        el.style.setProperty('--oneyt-caption-font-size', clamped + '%');
       } else {
         el.classList.remove('oneyt-caption-sized');
         el.style.removeProperty('--oneyt-caption-font-size');

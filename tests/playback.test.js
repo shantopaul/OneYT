@@ -195,3 +195,11 @@ test('playback: non-boolean autoplay/captions never click the toggle', async () 
   assert.equal(t.autonavClicked(), false);
   assert.equal(t.ccClicked(), false);
 });
+
+test('playback: caption font size is clamped to 200%', async () => {
+  const storage = mapStorage();
+  const t = playbackSetup(storage);
+  t.mod.apply(settingsWith({ playback: { captionFontSize: 10000 } }), 'watch');
+  await tick(30);
+  assert.equal(t.doc._root._vars.get('--oneyt-caption-font-size'), '200%');
+});

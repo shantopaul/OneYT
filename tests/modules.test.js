@@ -6,6 +6,7 @@ const { createFakeElement, createFakeDocument, createFakeDom, quietLogger } = re
 const { createSidebarModule } = require('../content/modules/sidebar/sidebar');
 const { createPlayerModule } = require('../content/modules/player/player');
 const { createLayoutModule, shortsWatchUrl } = require('../content/modules/layout/layout');
+const { createNavigationModule } = require('../content/modules/navigation/navigation');
 
 function settingsWith(patch) {
   const s = defaults.cloneDefaults();
@@ -673,4 +674,76 @@ test('player: mini-player config clears when it closes, re-applies on reopen', (
   mod.apply(settings, 'watch');
   assert.equal(doc._root._classes.has('oneyt-miniplayer-sized'), true);
   assert.equal(doc._root._vars.get('--oneyt-miniplayer-width'), '300px');
+});
+
+test('layout: numeric values are clamped to the dashboard ranges', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  mod.apply(
+    settingsWith({
+      layout: { watchSpacing: 99999, cardSpacing: 999, thumbnailSize: 9999, homeMaxWidth: 9999 },
+    }),
+    'home'
+  );
+  // homeMaxWidth/cardSpacing/thumbnailSize apply on home.
+  assert.equal(doc._root._vars.get('--oneyt-card-spacing'), '60px');
+  assert.equal(doc._root._vars.get('--oneyt-thumb-width'), '800px');
+  assert.equal(doc._root._vars.get('--oneyt-home-max-width'), '2560px');
+  mod.apply(settingsWith({ layout: { watchSpacing: 99999 } }), 'watch');
+  assert.equal(doc._root._vars.get('--oneyt-watch-spacing'), '200px');
+});
+
+test('navigation: guide width is clamped and compact wins over wide', () => {
+  const doc = createFakeDocument();
+  const mod = createNavigationModule({ document: doc });
+  mod.apply(settingsWith({ navigation: { guideWidth: 999 } }));
+  assert.equal(doc._root._classes.has('oneyt-nav-wide'), true);
+  assert.equal(doc._root._vars.get('--oneyt-guide-width'), '400px');
+  // Compact + wide together used to give a 300px guide with
+  // hidden titles (the wide rule won on equal specificity).
+  mod.apply(settingsWith({ navigation: { compact: true, guideWidth: 300 } }));
+  assert.equal(doc._root._classes.has('oneyt-nav-compact'), true);
+  assert.equal(doc._root._classes.has('oneyt-nav-wide'), false);
+  assert.equal(doc._root._vars.has('--oneyt-guide-width'), false);
+});
+
+test('player: numeric values are clamped to the dashboard ranges', () => {
+  const { doc, mod } = playerSetup();
+  const settings = settingsWith({
+    player: {
+      customWidth: 99999,
+      maxWidth: 99999,
+      borderRadius: -5,
+      spacing: 999,
+      miniPlayer: { size: 9999, borderRadius: 99, offsetX: 999, offsetY: -10 },
+    },
+  });
+  settings.sidebar.playerOffset = 999;
+  mod.apply(settings, 'watch');
+  assert.equal(doc._root._vars.get('--oneyt-player-width'), '2000px');
+  assert.equal(doc._root._vars.get('--oneyt-player-max-width'), '2000px');
+  assert.equal(doc._root._vars.get('--oneyt-player-radius'), '0px');
+  assert.equal(doc._root._vars.get('--oneyt-player-spacing'), '100px');
+  assert.equal(doc._root._vars.get('--oneyt-player-offset'), '200px');
+});
+
+test('sidebar: numeric values are clamped, invalid maxHeight falls back', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(
+    settingsWith({
+      sidebar: { customWidth: 9999, scrollbarWidth: 99, maxHeight: 'banana' },
+    }),
+    'watch'
+  );
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-width'), '800px');
+  assert.equal(doc._root._vars.get('--oneyt-scrollbar-width'), '24px');
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), 'calc(100vh - 100px)');
+  mod.apply(settingsWith({ sidebar: { maxHeight: '50vh' } }), 'watch');
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), '50vh');
 });

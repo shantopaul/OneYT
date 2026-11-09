@@ -163,6 +163,16 @@
       return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value) ? value : '';
     }
 
+    // Clamp a number to the dashboard control's range (see
+    // layout.js: a hand-edited import bypasses the dashboard
+    // inputs). Non-numbers pass through unchanged.
+    function clampNum(value, min, max) {
+      if (typeof value !== 'number' || !isFinite(value)) return value;
+      if (value < min) return min;
+      if (value > max) return max;
+      return value;
+    }
+
     // Default theater (Phase 14): click the theater button
     // once for this video. Never click when already in
     // theater, and never click twice for the same URL — the
@@ -391,6 +401,26 @@
       lastPage = page;
       if (!settings || !settings.player) return;
       var pl = settings.player;
+      // Clamp numeric values to the dashboard control ranges
+      // (customWidth/maxWidth 0–2000, radius 0–32, spacing
+      // 0–100, mini size 0–800, mini radius 0–32, mini
+      // offsets 0–500). A hand-edited import bypasses the
+      // dashboard inputs; the module is the last line of
+      // defence. Only finite numbers are clamped — other
+      // types keep the old behaviour (the checks below).
+      var mini = pl.miniPlayer || {};
+      pl = Object.assign({}, pl, {
+        customWidth: clampNum(pl.customWidth, 0, 2000),
+        maxWidth: clampNum(pl.maxWidth, 0, 2000),
+        borderRadius: clampNum(pl.borderRadius, 0, 32),
+        spacing: clampNum(pl.spacing, 0, 100),
+        miniPlayer: Object.assign({}, mini, {
+          size: clampNum(mini.size, 0, 800),
+          borderRadius: clampNum(mini.borderRadius, 0, 32),
+          offsetX: clampNum(mini.offsetX, 0, 500),
+          offsetY: clampNum(mini.offsetY, 0, 500),
+        }),
+      });
       var isWatch = page === 'watch';
       var fullscreen = isFullscreen();
       var theater = isWatch && !fullscreen ? isTheater() : false;
@@ -438,7 +468,7 @@
       setVar('--oneyt-player-accent', accent);
       var offset =
         settings.sidebar && settings.sidebar.playerOffset ? settings.sidebar.playerOffset : 0;
-      setVar('--oneyt-player-offset', offset > 0 ? offset + 'px' : null);
+      setVar('--oneyt-player-offset', offset > 0 ? clampNum(offset, 0, 200) + 'px' : null);
 
       // --- Sizing / alignment (skipped in theater) ---
       var sized = pl.customWidth && pl.customWidth > 0;
