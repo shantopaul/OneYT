@@ -212,3 +212,21 @@ test('profiles: validateProfiles drops names that shadow built-in presets', () =
     ['My setup']
   );
 });
+
+test('profiles: applyProfile keeps the current onboarded flag', () => {
+  const saved = customSettings();
+  saved.ui.onboarded = false;
+  const stored = profiles.createProfile('Mine', saved, [], defaults).profiles;
+  const current = defaults.cloneDefaults();
+  current.ui.onboarded = true;
+  const next = profiles.applyProfile(current, stored[0], defaults);
+  assert.equal(next.ui.onboarded, true);
+  // And the other way: a finished snapshot does not mark an
+  // unfinished setup as done.
+  const current2 = defaults.cloneDefaults();
+  current2.ui.onboarded = false;
+  const saved2 = customSettings();
+  saved2.ui.onboarded = true;
+  const stored2 = profiles.createProfile('Done', saved2, [], defaults).profiles;
+  assert.equal(profiles.applyProfile(current2, stored2[0], defaults).ui.onboarded, false);
+});

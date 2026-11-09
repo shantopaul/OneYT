@@ -234,11 +234,24 @@
   // Apply a custom profile: full replace with its snapshot.
   // A corrupt snapshot never wipes the current settings —
   // it returns them back, unchanged (cloned).
+  // `onboarded` is a "setup finished" flag, not a preference:
+  // a profile saved before onboarding finished must not
+  // un-complete the setup (the welcome page would show
+  // step 1 again on re-open), so the current value is kept.
   function applyProfile(currentSettings, profile, defaultsApi) {
     if (!profile || !isPlainObject(profile.settings)) {
       return defaultsApi.deepClone(currentSettings);
     }
-    return defaultsApi.migrateSettings(profile.settings);
+    var next = defaultsApi.migrateSettings(profile.settings);
+    if (
+      currentSettings &&
+      currentSettings.ui &&
+      typeof currentSettings.ui.onboarded === 'boolean'
+    ) {
+      next.ui = next.ui || {};
+      next.ui.onboarded = currentSettings.ui.onboarded;
+    }
+    return next;
   }
 
   // Repair a stored profiles value into a clean array:
