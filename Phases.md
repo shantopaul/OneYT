@@ -1260,6 +1260,50 @@ version 1.16.0, docs (this commit).
 **Browser verification still open** — the live page is
 the proof (`tests/manual-checklist.md` Phase 24).
 
+## Code-check round 1 (v1.16.1) ✅ MERGED (2026-11-10)
+
+Not a feature phase: a read-only code audit of every
+feature (shared engines, content modules, dashboard,
+popup, onboarding, docs), then fixes for everything it
+confirmed. No real-browser testing happened in this
+round — only code reads and the Node suite. Full report:
+`docs/CODE_CHECK.md`.
+
+- 45 findings fixed: a dead placebo toggle
+  (`sidebar.keepPlayerVisible`, deleted not wired), two
+  `deepMerge` type-repair holes, validator gaps (CSS
+  strings/comments, `url()` quote evasion), one-token-per
+  `--yt-spec-*` target, repair-path shadowing, base.css
+  width variables fighting their documented defaults,
+  mini-player stale config, focus reset, keyboard repeat,
+  apply-time numeric clamps, compact-wins-over-wide,
+  stale theater waiters, starved health timer,
+  settings-manager equality + echo notify, scoped
+  `waitFor`, page-detector feed pages, detached-video
+  playback, and the dashboard/popup/onboarding batch
+  (theme after state replace, honest save reporting,
+  shortcut blur, colour reset, speed options, theme
+  clamp, delete confirms, independent load failures,
+  byte-size imports, CSS probe validation, onChanged
+  refresh, search tool-box items, AA primary buttons,
+  popup write cache, onboarding theme + error).
+- 3 small optimizations: sidebar wheel re-bind skip,
+  stale `inputsByKey` clear, dead validators include
+  removed.
+- Docs staleness fixed: README tests badge 121 → 264,
+  `package.json` 1.1.0 → 1.16.1, `Memory.md` table
+  (frozen at Phase 16), Future list (shipped Phase 19
+  items removed).
+- Tests 220 → 264, lint + format clean, manifest valid,
+  `npm run package` builds `oneyt-1.16.1.zip`.
+- **Not verified here:** the suspicions in
+  `docs/CODE_CHECK.md` (S1–S6) still need a real
+  browser; the manual checklists stay open on Shanto's PC.
+- **Merged to `main` 2026-11-10** (merge `<hash>`, per the
+  standing rule: feature complete → merge to main).
+  Follow-up docs commit records the merge in Phases.md +
+  Memory.md.
+
 ## Future (v1.1+, not in scope now)
 
 - Optional cloud sync / cross-device backup (opt-in, explicit)
