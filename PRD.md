@@ -141,6 +141,7 @@ and must work flawlessly before anything else ships.
 | PL-10 | Hide like count | Toggle; the number next to the Like button is hidden, the button stays clickable; live apply |
 | PL-11 | Hide view count | Toggle; the "X views" line on the watch page is hidden; live apply |
 | PL-12 | Hide subscriber count | Toggle; the "X subscribers" next to the channel name is hidden, the Subscribe button stays; live apply |
+| PL-15 | Hide live / mixes / news shelves | Three toggles; the "Live now" shelf, Mixes (shelf + mix cards), and the "Breaking news" shelf are hidden on the home feed; live apply |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.
