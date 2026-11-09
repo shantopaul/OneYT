@@ -1,0 +1,217 @@
+// OneYT — Phase 2 module tests (node:test, fake DOM).
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const defaults = require('../shared/defaults');
+const { createFakeElement, createFakeDocument, createFakeDom, quietLogger } = require('./fake-dom');
+const { createSidebarModule } = require('../content/modules/sidebar/sidebar');
+const { createPlayerModule } = require('../content/modules/player/player');
+const { createLayoutModule } = require('../content/modules/layout/layout');
+
+function settingsWith(patch) {
+  const s = defaults.cloneDefaults();
+  if (patch) {
+    for (const [section, values] of Object.entries(patch)) {
+      Object.assign(s[section], values);
+    }
+  }
+  return s;
+}
+
+// ---------- Sidebar ----------
+
+test('sidebar: watch + independent scroll sets classes and vars', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(settingsWith(), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), true);
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-width'), '402px');
+  assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), 'calc(100vh - 100px)');
+});
+
+test('sidebar: customWidth 0 removes the width var; non-watch removes classes', () => {
+  const doc = createFakeDocument();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary: createFakeElement() }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(settingsWith({ sidebar: { customWidth: 0 } }), 'watch');
+  assert.equal(doc._root._vars.has('--oneyt-sidebar-width'), false);
+  mod.apply(settingsWith(), 'home');
+  assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), false);
+});
+
+test('sidebar: fullscreen suspends scrolling; disable restores everything', () => {
+  const doc = createFakeDocument();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary: createFakeElement() }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(settingsWith(), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), true);
+  doc.fullscreenElement = createFakeElement();
+  mod.apply(settingsWith(), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), false);
+  doc.fullscreenElement = null;
+  mod.apply(settingsWith(), 'watch');
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+  assert.equal(doc._root._vars.size, 0);
+});
+
+test('sidebar: scrollbar hidden class; smooth class', () => {
+  const doc = createFakeDocument();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary: createFakeElement() }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(settingsWith({ sidebar: { scrollbarVisible: false, smoothScroll: true } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-sidebar-hide-scrollbar'), true);
+  assert.equal(doc._root._classes.has('oneyt-sidebar-smooth'), true);
+});
+
+test('sidebar: wheel handler scales scroll only when sensitivity != 1', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  mod.apply(settingsWith({ sidebar: { scrollSensitivity: 2 } }), 'watch');
+  assert.equal((secondary._listeners.wheel || []).length, 1);
+  let prevented = false;
+  secondary.dispatch('wheel', {
+    deltaY: 100,
+    preventDefault: () => {
+      prevented = true;
+    },
+  });
+  assert.equal(prevented, true);
+  assert.equal(secondary.scrollTop, 200);
+
+  mod.apply(settingsWith({ sidebar: { scrollSensitivity: 1 } }), 'watch');
+  assert.equal((secondary._listeners.wheel || []).length, 0);
+});
+
+// ---------- Player ----------
+
+function playerSetup(options) {
+  const opts = options || {};
+  const doc = createFakeDocument();
+  const flexy = createFakeElement({ attrs: opts.theater ? { theater: '' } : {} });
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const mod = createPlayerModule({
+    dom: createFakeDom({ watchFlexy: flexy, playerContainer: container, player: moviePlayer }),
+    logger: quietLogger,
+    document: doc,
+  });
+  return { doc, flexy, container, moviePlayer, mod };
+}
+
+test('player: custom width + right alignment set classes and vars', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { customWidth: 800, alignment: 'right' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-sized'), true);
+  assert.equal(doc._root._classes.has('oneyt-player-align-right'), true);
+  assert.equal(doc._root._vars.get('--oneyt-player-width'), '800px');
+  assert.equal(doc._root._vars.get('--oneyt-player-max-width'), '1280px');
+  assert.equal(doc._root._classes.has('oneyt-player-styled'), true);
+});
+
+test('player: absolute position measures the container', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { position: 'absolute' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-absolute'), true);
+  assert.equal(doc._root._vars.get('--oneyt-player-fixed-width'), '800px');
+  assert.equal(doc._root._vars.get('--oneyt-player-height'), '450px');
+});
+
+test('player: legacy sticky boolean maps to sticky position', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { sticky: true } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-sticky'), true);
+});
+
+test('player: theater skips sizing/position but keeps appearance', () => {
+  const { doc, mod } = playerSetup({ theater: true });
+  mod.apply(settingsWith({ player: { customWidth: 800, position: 'fixed' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-sized'), false);
+  assert.equal(doc._root._classes.has('oneyt-player-fixed'), false);
+  assert.equal(doc._root._classes.has('oneyt-player-styled'), true);
+});
+
+test('player: fullscreen removes all classes; disable restores everything', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { customWidth: 800, position: 'sticky' } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-player-sticky'), true);
+  doc.fullscreenElement = createFakeElement();
+  mod.apply(settingsWith({ player: { customWidth: 800, position: 'sticky' } }), 'watch');
+  assert.equal(doc._root._classes.size, 0);
+  doc.fullscreenElement = null;
+  mod.apply(settingsWith({ player: { customWidth: 800 } }), 'watch');
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+  assert.equal(doc._root._vars.size, 0);
+});
+
+test('player: non-watch page applies nothing', () => {
+  const { doc, mod } = playerSetup();
+  mod.apply(settingsWith({ player: { customWidth: 800 } }), 'home');
+  assert.equal(doc._root._classes.size, 0);
+});
+
+// ---------- Layout ----------
+
+test('layout: hide comments + watch spacing on watch; cleanup elsewhere', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  mod.apply(settingsWith({ layout: { hideComments: true, watchSpacing: 24 } }), 'watch');
+  assert.equal(doc._root._classes.has('oneyt-hide-comments'), true);
+  assert.equal(doc._root._classes.has('oneyt-watch-spaced'), true);
+  assert.equal(doc._root._vars.get('--oneyt-watch-spacing'), '24px');
+  mod.apply(settingsWith(), 'home');
+  assert.equal(doc._root._classes.size, 0);
+  assert.equal(doc._root._vars.size, 0);
+  mod.apply(settingsWith({ layout: { hideComments: true, watchSpacing: 24 } }), 'watch');
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+});
+
+// ---------- Registration / manager integration ----------
+
+test('all three Phase 2 modules register and run through the manager', () => {
+  const doc = createFakeDocument();
+  const dom = createFakeDom({
+    secondary: createFakeElement(),
+    watchFlexy: createFakeElement(),
+    playerContainer: createFakeElement({ rect: { width: 800, height: 450, left: 0, top: 0 } }),
+    player: createFakeElement(),
+  });
+  const { createModuleManager } = require('../content/core/module-manager');
+  const mm = createModuleManager({ logger: quietLogger });
+  mm.register(createSidebarModule({ dom, logger: quietLogger, document: doc }));
+  mm.register(createPlayerModule({ dom, logger: quietLogger, document: doc }));
+  mm.register(createLayoutModule({ document: doc }));
+  assert.deepEqual(mm.listIds().sort(), ['layout', 'player', 'sidebar']);
+  mm.initAll({});
+  mm.updateAll(settingsWith(), 'watch');
+  assert.equal(mm.isEnabled('sidebar'), true);
+  assert.equal(mm.isEnabled('player'), true);
+  assert.equal(mm.isEnabled('layout'), true);
+  assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), true);
+  assert.equal(doc._root._classes.has('oneyt-player-styled'), true);
+  mm.updateAll(settingsWith(), 'home');
+  assert.equal(doc._root._classes.has('oneyt-sidebar-scroll'), false);
+  mm.destroy();
+});
