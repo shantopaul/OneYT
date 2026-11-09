@@ -583,15 +583,18 @@
       });
       var capturing = false;
       var onKey = function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key === 'Escape') {
+        // Escape cancels; Tab cancels too and must keep moving
+        // focus — binding 'Tab' as a shortcut would trap keyboard
+        // users in the field (Phase 6 accessibility pass).
+        if (event.key === 'Escape' || event.key === 'Tab') {
           capturing = false;
           input.value = getPath(state, control.key) || '';
           input.classList.remove('capturing');
           doc.removeEventListener('keydown', onKey, true);
           return;
         }
+        event.preventDefault();
+        event.stopPropagation();
         if (['Control', 'Shift', 'Alt', 'Meta'].indexOf(event.key) !== -1) return;
         var parts = [];
         if (event.ctrlKey) parts.push('Ctrl');
