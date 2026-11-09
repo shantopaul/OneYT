@@ -137,6 +137,16 @@
         toggleTheater: 'Shift+T',
       },
     },
+
+    navigation: {
+      hideHome: false,
+      hideShorts: false,
+      hideSubscriptions: false,
+      hideLibrary: false,
+      hideHistory: false,
+      compact: false, // mini guide (icons only)
+      guideWidth: 0, // px, 0 = YouTube default (min 72)
+    },
   };
 
   function isPlainObject(value) {

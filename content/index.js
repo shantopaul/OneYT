@@ -102,6 +102,9 @@
         })
       );
     }
+    if (ns.modules && ns.modules.navigation) {
+      moduleManager.register(ns.modules.navigation.createNavigationModule({ logger: logger }));
+    }
 
     var app = ns.app.createApp({
       logger: logger,

@@ -12,7 +12,8 @@
         "content/modules/typography/typography.css",
         "content/modules/playback/playback.css",
         "content/modules/focus/focus.css",
-        "content/modules/recommendations/recommendations.css"
+        "content/modules/recommendations/recommendations.css",
+        "content/modules/navigation/navigation.css"
       ],
       "js": [
         "shared/constants.js",
@@ -36,6 +37,7 @@
         "content/modules/focus/focus.js",
         "content/modules/recommendations/recommendations.js",
         "content/modules/keyboard/keyboard.js",
+        "content/modules/navigation/navigation.js",
         "content/core/app.js",
         "content/index.js"
       ],
