@@ -522,3 +522,31 @@ leave an empty gap where its section wrapper
 
 Notes / failures:
 - _…_
+
+---
+
+## Phase 16 — Presets / Profiles (v1.8) — live in the dashboard and popup
+
+No selectors under test: presets and profiles only write
+settings, and the modules apply them through the existing
+live-apply path. Known risks: the Profiles section is a
+custom render block (like Advanced) — check it renders and
+its buttons work; the popup picker lists profiles saved in
+the dashboard — check the list updates after saving one.
+
+- [ ] Open the dashboard — a Profiles section sits after General
+- [ ] Built-in presets are listed: Stock YouTube, Focus, Clean, Cinema, each with a description
+- [ ] Apply Focus — comments, recommendations and Shorts hide; the theme and speed you set before stay untouched
+- [ ] Apply Clean — counts hide and the theme switches to Minimal
+- [ ] Apply Cinema — the video opens in theater on a full-width player
+- [ ] Apply Stock YouTube — the hiding is undone, YouTube looks stock again
+- [ ] Save the current settings as a profile named "Test" — it appears in Your profiles (1/10)
+- [ ] Change a setting, then Apply "Test" — the settings return to the saved snapshot exactly
+- [ ] Rename "Test" to "Test 2" and delete it — the list updates, no errors
+- [ ] Try saving a profile named "Focus" — it is rejected (built-in name)
+- [ ] Open the popup — the Preset / Profile picker lists the 4 presets plus saved profiles
+- [ ] Pick Cinema in the popup — the open YouTube tab applies it live, no reload
+- [ ] Turn the extension off in the popup — the preset picker is disabled too
+
+Notes / failures:
+- _…_
