@@ -17,6 +17,59 @@ news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.15.0 (Phase 23 player accent color),
 1.16.0 (Phase 24 custom font).
 
+## 1.16.1 — 2026-11-10 (Code-check round 1)
+
+A read-only code audit of every feature (shared engines,
+content modules, dashboard, popup, onboarding, docs), then
+fixes for everything it confirmed. No new features; no
+behaviour change except where a bug is listed. Full report:
+`docs/CODE_CHECK.md`. Tests 220 → 264.
+
+Fixed:
+
+- Removed the dead `sidebar.keepPlayerVisible` setting:
+  the dashboard toggle and the Cinema preset set it, but
+  nothing ever read it.
+- `deepMerge` now repairs a `null` settings section (a
+  stored `{player: null}` used to wipe the whole section)
+  and only accepts boolean-or-null for `autoplay` /
+  `captions` (a hand-edited `"yes"` made playback click
+  the toggle on every apply).
+- Validators: brace/paren counting ignores strings and
+  comments (`content: "}"` is valid CSS); the `url()`
+  check now catches a quote smuggled into an unquoted
+  URL; the unknown-key warning says keys are kept, not
+  dropped.
+- One theme token owns each `--yt-spec-*` variable
+  (`card` no longer overwrites `surface`); the dead
+  `SCHEMA_VERSION` copy in `constants.js` is gone.
+- Profile/theme/health repair now drops entries that
+  shadow built-in names and rejects unknown page types.
+- Numeric settings are clamped at apply() time to their
+  dashboard ranges (a hand-edited import bypassed the
+  inputs); sidebar max-height is validated as CSS;
+  navigation compact wins over wide.
+- Stale theater waiters, starved health timers,
+  settings-manager echo notifies and key-order spurious
+  persists, scoped `waitFor`, history/library page
+  detection, and detached-video playback are fixed.
+- Dashboard: theme follows import/reset/preset/profile
+  actions; save failures report honestly (boolean +
+  red text); shortcut blur restore; colour reset;
+  speed-preset options refresh; unknown theme clamps to
+  default; delete confirms; independent load failures;
+  import size measured in bytes; onChanged refreshes
+  profiles, themes and the layout preview; search
+  indexes tool-box items; free-text CSS is
+  probe-validated before saving.
+- Popup: toggles share one in-memory settings copy with
+  chained writes (no lost fast toggles).
+- Onboarding: re-opening a finished setup applies the
+  theme; missing scripts show an error, not a blank page.
+- Dark primary buttons now meet WCAG AA 4.5 (`#e6002e` /
+  `#cc0027`); `--ui-accent` stays `#ff0033` for non-text
+  accents.
+
 ## 1.16.0 — 2026-11-09 (Custom Font, Phase 24)
 
 - One text setting `appearance.typography.customFont`
