@@ -4,7 +4,29 @@ All notable changes, newest first. Version numbers follow the
 phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts),
 1.2.0 (Phase 9 dashboard theme + search),
-1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts).
+1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts),
+1.5.0 (Phase 12 hide topic chips bar — unmerged branch
+`feature/hide-topic-chips`), 1.6.0 (Phase 14 default
+theater — unmerged branch `feature/default-theater`),
+1.7.0 (Phase 15 hide live / mixes / news shelves).
+
+## 1.7.0 — 2026-11-09 (Hide Live / Mixes / News Shelves, Phase 15)
+
+- **Hide Live / Mixes / News shelves**
+  (`layout.hideLiveShelf`, `layout.hideMixesShelf`,
+  `layout.hideNewsShelf`, all default off): three toggles
+  in the Layout section. They hide the "Live now" shelf,
+  Mixes, and the "Breaking news" shelf from the home feed
+  — the same treatment the Shorts shelves already get.
+  Shelves are matched by their title attribute; Mixes are
+  matched two ways (a Mixes shelf by title, plus the
+  individual mix cards by their radio link
+  `start_radio=1`, since mixes on home are grid items,
+  not a shelf). Home page only — the same shelves on
+  other pages stay. See `tests/manual-checklist.md`
+  Phase 15 for the live checks (title attributes are
+  English UI text; a hidden shelf may leave a gap where
+  its section wrapper stays).
 
 ## 1.4.0 — 2026-11-09 (Hide Counts, Phase 11)
 

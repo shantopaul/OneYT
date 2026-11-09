@@ -6,7 +6,7 @@
 
 **Your YouTube. Your Layout. Your Rules.**
 
-[![Version](https://img.shields.io/badge/version-1.4.0-FF0033)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.7.0-FF0033)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 [![Tests](https://img.shields.io/badge/tests-121%20passing-brightgreen)](tests/)
@@ -141,7 +141,7 @@ npm test             # 121 tests (node:test)
 npm run lint         # ESLint
 npm run format       # Prettier (check)
 npm run format:fix   # Prettier (write)
-npm run package      # builds oneyt-1.4.0.zip for the store
+npm run package      # builds oneyt-1.7.0.zip for the store
 ```
 
 **Before every commit:** tests green, lint clean, format
@@ -160,10 +160,13 @@ is complete.
 
 ## 🗺 Roadmap
 
-**v1.4.0** (current) — all 11 feature areas, sync, settings
+**v1.7.0** (current) — all 11 feature areas, sync, settings
 dashboard, store-ready packaging, Block Shorts, dashboard
 dark/light theme, optimised dashboard search, hide
-endscreen cards, hide like/view/subscriber counts.
+endscreen cards, hide like/view/subscriber counts, hide
+topic chips bar on Home (Phase 12, unmerged branch),
+default theater mode (Phase 14, unmerged branch), hide
+Live / Mixes / News shelves on Home.
 
 **v1.1** (planned) — the browser-only checks from the Phase 6
 bug bash: cross-browser and viewport verification, live
