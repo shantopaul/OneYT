@@ -6,11 +6,13 @@
  * dashboard reads it.
  *
  * Behaviour:
- * - One delayed check (2 s) per apply: YouTube loads
+ * - One delayed check (2 s) per page: YouTube loads
  *   elements late, so checking immediately would
- *   report working selectors as missing. Re-applying
- *   (SPA navigation, settings change) resets the timer,
- *   so the check always runs 2 s after the last apply.
+ *   report working selectors as missing. Re-applying on
+ *   the SAME page (resize, slider drag) keeps the pending
+ *   timer — restarting it on every apply would starve
+ *   the check forever. Navigation to another page
+ *   reschedules the check for that page.
  * - Page types with nothing to check (shorts, channel,
  *   playlist, other — no selector in the metadata lives
  *   there) skip the check entirely and write nothing.
@@ -51,6 +53,7 @@
     var nowFn = deps.now || Date.now;
 
     var timer = null;
+    var timerPage = null;
 
     function exists(key) {
       if (!dom || typeof dom.query !== 'function') return false;
@@ -80,12 +83,19 @@
 
     function scheduleCheck(page) {
       if (timer !== null) {
+        // A check is already pending for this page: keep it.
+        // Restarting the timer on every apply would starve
+        // the check during continuous resizes or slider
+        // drags. Only navigation to another page reschedules.
+        if (timerPage === page) return;
         clearTimeoutFn(timer);
         timer = null;
       }
       if (!healthApi || healthApi.selectorsForPage(page).length === 0) return;
+      timerPage = page;
       timer = setTimeoutFn(function () {
         timer = null;
+        timerPage = null;
         runCheck(page);
       }, CHECK_DELAY_MS);
     }
@@ -102,6 +112,7 @@
         clearTimeoutFn(timer);
         timer = null;
       }
+      timerPage = null;
     }
 
     return {
