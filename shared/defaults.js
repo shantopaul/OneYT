@@ -73,6 +73,7 @@
     },
 
     layout: {
+      blockShorts: false, // v1.1: hide Shorts everywhere + open /shorts/ links as normal videos
       hideShortsHome: false,
       hideShortsWatch: false,
       homeColumns: 0, // 0 = default
