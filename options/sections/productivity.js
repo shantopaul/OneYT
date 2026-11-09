@@ -12,7 +12,8 @@
         key: 'productivity.focusMode',
         type: 'toggle',
         label: 'Focus Mode',
-        description: 'Hide the distractions below on every YouTube tab. Shift+F toggles it for the current tab only.',
+        description:
+          'Hide the distractions below on every YouTube tab. Shift+F toggles it for the current tab only.',
         keywords: ['focus', 'distraction', 'mode'],
       },
       {
@@ -61,7 +62,8 @@
         key: 'productivity.focusHideNav',
         type: 'toggle',
         label: 'Hide guide in Focus Mode',
-        description: 'Hide the left guide while Focus Mode is on. Search and account are never hidden.',
+        description:
+          'Hide the left guide while Focus Mode is on. Search and account are never hidden.',
         keywords: ['focus', 'guide', 'navigation', 'hide'],
       },
     ],

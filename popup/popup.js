@@ -19,7 +19,7 @@
     var parsed;
     try {
       parsed = new URL(url);
-    } catch (err) {
+    } catch {
       return { onYouTube: false, label: 'Not on YouTube' };
     }
     var host = parsed.hostname || '';
@@ -32,8 +32,9 @@
     if (path === '/watch') return { onYouTube: true, label: 'Watch page' };
     if (path === '/' || path === '') return { onYouTube: true, label: 'Home' };
     if (path.indexOf('/shorts') === 0) return { onYouTube: true, label: 'Shorts' };
-    if (path.indexOf('/feed/subscriptions') === 0)
+    if (path.indexOf('/feed/subscriptions') === 0) {
       return { onYouTube: true, label: 'Subscriptions' };
+    }
     if (path.indexOf('/feed/library') === 0 || path.indexOf('/feed/you') === 0) {
       return { onYouTube: true, label: 'Library' };
     }
@@ -50,7 +51,9 @@
   }
 
   // Browser wiring only.
-  if (typeof document === 'undefined' || !document.getElementById('status')) return;
+  if (typeof document === 'undefined' || !document.getElementById('status')) {
+    return;
+  }
 
   var storage = ns.storage.createStorage();
   var defaultsApi = ns.defaults;

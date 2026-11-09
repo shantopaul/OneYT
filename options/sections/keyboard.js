@@ -25,7 +25,8 @@
   var section = {
     id: 'keyboard',
     title: 'Keyboard',
-    description: 'Custom keyboard shortcuts. Plain letters are YouTube-native keys — prefer Shift+ combinations.',
+    description:
+      'Custom keyboard shortcuts. Plain letters are YouTube-native keys — prefer Shift+ combinations.',
     controls: SHORTCUTS,
   };
 

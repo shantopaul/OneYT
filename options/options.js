@@ -12,6 +12,7 @@
  * Pure helpers (getPath/setPath/diffSettings/search) are exported
  * for Node tests. The DOM wiring only runs in the browser.
  */
+/* global Blob, FileReader, URL */
 (function () {
   'use strict';
 
@@ -242,7 +243,6 @@
 
     var state = defaultsApi.cloneDefaults();
     var saveTimer = null;
-    var root = doc.getElementById('options-root');
     var navEl = doc.getElementById('options-nav');
     var mainEl = doc.getElementById('options-main');
     var searchEl = doc.getElementById('options-search');
@@ -272,9 +272,12 @@
         clearTimeout(saveTimer);
         saveTimer = null;
       }
-      return storage.set({ [STORAGE_KEY]: state }).then(markSaved).catch(function () {
-        if (savedEl) savedEl.textContent = 'Save failed — try again';
-      });
+      return storage
+        .set({ [STORAGE_KEY]: state })
+        .then(markSaved)
+        .catch(function () {
+          if (savedEl) savedEl.textContent = 'Save failed — try again';
+        });
     }
 
     function saveSoon(delay) {
@@ -337,7 +340,7 @@
         set: function (value) {
           input.checked = !!value;
         },
-        bind: function (row) {
+        bind: function () {
           input.addEventListener('change', function () {
             setValue(control.key, input.checked, 0);
           });
@@ -693,7 +696,10 @@
       inputsByKey[control.key] = input;
       row.appendChild(input.node);
       row.appendChild(
-        el(doc, 'p', { class: 'control-default', text: 'Default: ' + formatValue(getDefault(control.key)) })
+        el(doc, 'p', {
+          class: 'control-default',
+          text: 'Default: ' + formatValue(getDefault(control.key)),
+        })
       );
       row.appendChild(el(doc, 'p', { class: 'control-warning', text: '' }));
       input.bind(row);
@@ -710,7 +716,11 @@
           text: 'Export downloads your settings as JSON. Import validates the file first, shows what would change, and only applies it when you confirm.',
         })
       );
-      var exportBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Export settings (JSON)' });
+      var exportBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn',
+        text: 'Export settings (JSON)',
+      });
       var importFile = el(doc, 'input', { type: 'file', accept: '.json,application/json' });
       var importText = el(doc, 'textarea', {
         class: 'control-input control-textarea',
@@ -759,7 +769,10 @@
         pendingImport = result.cleaned;
         if (result.warnings && result.warnings.length > 0) {
           previewEl.appendChild(
-            el(doc, 'p', { class: 'control-warning', text: 'Warnings: ' + result.warnings.join(' ') })
+            el(doc, 'p', {
+              class: 'control-warning',
+              text: 'Warnings: ' + result.warnings.join(' '),
+            })
           );
           previewEl.lastChild.style.display = 'block';
         }
@@ -770,7 +783,12 @@
           diff.forEach(function (change) {
             list.appendChild(
               el(doc, 'li', {
-                text: change.key + ': ' + formatValue(change.oldValue) + ' → ' + formatValue(change.newValue),
+                text:
+                  change.key +
+                  ': ' +
+                  formatValue(change.oldValue) +
+                  ' → ' +
+                  formatValue(change.newValue),
               })
             );
           });
@@ -788,7 +806,11 @@
         };
         reader.readAsText(file);
       });
-      var importBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Validate & preview' });
+      var importBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn',
+        text: 'Validate & preview',
+      });
       importBtn.addEventListener('click', function () {
         handleImportText(importText.value);
       });
@@ -818,7 +840,11 @@
       resetBox.appendChild(
         el(doc, 'p', { text: 'Restore every setting to its default. This cannot be undone.' })
       );
-      var resetAllBtn = el(doc, 'button', { type: 'button', class: 'btn btn-danger', text: 'Reset all settings' });
+      var resetAllBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-danger',
+        text: 'Reset all settings',
+      });
       resetAllBtn.addEventListener('click', function () {
         if (!window.confirm('Reset ALL OneYT settings to defaults?')) return;
         state = defaultsApi.cloneDefaults();
@@ -837,10 +863,19 @@
         if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
           version = chrome.runtime.getManifest().version || version;
         }
-      } catch (err) {
+      } catch {
         // Non-Chrome context (tests): keep the fallback.
       }
-      infoBox.appendChild(el(doc, 'p', { text: 'OneYT version ' + version + ' · Settings schema v' + state.schemaVersion + ' · All settings are stored locally on this device.' }));
+      infoBox.appendChild(
+        el(doc, 'p', {
+          text:
+            'OneYT version ' +
+            version +
+            ' · Settings schema v' +
+            state.schemaVersion +
+            ' · All settings are stored locally on this device.',
+        })
+      );
       sectionEl.appendChild(infoBox);
     }
 
@@ -967,7 +1002,13 @@
       });
     }
 
-    return { init: init, renderSection: renderSection, getState: function () { return state; } };
+    return {
+      init: init,
+      renderSection: renderSection,
+      getState: function () {
+        return state;
+      },
+    };
   }
 
   var api = {

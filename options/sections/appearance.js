@@ -105,7 +105,8 @@
           key: 'appearance.customCSSEnabled',
           type: 'toggle',
           label: 'Enable custom CSS',
-          description: 'Apply the custom CSS below. It is validated before it ever reaches the page.',
+          description:
+            'Apply the custom CSS below. It is validated before it ever reaches the page.',
           keywords: ['css', 'custom', 'enable'],
         },
         {
