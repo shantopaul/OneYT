@@ -18,10 +18,10 @@
 | **Date** | 2026-11-09 |
 | **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · **Phase 6 — Optimisation & Testing ✅ code complete, pushed to branch** (browser check still open) |
 | **Version** | 0.9.0 — release candidate (Phase 6) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`); branch `feature/Optimisation` pushed 2026-11-09, **not merged** |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`; PR #6 `feature/Optimisation` still open — not merged yet); branch `feature/Release` in progress (based on `feature/Optimisation`, so it carries Phase 6) |
 | **Code written** | Phases 1–6: all modules + dashboard (9 sections, 97 controls) + final popup + sync + 5 audit docs + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 6 code done; waiting for browser check + Phase 7 go-ahead) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open |
+| **Currently working on** | Phase 7 — Public Release (branch `feature/Release`) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3) and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
