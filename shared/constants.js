@@ -38,6 +38,14 @@
     // synced: a profile holds a full settings snapshot.
     PROFILES_STORAGE_KEY: 'oneyt.profiles.v1',
 
+    // Selector health records live under their own key in
+    // chrome.storage.local (Phase 18). Local only, never
+    // synced, never a setting: a runtime snapshot of which
+    // YouTube selectors matched on which page type, and
+    // when. The dashboard reads it; the health module
+    // writes it.
+    HEALTH_STORAGE_KEY: 'oneyt.health.v1',
+
     // Debounce intervals (ms) — see Rules.md: no storage spam
     // from sliders, no layout thrash from resize.
     DEBOUNCE: {

@@ -19,6 +19,7 @@
         "shared/constants.js",
         "shared/defaults.js",
         "shared/selectors.js",
+        "shared/health.js",
         "shared/storage.js",
         "shared/validators.js",
         "shared/themes.js",
@@ -38,6 +39,7 @@
         "content/modules/recommendations/recommendations.js",
         "content/modules/keyboard/keyboard.js",
         "content/modules/navigation/navigation.js",
+        "content/modules/health/health.js",
         "content/core/app.js",
         "content/index.js"
       ],
@@ -56,5 +58,5 @@
   "name": "OneYT — All-in-One YouTube Customizer",
   "options_page": "options/options.html",
   "permissions": ["activeTab", "storage"],
-  "version": "1.9.0"
+  "version": "1.10.0"
 }

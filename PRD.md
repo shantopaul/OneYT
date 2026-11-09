@@ -146,6 +146,7 @@ and must work flawlessly before anything else ships.
 | PL-15 | Hide live / mixes / news shelves | Three toggles; the "Live now" shelf, Mixes (shelf + mix cards), and the "Breaking news" shelf are hidden on the home feed; live apply |
 | PL-16 | Presets / Profiles | Four built-in presets (Stock YouTube, Focus, Clean, Cinema) applied in one click, plus named custom profiles that save the current settings as a snapshot and restore them exactly; dashboard Profiles section + popup picker; live apply; profiles stay on this device (never synced) |
 | PL-17 | Onboarding | A 3-step welcome setup on first install: pick a preset, pick the dashboard theme, done — the dashboard tour is the settings page itself; re-openable from the popup; never shown again once finished or skipped |
+| PL-18 | Selector health check | The extension checks its own YouTube selectors against the live page (one delayed check per page type, re-checked on every SPA navigation) and the dashboard shows, per feature, whether it is working, broken, or not seen on this visit — so a YouTube DOM change stops failing silently; no auto-disable (a missing selector at check time does not prove the feature is broken) |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.
