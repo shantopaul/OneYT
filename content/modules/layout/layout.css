@@ -92,3 +92,15 @@ html.oneyt-enabled.oneyt-thumb-sized ytd-rich-item-renderer ytd-thumbnail {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* Home feed max width (layout.homeMaxWidth, v1.14): cap
+ * the home grid and centre it — the ultrawide fix.
+ * The class is set on home pages alone, so watch/search
+ * grids are untouched. Verify live — on a narrow
+ * viewport a cap below the viewport width leaves empty
+ * space on both sides of the feed by design. */
+html.oneyt-enabled.oneyt-home-max-width ytd-rich-grid-renderer {
+  max-width: var(--oneyt-home-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
