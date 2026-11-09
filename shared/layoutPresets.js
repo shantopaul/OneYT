@@ -113,9 +113,7 @@
     var gap =
       typeof layout.cardSpacing === 'number' && layout.cardSpacing > 0 ? layout.cardSpacing : 12;
     var maxWidth =
-      typeof layout.homeMaxWidth === 'number' && layout.homeMaxWidth > 0
-        ? layout.homeMaxWidth
-        : 0;
+      typeof layout.homeMaxWidth === 'number' && layout.homeMaxWidth > 0 ? layout.homeMaxWidth : 0;
     return { columns: columns, gap: gap, maxWidth: maxWidth };
   }
 
