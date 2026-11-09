@@ -1,0 +1,163 @@
+// OneYT — dashboard section: Player.
+// Player sizing/position/appearance + mini-player.
+(function () {
+  'use strict';
+
+  var section = {
+    id: 'player',
+    title: 'Player',
+    description: 'Video player size, position, appearance and mini-player.',
+    controls: [
+      {
+        key: 'player.customWidth',
+        type: 'number',
+        label: 'Player width',
+        description: 'Width in pixels. 0 = YouTube default.',
+        min: 0,
+        max: 2000,
+        step: 10,
+        unit: 'px',
+        keywords: ['player', 'width', 'size'],
+      },
+      {
+        key: 'player.maxWidth',
+        type: 'number',
+        label: 'Player max width',
+        description: 'Maximum width in pixels. 0 = no cap.',
+        min: 0,
+        max: 2000,
+        step: 10,
+        unit: 'px',
+        keywords: ['player', 'max', 'width'],
+      },
+      {
+        key: 'player.alignment',
+        type: 'select',
+        label: 'Player alignment',
+        description: 'Horizontal alignment when a custom width is set.',
+        source: 'alignments',
+        keywords: ['player', 'align', 'left', 'center', 'right'],
+      },
+      {
+        key: 'player.position',
+        type: 'select',
+        label: 'Player position',
+        description: 'How the player behaves while scrolling.',
+        source: 'positions',
+        keywords: ['player', 'position', 'sticky', 'fixed', 'absolute'],
+      },
+      {
+        key: 'player.sticky',
+        type: 'toggle',
+        label: 'Sticky player (legacy)',
+        description: 'Legacy alias for position "sticky". Prefer the position setting above.',
+        keywords: ['player', 'sticky'],
+      },
+      {
+        key: 'player.borderRadius',
+        type: 'number',
+        label: 'Player corner radius',
+        description: 'Rounded corners in pixels.',
+        min: 0,
+        max: 32,
+        step: 1,
+        unit: 'px',
+        keywords: ['player', 'radius', 'corners', 'rounded'],
+      },
+      {
+        key: 'player.border',
+        type: 'text',
+        label: 'Player border',
+        description: 'CSS border shorthand, or "none".',
+        placeholder: 'none',
+        keywords: ['player', 'border'],
+      },
+      {
+        key: 'player.shadow',
+        type: 'text',
+        label: 'Player shadow',
+        description: 'CSS box-shadow, or "none".',
+        placeholder: 'none',
+        keywords: ['player', 'shadow'],
+      },
+      {
+        key: 'player.spacing',
+        type: 'number',
+        label: 'Player spacing',
+        description: 'Space below the player in pixels.',
+        min: 0,
+        max: 100,
+        step: 1,
+        unit: 'px',
+        keywords: ['player', 'spacing', 'margin'],
+      },
+      {
+        key: 'player.miniPlayer.size',
+        type: 'number',
+        label: 'Mini-player width',
+        description: 'Width in pixels. 0 = YouTube default.',
+        min: 0,
+        max: 800,
+        step: 10,
+        unit: 'px',
+        keywords: ['mini-player', 'miniplayer', 'width', 'size'],
+      },
+      {
+        key: 'player.miniPlayer.position',
+        type: 'select',
+        label: 'Mini-player position',
+        description: 'Which corner the mini-player sticks to.',
+        source: 'miniPositions',
+        keywords: ['mini-player', 'miniplayer', 'position', 'corner'],
+      },
+      {
+        key: 'player.miniPlayer.borderRadius',
+        type: 'number',
+        label: 'Mini-player corner radius',
+        description: 'Rounded corners in pixels. 0 = YouTube default.',
+        min: 0,
+        max: 32,
+        step: 1,
+        unit: 'px',
+        keywords: ['mini-player', 'radius', 'corners'],
+      },
+      {
+        key: 'player.miniPlayer.shadow',
+        type: 'text',
+        label: 'Mini-player shadow',
+        description: 'CSS box-shadow, or "none".',
+        placeholder: 'none',
+        keywords: ['mini-player', 'shadow'],
+      },
+      {
+        key: 'player.miniPlayer.offsetX',
+        type: 'number',
+        label: 'Mini-player horizontal offset',
+        description: 'Distance from the chosen corner in pixels.',
+        min: 0,
+        max: 500,
+        step: 1,
+        unit: 'px',
+        keywords: ['mini-player', 'offset', 'horizontal'],
+      },
+      {
+        key: 'player.miniPlayer.offsetY',
+        type: 'number',
+        label: 'Mini-player vertical offset',
+        description: 'Distance from the chosen corner in pixels.',
+        min: 0,
+        max: 500,
+        step: 1,
+        unit: 'px',
+        keywords: ['mini-player', 'offset', 'vertical'],
+      },
+    ],
+  };
+
+  var ns = (globalThis.OneYT = globalThis.OneYT || {});
+  ns.optionsSections = ns.optionsSections || {};
+  ns.optionsSections.player = section;
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = section;
+  }
+})();
