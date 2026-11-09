@@ -76,6 +76,13 @@
         })
       );
     }
+    // Kept in a variable: the keyboard module's toggleFocus action
+    // calls focusModule.toggleTab() (wired below).
+    var focusModule = null;
+    if (ns.modules && ns.modules.focus) {
+      focusModule = ns.modules.focus.createFocusModule({ logger: logger });
+      moduleManager.register(focusModule);
+    }
 
     var app = ns.app.createApp({
       logger: logger,

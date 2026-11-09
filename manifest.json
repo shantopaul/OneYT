@@ -10,7 +10,8 @@
         "content/modules/layout/layout.css",
         "content/modules/appearance/appearance.css",
         "content/modules/typography/typography.css",
-        "content/modules/playback/playback.css"
+        "content/modules/playback/playback.css",
+        "content/modules/focus/focus.css"
       ],
       "js": [
         "shared/constants.js",
@@ -31,6 +32,7 @@
         "content/modules/appearance/appearance.js",
         "content/modules/typography/typography.js",
         "content/modules/playback/playback.js",
+        "content/modules/focus/focus.js",
         "content/core/app.js",
         "content/index.js"
       ],

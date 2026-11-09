@@ -110,6 +110,9 @@
       focusHideChat: true,
       focusHideRecommendations: true,
       focusHideShorts: true,
+      focusHideButtons: true, // like/share/download row
+      focusHideMetadata: true, // video description
+      focusHideNav: true, // guide only — masthead (search/account) is never hidden
     },
 
     keyboard: {
