@@ -85,6 +85,23 @@ html.oneyt-enabled.oneyt-player-styled #primary #player {
   margin-bottom: var(--oneyt-player-spacing, 0px);
 }
 
+/* --- Player accent (Phase 23) ---
+ * Recolours the played portion of the progress bar and
+ * the scrubber knob with the user's accent colour. Only
+ * these two hooks: the buffered portion keeps YouTube's
+ * own colour so played vs buffered stays readable.
+ * Class-only hiding-style restore: removing the class
+ * brings YouTube red back exactly. Works in theater too
+ * (the class is set in the theater-safe section of
+ * apply()). Verify live — YouTube renames DOM elements. */
+html.oneyt-enabled.oneyt-player-accent #movie_player .ytp-play-progress {
+  background: var(--oneyt-player-accent);
+}
+
+html.oneyt-enabled.oneyt-player-accent #movie_player .ytp-scrubber-button {
+  background: var(--oneyt-player-accent);
+}
+
 /* --- Endscreen (Phase 10) ---
  * Hides the video suggestions shown at the end of a video.
  * Class-only hiding, like the focus module: removing the
