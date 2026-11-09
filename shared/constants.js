@@ -33,13 +33,6 @@
     // chrome.storage keys
     STORAGE_KEY: 'oneyt.settings.v1',
 
-    // Runtime message types (popup/dashboard <-> content script,
-    // relayed through the service worker where needed)
-    MESSAGES: {
-      GET_STATE: 'oneyt:get-state',
-      SET_SETTING: 'oneyt:set-setting',
-    },
-
     // Debounce intervals (ms) — see Rules.md: no storage spam
     // from sliders, no layout thrash from resize.
     DEBOUNCE: {

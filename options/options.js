@@ -750,6 +750,13 @@
         previewEl.textContent = '';
         applyBtn.style.display = 'none';
         pendingImport = null;
+        var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
+        if (text.length > maxBytes) {
+          importMsg.textContent =
+            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+          importMsg.style.display = 'block';
+          return;
+        }
         var data;
         try {
           data = JSON.parse(text);
