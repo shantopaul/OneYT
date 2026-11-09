@@ -1882,6 +1882,42 @@
       });
     }
 
+    // Tool-box items have no control row, so they are not in
+    // buildSearchIndex's static section list. They are
+    // appended at search time (profiles and saved themes are
+    // dynamic): activating one switches to its section, with
+    // no row to scroll to.
+    function dynamicSearchEntries() {
+      var entries = [];
+      var add = function (sectionId, sectionTitle, label, description, keywords) {
+        entries.push({
+          key: '',
+          sectionId: sectionId,
+          sectionTitle: sectionTitle,
+          label: label,
+          description: description,
+          haystack: [sectionTitle, label, description, keywords].join(' ').toLowerCase(),
+        });
+      };
+      if (cssTemplatesApi && cssTemplatesApi.CSS_TEMPLATES) {
+        cssTemplatesApi.CSS_TEMPLATES.forEach(function (t) {
+          add('appearance', 'Appearance', 'CSS template: ' + t.name, t.description || '', 'css template');
+        });
+      }
+      if (layoutPresetsApi && layoutPresetsApi.LAYOUT_PRESETS) {
+        layoutPresetsApi.LAYOUT_PRESETS.forEach(function (p) {
+          add('layout', 'Layout', 'Layout preset: ' + p.name, p.description || '', 'layout preset');
+        });
+      }
+      profiles.forEach(function (profile) {
+        add('profiles', 'Profiles', 'Profile: ' + profile.name, 'Saved profile', 'profile');
+      });
+      savedThemes.forEach(function (theme) {
+        add('appearance', 'Appearance', 'Saved theme: ' + theme.name, 'Saved theme', 'theme');
+      });
+      return entries;
+    }
+
     function bindSearch() {
       if (!searchEl || !resultsEl) return;
       var MAX_RESULTS = 8;
@@ -1930,7 +1966,7 @@
           .toLowerCase()
           .split(/\s+/)
           .filter(Boolean);
-        currentResults = searchSettings(searchIndex, query);
+        currentResults = searchSettings(searchIndex.concat(dynamicSearchEntries()), query);
         resultItems = [];
         activeIndex = -1;
         resultsEl.textContent = '';

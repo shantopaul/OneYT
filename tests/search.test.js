@@ -86,3 +86,46 @@ test('search: dropdown is anchored to its wrapper, not the topbar', () => {
   assert.match(css, /\.search-results\s*\{[^}]*top:\s*calc\(100% \+ 6px\)/);
   assert.doesNotMatch(css, /top:\s*56px/);
 });
+
+test('search: tool-box entries (no control key) are searchable and rank by label', () => {
+  const index = [
+    entry('appearance.theme', 'Appearance', 'Theme', 'pick a theme'),
+    {
+      key: '',
+      sectionId: 'appearance',
+      sectionTitle: 'Appearance',
+      label: 'CSS template: Hide duration badges',
+      description: 'Hides the length badge on video thumbnails.',
+      haystack: 'appearance css template: hide duration badges hides the length badge css template',
+    },
+    {
+      key: '',
+      sectionId: 'profiles',
+      sectionTitle: 'Profiles',
+      label: 'Profile: Focus',
+      description: 'Saved profile',
+      haystack: 'profiles profile: focus saved profile profile',
+    },
+  ];
+  assert.deepEqual(
+    options.searchSettings(index, 'duration').map((e) => e.label),
+    ['CSS template: Hide duration badges']
+  );
+  assert.deepEqual(
+    options.searchSettings(index, 'focus').map((e) => e.label),
+    ['Profile: Focus']
+  );
+});
+
+test('search: dashboard appends dynamic tool-box entries at search time', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(src.includes('function dynamicSearchEntries()'), 'dynamic entries helper exists');
+  assert.ok(
+    src.includes('searchIndex.concat(dynamicSearchEntries())'),
+    'renderResults searches the static index plus tool-box entries'
+  );
+  assert.ok(src.includes('CSS_TEMPLATES.forEach'), 'CSS templates indexed');
+  assert.ok(src.includes('LAYOUT_PRESETS.forEach'), 'layout presets indexed');
+  assert.ok(src.includes("add('profiles', 'Profiles', 'Profile: '"), 'profiles indexed');
+  assert.ok(src.includes("add('appearance', 'Appearance', 'Saved theme: '"), 'themes indexed');
+});
