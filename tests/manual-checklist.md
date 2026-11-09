@@ -51,3 +51,59 @@ Performance / privacy (DevTools):
 
 Notes / failures:
 - _…_
+
+---
+
+# Phase 2 Manual Checklist (browser) — Core Layout
+
+Run on a watch page, after loading the `feature/core` branch
+unpacked. Tick only after verifying in the browser.
+
+Independent sidebar scrolling (flagship):
+- [ ] Scroll the mouse wheel over the recommendations sidebar —
+      only the sidebar scrolls, the player stays visible
+- [ ] Video keeps playing while scrolling recommendations
+- [ ] Sidebar scrollbar appears, width matches the setting
+- [ ] Toggle `sidebar.independentScroll` off in storage (or via
+      a future dashboard) — page scroll returns to normal
+
+Player sizing / alignment:
+- [ ] Set `player.customWidth` (e.g. 900) — player widens live,
+      no reload; survives watch → watch SPA navigation
+- [ ] Alignment left / center / right — player moves, no overlap
+      with the sidebar
+- [ ] Set `player.customWidth` back to 0 — YouTube default returns
+
+Player position:
+- [ ] `position: sticky` — player column stays visible on scroll
+- [ ] `position: fixed` — player stays fixed; title/comments do
+      NOT jump up underneath it
+- [ ] `position: absolute` — same, no overlap with sidebar or
+      title; no horizontal scrollbar
+- [ ] `position: default` — YouTube's own layout returns exactly
+
+Player appearance:
+- [ ] Border radius / border / shadow / spacing apply and reset
+
+Fullscreen / theater:
+- [ ] Fullscreen — all OneYT player positioning disappears,
+      native fullscreen controls work, exit restores settings
+- [ ] Theater toggle on/off — sizing/position suspend in theater,
+      appearance stays; no breakage toggling back
+
+Responsive / disable:
+- [ ] Widths 1280 / 1440 / 1920 — no overlap, no horizontal scrollbar
+- [ ] Resize the window — layout updates, no thrash
+- [ ] Disable the sidebar module — sidebar returns to YouTube
+      default exactly; disable the player module — same
+- [ ] Hide comments (`layout.hideComments`) — `#comments` hides;
+      toggle off — returns
+
+Selector sanity (live YouTube DOM):
+- [ ] `#primary #player` exists on a watch page (player module's
+      fixed/absolute anchor). If it is missing/renamed, note it
+      here and fix `shared/selectors.js`:
+      - _notes:_
+
+Notes / failures:
+- _…_
