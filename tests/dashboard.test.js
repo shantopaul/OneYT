@@ -337,3 +337,31 @@ test('dashboard: control fixes — shortcut blur restore, colour reset, speed op
   assert.ok(src.includes("if (control.source === 'themes')"));
   assert.ok(src.includes("if (names.indexOf(String(value)) === -1) v = 'default';"));
 });
+
+test('dashboard: deletes confirm, loads fail independently, import size is bytes', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  // B10: profile and saved-theme deletes confirm first, like reset-all.
+  assert.ok(src.includes('Delete profile "'), 'profile delete confirms');
+  assert.ok(src.includes('Delete theme "'), 'saved-theme delete confirms');
+  // B11: each storage read in load() has its own catch.
+  assert.ok(
+    src.includes('storage.get(STORAGE_KEY).catch(function () {'),
+    'settings read fails independently'
+  );
+  assert.ok(
+    src.includes('storage.get(PROFILES_KEY).catch(function () {'),
+    'profiles read fails independently'
+  );
+  assert.ok(
+    src.includes('storage.get(HEALTH_KEY).catch(function () {'),
+    'health read fails independently'
+  );
+  assert.ok(
+    src.includes('storage.get(SAVED_THEMES_KEY).catch(function () {'),
+    'themes read fails independently'
+  );
+  // B13: import size is measured in bytes, not UTF-16 units.
+  assert.ok(src.includes('new TextEncoder().encode(text).length'), 'byte length measured');
+  assert.ok(!src.includes("text.length > maxBytes"), 'no UTF-16 length check remains');
+  assert.ok(src.includes("' bytes, max '"), 'message reports bytes');
+});

@@ -940,9 +940,12 @@
         applyBtn.style.display = 'none';
         pendingImport = null;
         var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
-        if (text.length > maxBytes) {
+        // text.length counts UTF-16 units, not bytes: a file
+        // of 200k emoji is ~400k bytes. Measure real bytes.
+        var byteLength = new TextEncoder().encode(text).length;
+        if (byteLength > maxBytes) {
           importMsg.textContent =
-            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+            'Import is too large (' + byteLength + ' bytes, max ' + maxBytes + ' bytes).';
           importMsg.style.display = 'block';
           return;
         }
@@ -1260,6 +1263,7 @@
           text: 'Delete',
         });
         deleteBtn.addEventListener('click', function () {
+          if (!window.confirm('Delete profile "' + profile.name + '"?')) return;
           profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
           saveProfiles().then(function () {
             profilesNotice = 'Deleted profile "' + profile.name + '".';
@@ -1518,6 +1522,7 @@
           text: 'Delete',
         });
         deleteBtn.addEventListener('click', function () {
+          if (!window.confirm('Delete theme "' + savedTheme.name + '"?')) return;
           savedThemes = savedThemesApi.deleteSavedTheme(savedThemes, savedTheme.name, themesApi);
           saveSavedThemes().then(function () {
             savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
@@ -1561,9 +1566,12 @@
         addBtn.style.display = 'none';
         pendingTheme = null;
         var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
-        if (text.length > maxBytes) {
+        // text.length counts UTF-16 units, not bytes: measure
+        // real bytes (see the settings import above).
+        var byteLength = new TextEncoder().encode(text).length;
+        if (byteLength > maxBytes) {
           importMsg.textContent =
-            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+            'Import is too large (' + byteLength + ' bytes, max ' + maxBytes + ' bytes).';
           importMsg.style.display = 'block';
           return;
         }
@@ -1990,11 +1998,23 @@
     }
 
     function load() {
+      // Each read fails independently: one failing get used
+      // to reset ALL state (settings, profiles, health,
+      // themes) to defaults. The migrate/validate functions
+      // already treat undefined as "use defaults".
       return Promise.all([
-        storage.get(STORAGE_KEY),
-        storage.get(PROFILES_KEY),
-        storage.get(HEALTH_KEY),
-        storage.get(SAVED_THEMES_KEY),
+        storage.get(STORAGE_KEY).catch(function () {
+          return undefined;
+        }),
+        storage.get(PROFILES_KEY).catch(function () {
+          return undefined;
+        }),
+        storage.get(HEALTH_KEY).catch(function () {
+          return undefined;
+        }),
+        storage.get(SAVED_THEMES_KEY).catch(function () {
+          return undefined;
+        }),
       ])
         .then(function (results) {
           state = defaultsApi.migrateSettings(results[0]);
