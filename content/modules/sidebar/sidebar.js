@@ -146,7 +146,12 @@
             .waitFor('secondary')
             .then(function () {
               waitPending = false;
-              if (lastSettings) apply(lastSettings, lastPage);
+              // Only re-apply when the element actually arrived;
+              // otherwise a never-appearing element would loop
+              // waitFor -> apply -> waitFor forever.
+              if (dom.query('secondary') && lastSettings) {
+                apply(lastSettings, lastPage);
+              }
             })
             .catch(function () {
               waitPending = false;

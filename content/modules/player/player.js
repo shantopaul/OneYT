@@ -127,21 +127,11 @@
     function observeTheater() {
       if (theaterObserved || typeof MutationObserver === 'undefined') return;
       var flexy = dom ? dom.query('watchFlexy') : null;
-      if (!flexy || typeof flexy.addEventListener !== 'function') {
-        // watchFlexy itself may arrive late; waitFor handles it.
-        if (!waitPending && dom && dom.waitFor) {
-          waitPending = true;
-          dom
-            .waitFor('watchFlexy')
-            .then(function () {
-              waitPending = false;
-              observeTheater();
-              if (lastSettings) apply(lastSettings, lastPage);
-            })
-            .catch(function () {
-              waitPending = false;
-            });
-        }
+      if (!flexy) {
+        // watchFlexy may arrive late; apply() calls observeTheater()
+        // on every navigation / settings / resize update, so the
+        // observer attaches then. No waitFor here: retrying blindly
+        // could loop forever when the element never appears.
         return;
       }
       theaterObserved = true;
@@ -230,7 +220,12 @@
             .waitFor('playerContainer')
             .then(function () {
               waitPending = false;
-              if (lastSettings) apply(lastSettings, lastPage);
+              // Only re-apply when the element actually arrived;
+              // otherwise a never-appearing element would loop
+              // waitFor -> apply -> waitFor forever.
+              if (dom.query('playerContainer') && lastSettings) {
+                apply(lastSettings, lastPage);
+              }
             })
             .catch(function () {
               waitPending = false;
