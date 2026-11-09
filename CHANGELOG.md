@@ -8,7 +8,20 @@ phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.5.0 (Phase 12 hide topic chips bar), 1.6.0 (Phase 14
 default theater), 1.7.0 (Phase 15 hide live / mixes /
 news shelves), 1.8.0 (Phase 16 presets / profiles),
-1.9.0 (Phase 17 onboarding).
+1.9.0 (Phase 17 onboarding),
+1.10.0 (Phase 18 selector health check).
+
+## 1.10.0 — 2026-11-09 (Selector Health Check, Phase 18)
+
+- The extension now checks its own YouTube selectors
+  against the live page (one delayed check per page
+  type, re-checked on every navigation) and the
+  dashboard's new Health section shows, per feature,
+  whether it is working, not working, or not seen on
+  this visit — so a YouTube DOM change stops failing
+  silently. Deliberately no auto-disable: a missing
+  selector at check time does not prove the feature is
+  broken. No new permission, no new host.
 
 ## 1.9.0 — 2026-11-09 (Onboarding, Phase 17)
 
