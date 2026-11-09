@@ -10,6 +10,10 @@
  *   height on #primary (padding-top) so the title/comments do
  *   not jump up underneath it.
  * - Appearance: border radius, border, shadow, spacing.
+ * - Player accent (Phase 23): when player.accentColor
+ *   is a #rrggbb hex, the played progress bar and the
+ *   scrubber knob take that colour (class + variable,
+ *   theater-safe); empty/invalid means YouTube red.
  * - Default theater (Phase 14): when player.defaultTheater
  *   is on, the theater button is clicked once per video so
  *   every video opens in theater mode. See enableTheater()
@@ -55,6 +59,7 @@
     '--oneyt-player-border',
     '--oneyt-player-shadow',
     '--oneyt-player-spacing',
+    '--oneyt-player-accent',
     '--oneyt-player-offset',
     '--oneyt-player-fixed-left',
     '--oneyt-player-fixed-width',
@@ -70,6 +75,7 @@
     'oneyt-player-fixed',
     'oneyt-player-absolute',
     'oneyt-player-styled',
+    'oneyt-player-accent',
     'oneyt-player-hide-endscreen',
     'oneyt-player-hide-like-count',
     'oneyt-player-hide-view-count',
@@ -146,6 +152,15 @@
 
     function currentUrl() {
       return loc && typeof loc.href === 'string' ? loc.href : '';
+    }
+
+    // Player accent (Phase 23): only a #rrggbb hex counts.
+    // Anything else (empty, a colour name, a 3-digit hex, a
+    // hand-edited import) means YouTube's default red — the
+    // dashboard colour control only ever writes '' or
+    // #rrggbb, so a stored value outside that is corrupt.
+    function validAccent(value) {
+      return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value) ? value : '';
     }
 
     // Default theater (Phase 14): click the theater button
@@ -411,6 +426,8 @@
       setVar('--oneyt-player-border', pl.border && pl.border !== 'none' ? pl.border : null);
       setVar('--oneyt-player-shadow', pl.shadow && pl.shadow !== 'none' ? pl.shadow : null);
       setVar('--oneyt-player-spacing', pl.spacing && pl.spacing > 0 ? pl.spacing + 'px' : null);
+      var accent = validAccent(pl.accentColor);
+      setVar('--oneyt-player-accent', accent);
       var offset =
         settings.sidebar && settings.sidebar.playerOffset ? settings.sidebar.playerOffset : 0;
       setVar('--oneyt-player-offset', offset > 0 ? offset + 'px' : null);
@@ -432,6 +449,7 @@
 
       // --- Appearance (safe in theater too) ---
       setClass('oneyt-player-styled', true);
+      setClass('oneyt-player-accent', accent !== '');
       setClass('oneyt-player-hide-endscreen', pl.hideEndscreen === true);
       setClass('oneyt-player-hide-like-count', pl.hideLikeCount === true);
       setClass('oneyt-player-hide-view-count', pl.hideViewCount === true);

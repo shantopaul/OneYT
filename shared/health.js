@@ -102,6 +102,8 @@
     likeCountText: { pages: ['watch'], feature: 'Like count', presence: 'always' },
     viewCountText: { pages: ['watch'], feature: 'View count', presence: 'always' },
     subscriberCount: { pages: ['watch'], feature: 'Subscriber count', presence: 'always' },
+    playProgress: { pages: ['watch'], feature: 'Player accent color', presence: 'always' },
+    scrubberButton: { pages: ['watch'], feature: 'Player accent color', presence: 'always' },
     chat: { pages: ['watch'], feature: 'Live chat', presence: 'sometimes' },
     actions: { pages: ['watch'], feature: 'Action row (like / share)', presence: 'always' },
     description: { pages: ['watch'], feature: 'Video description', presence: 'always' },

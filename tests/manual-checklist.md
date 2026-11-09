@@ -636,3 +636,19 @@ Notes / failures:
 
 Notes / failures:
 - _…_
+
+## Phase 23 — Player Accent Color (v1.15) — live in Chrome
+
+- [ ] Dashboard → Player: a "Player accent color" picker sits after "Player spacing" — empty by default (YouTube red)
+- [ ] Pick a colour (e.g. #00aaff): open a watch page — the played portion of the progress bar and the scrubber knob turn that colour immediately, no reload
+- [ ] The buffered portion stays YouTube's own colour — played vs buffered is still easy to tell apart
+- [ ] Theater mode: the accent stays on the wide player. Fullscreen: the bar goes back to YouTube red; exiting fullscreen brings the accent back
+- [ ] Clear the colour (Clear button): the bar and knob go back to YouTube red immediately, no reload
+- [ ] Type "red" (not a hex) into the colour text box: a warning shows, the value is rejected, and the player keeps its previous colour
+- [ ] Import settings JSON with `"accentColor": "red"`: the import applies but the player stays YouTube red (invalid hex is ignored, never applied)
+- [ ] Dashboard → Health on a watch page: the "Player accent color" row reads Working
+- [ ] The accent is independent of the theme accent: set Appearance → Accent to a different colour and the player keeps its own accent colour
+- [ ] If the accent does nothing on the live page, check the real elements in DevTools (right-click → Inspect) and note the selectors YouTube actually uses — `.ytp-play-progress` / `.ytp-scrubber-button` are DOM hooks and YouTube renames them
+
+Notes / failures:
+- _…_

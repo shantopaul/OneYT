@@ -57,6 +57,7 @@
       border: 'none', // CSS border shorthand or "none"
       shadow: 'none', // CSS box-shadow or "none"
       spacing: 0, // px around player
+      accentColor: '', // #rrggbb = recolour the progress bar + scrubber knob; '' = YouTube default red (Phase 23)
       sticky: false,
       defaultTheater: false, // open every video in theater mode automatically
       hideEndscreen: false, // hide the video suggestions shown at the end of a video

@@ -1113,7 +1113,7 @@ wiring, tests, checklist, version, docs.
   the live page is the proof
   (`tests/manual-checklist.md` Phase 22).
 **Status 2026-11-09:** code complete on branch
-`feature/layout-editor` (9 part-by-part commits on top
+`feature/layout-editor` (10 part-by-part commits on top
 of `main` `1324f15`, pushed after completion) and
 **merged to `main` — merge `e581692`, `main` now
 `e581692`** (per the standing rule: feature complete →
@@ -1131,6 +1131,67 @@ script pin 22 → 23), `33490a3` tests (11 new),
 format, `6e0f71f` version 1.14.0, docs (this commit).
 **Browser verification still open** — the live page
 is the proof (`tests/manual-checklist.md` Phase 22).
+
+## Phase 23 — Player Accent Color (v1.15) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** the red progress bar is YouTube's colour, not the
+user's. One colour setting recolours the played portion
+of the progress bar and the scrubber knob, so the player
+matches the user's theme instead of always shouting red.
+
+**Deliverable:** v1.15.0.
+
+**Plan (part-by-part, push only when complete):** one new
+setting `player.accentColor` (string, default `''` —
+empty means YouTube's default red; a `#rrggbb` value
+overrides it; additive, old settings migrate with the
+default). Two selector keys in `shared/selectors.js`
+(count 31 → 33) — `playProgress: '.ytp-play-progress'`
+(the played portion) and `scrubberButton:
+'.ytp-scrubber-button'` (the knob) — sourced from
+several independent userstyles (Youtube Cybercore,
+Gura, Acheron, YouTube Custom Color, Youtube Retouch,
+xlvxlv, V3-2011 player all recolour these two hooks);
+health metadata for both (watch, `always`, feature
+'Player accent color'). The player module sets class
+`oneyt-player-accent` + variable
+`--oneyt-player-accent` in the theater-safe Appearance
+section of `apply()` (so it works in theater too, and
+is cleared off watch pages and in fullscreen like every
+player class); an invalid hex (e.g. from a hand-edited
+import) is treated as empty — no var, no class, the
+page keeps YouTube's red. `player.css` recolours only
+those two elements under `#movie_player`; the buffered
+portion (`.ytp-load-progress`) is deliberately left
+alone so played vs buffered stays readable. Dashboard:
+one `color` control in the Player section (the existing
+picker + text + Clear control type) after "Player
+spacing". Module tests + manual checklist item.
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 23).
+**Honest limits:** the volume slider is out of scope
+(its fill hook appears in only one source, not enough
+to trust); if YouTube renames `.ytp-play-progress` /
+`.ytp-scrubber-button`, the accent silently does
+nothing and the Health section reports it; the accent
+is independent of the appearance theme accent — it
+recolours the player only, not the page.
+**Status 2026-11-09:** code complete on branch
+`feature/player-accent-color` (10 part-by-part commits on top
+of `main` `cd49ebb`, pushed after completion).
+`npm test` 217/217 pass (214 baseline + 3 new), lint +
+format clean, manifest valid, `npm run package` builds
+a clean `oneyt-1.15.0.zip` (runtime files only).
+**Done:** `b8f948f` start (PRD PL-23 + plan),
+`eacebf8` setting (`player.accentColor`), `8e7763f`
+selectors (count 31 → 33) + health metadata,
+`8ae49c7` player module + CSS, `a48f1ec` dashboard
+picker, `bbd9191` tests (3 new), `3a6bd88` fix —
+second selector-count pin in `tests/popup-theme.test.js`
+(the tests commit landed 216/217), `9eee4d1`
+checklist, `d5f7a65` version 1.15.0, docs (this commit).
+**Browser verification still open** — the live DOM is
+the proof (`tests/manual-checklist.md` Phase 23).
 
 ## Future (v1.1+, not in scope now)
 

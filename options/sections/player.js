@@ -100,6 +100,14 @@
         keywords: ['player', 'spacing', 'margin'],
       },
       {
+        key: 'player.accentColor',
+        type: 'color',
+        label: 'Player accent color',
+        description:
+          'Colour of the played progress bar and the scrubber knob. Empty = YouTube default red. Clear restores the default.',
+        keywords: ['player', 'accent', 'color', 'colour', 'progress', 'bar', 'scrubber'],
+      },
+      {
         key: 'player.hideEndscreen',
         type: 'toggle',
         label: 'Hide endscreen cards',
