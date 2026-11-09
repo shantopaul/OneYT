@@ -88,7 +88,7 @@ stationary player + player/sidebar sizing.
 **Deliverable:** functional layout customisation, v0.2.0.
 
 **Status 2026-11-09:** code complete on branch `feature/core`
-(7 part-by-part commits on top of `feature/foundation`, pushed
+(8 part-by-part commits on top of `feature/foundation`, pushed
 after completion, `main` untouched). `npm test` 51/51 pass, lint
 + format clean, manifest valid, no polling/network. **Browser
 verification still open** — the visual behaviour (player staying
@@ -383,7 +383,7 @@ them everywhere and do not show them.
 **Deliverable:** v1.1.0.
 
 **Status 2026-11-09:** code complete on branch
-`feature/shorts-block` (7 part-by-part commits on top of
+`feature/shorts-block` (8 part-by-part commits on top of
 `main` `4ca8a88`, pushed after completion, nothing merged).
 `npm test` 123/123 pass, lint + format clean, manifest valid,
 `npm run package` builds a clean 100 KB `oneyt-1.1.0.zip`.

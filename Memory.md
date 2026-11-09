@@ -362,7 +362,7 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
 ### 2026-11-09 — Phase 2: Core Layout DONE (code, branch only)
 
 - Branch `feature/core` from `feature/foundation` (`6385ad3`).
-  **7 part-by-part commits, pushed only when Phase 2 was fully
+  **8 part-by-part commits, pushed only when Phase 2 was fully
   complete** (same rule as Phase 1 — no intermediate push,
   no merge to `main` or to `feature/foundation`).
 - Built: sidebar module (independent scroll, width, scrollbar,
@@ -640,7 +640,7 @@ here in Node, ⬜ = needs Chrome on Shanto's PC):
   video cards, and nothing stopped the `/shorts/` player
   page from playing.
 - Branch `feature/shorts-block` from `main` (`4ca8a88`).
-  **7 part-by-part commits, pushed only when Phase 8 was
+  **8 part-by-part commits, pushed only when Phase 8 was
   fully complete** (same rule — no intermediate push, no
   merge to `main`).
 - New setting `layout.blockShorts: false` (additive default
