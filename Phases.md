@@ -1132,7 +1132,7 @@ format, `6e0f71f` version 1.14.0, docs (this commit).
 **Browser verification still open** — the live page
 is the proof (`tests/manual-checklist.md` Phase 22).
 
-## Phase 23 — Player Accent Color (v1.15) ✅ CODE COMPLETE (2026-11-09)
+## Phase 23 — Player Accent Color (v1.15) ✅ MERGED (2026-11-09)
 
 **Goal:** the red progress bar is YouTube's colour, not the
 user's. One colour setting recolours the played portion
@@ -1178,7 +1178,9 @@ is independent of the appearance theme accent — it
 recolours the player only, not the page.
 **Status 2026-11-09:** code complete on branch
 `feature/player-accent-color` (10 part-by-part commits on top
-of `main` `cd49ebb`, pushed after completion).
+of `main` `cd49ebb`, pushed after completion) and **merged
+to `main` — merge `bcc733b`, `main` now `bcc733b`** (per
+the standing rule: feature complete → merge to main).
 `npm test` 217/217 pass (214 baseline + 3 new), lint +
 format clean, manifest valid, `npm run package` builds
 a clean `oneyt-1.15.0.zip` (runtime files only).
