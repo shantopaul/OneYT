@@ -7,7 +7,7 @@
   var section = {
     id: 'general',
     title: 'General',
-    description: 'Master switch and per-module toggles.',
+    description: 'Master switch, dashboard theme and per-module toggles.',
     controls: [
       {
         key: 'enabled',
@@ -15,6 +15,15 @@
         label: 'Extension enabled',
         description: 'Turn all OneYT customisation on or off. When off, YouTube is untouched.',
         keywords: ['enable', 'disable', 'on', 'off', 'master'],
+      },
+      {
+        key: 'ui.dashboardTheme',
+        type: 'select',
+        source: 'dashboardThemes',
+        label: 'Dashboard theme',
+        description:
+          'Colour scheme for this settings dashboard. System follows your operating system.',
+        keywords: ['dashboard', 'theme', 'dark', 'light', 'system', 'appearance'],
       },
       {
         key: 'modules.player',

@@ -110,6 +110,11 @@
         });
         break;
       }
+      case 'dashboardThemes':
+        push('system', 'System');
+        push('dark', 'Dark');
+        push('light', 'Light');
+        break;
       case 'fontFamilies': {
         push('', 'YouTube default');
         var stacks = (apis.themes && apis.themes.FONT_STACKS) || {};
