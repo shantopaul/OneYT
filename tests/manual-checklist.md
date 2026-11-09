@@ -430,3 +430,27 @@ real element here and fix the selector.
 
 Notes / failures:
 - _…_
+
+---
+
+## Phase 12 — Hide Topic Chips Bar (v1.5) — live on a real home page
+
+Selector under test: `ytd-feed-filter-chip-bar-renderer`.
+Known risk: the frosted-glass header (`#frosted-glass`,
+class `with-chipbar`) may leave an empty strip where the
+bar was — if it does, note it here; the fix is to collapse
+that container too.
+
+- [ ] Open the home page — the topic chips row ("All",
+      "Music", "Gaming", …) is visible at the top
+- [ ] Turn on "Hide topic chips bar on Home" — the whole
+      row disappears and the videos move up (no empty gap
+      left behind)
+- [ ] Turn it off again — the chips row returns exactly
+      (class-only hiding)
+- [ ] Open a video — the watch-page sidebar chips are
+      still there (home-only scope)
+- [ ] Search something — the search chips are still there
+
+Notes / failures:
+- _…_

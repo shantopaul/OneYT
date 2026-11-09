@@ -39,6 +39,12 @@
     // Shorts shelf on search / subscriptions (v1.1 Block Shorts).
     reelShelf: 'ytd-reel-shelf-renderer',
     richGrid: 'ytd-rich-grid-renderer',
+    // Topic filter chips bar on the home feed ("All",
+    // "Music", "Gaming", ...). Well-known hook, confirmed
+    // by several independent userstyles. Home only — the
+    // watch-page sidebar chips and the search chips are
+    // different elements and are not hidden by this key.
+    topicChips: 'ytd-feed-filter-chip-bar-renderer',
 
     // --- Navigation (Phase 4) ---
     guide: '#guide',

@@ -15,6 +15,8 @@
  *   sets --ytd-rich-grid-item-margin through a variable.
  * - Thumbnail size (layout.thumbnailSize, px width, 0 = default).
  * - Hide Shorts shelf (layout.hideShortsHome).
+ * - Hide topic chips bar (layout.hideTopicChips) — the topic
+ *   filter row ("All", "Music", ...) at the top of the feed.
  *
  * Every page (v1.1 Block Shorts):
  * - Block Shorts (layout.blockShorts) — one class on <html>
@@ -89,6 +91,7 @@
       setClass('oneyt-card-spaced', false);
       setClass('oneyt-thumb-sized', false);
       setClass('oneyt-hide-shorts-home', false);
+      setClass('oneyt-hide-topic-chips', false);
       setClass('oneyt-block-shorts', false);
       setVar('--oneyt-home-columns', null);
       setVar('--oneyt-card-spacing', null);
@@ -124,6 +127,7 @@
       setClass('oneyt-thumb-sized', !!sized);
       setVar('--oneyt-thumb-width', sized ? layout.thumbnailSize + 'px' : null);
       setClass('oneyt-hide-shorts-home', layout.hideShortsHome === true);
+      setClass('oneyt-hide-topic-chips', layout.hideTopicChips === true);
     }
 
     function apply(settings, page) {
@@ -141,6 +145,7 @@
         setClass('oneyt-card-spaced', false);
         setClass('oneyt-thumb-sized', false);
         setClass('oneyt-hide-shorts-home', false);
+        setClass('oneyt-hide-topic-chips', false);
         setVar('--oneyt-home-columns', null);
         setVar('--oneyt-card-spacing', null);
         setVar('--oneyt-thumb-width', null);

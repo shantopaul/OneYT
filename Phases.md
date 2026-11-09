@@ -517,8 +517,43 @@ merged as PR #12) and this phase takes PL-10–12; v1.4.0
 follows because 1.3.0 is in `main` now. Ambient mode was
 redirected mid-work: branch `feature/disable-ambient-mode`
 exists (no commits yet) with the research done —
-`#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 12
-when resumed.
+`#cinematics` + `.ytp-ambient-canvas` — and becomes Phase 13
+when resumed (renumbered: this phase takes 12).
+
+## Phase 12 — Hide Topic Chips Bar (v1.5) ✅ CODE COMPLETE (2026-11-09)
+
+**Goal:** one toggle that hides the topic filter chips row
+("All", "Music", "Gaming", …) at the top of the home feed,
+so the home page opens straight into videos.
+
+**Deliverable:** v1.5.0.
+
+**Plan (part-by-part, push only when complete):** one new
+setting `layout.hideTopicChips` (default off, additive);
+one selector in `shared/selectors.js` (count 25 → 26) —
+`topicChips: 'ytd-feed-filter-chip-bar-renderer'` (the
+well-known home chip-bar hook, confirmed by several
+independent userstyles); layout module sets
+`oneyt-hide-topic-chips` on `<html>` on home pages only
+and its CSS hides the bar (class-only hiding, cleared on
+watch/other pages like the other home classes); one toggle
+in the Layout section; module tests + manual checklist
+item. **Done (8 commits):** `809117a` start (PRD PL-13 +
+plan, Memory.md corrected to Phase 11 merged as PR #13),
+`bdf61e1` setting, `e2bf8b5` selector (count 25 → 26),
+`d55958a` layout module + CSS, `1f47d4b` dashboard toggle,
+`407682b` tests (137/137) + checklist, `09fd840` version
+1.5.0. **Browser verification still open** — the selector
+needs a real home page on Shanto's PC; one known risk: the
+frosted-glass header (`#frosted-glass`, class
+`with-chipbar`) may leave an empty strip where the bar
+was, in which case the fix is to collapse that container
+too — the checklist asks to check for the gap.
+Numbering note: this phase takes Phase 12 because it is
+being built now; ambient mode moves to Phase 13 and
+default theater mode (branch `feature/default-theater`,
+no commits yet) moves to Phase 14. v1.5.0 is unambiguous:
+1.4.0 is in `main` now (PR #13 merged).
 
 ## Future (v1.1+, not in scope now)
 

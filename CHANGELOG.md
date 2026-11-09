@@ -4,7 +4,22 @@ All notable changes, newest first. Version numbers follow the
 phases: 0.1.0 (Phases 1–5), 0.9.0 (Phase 6 release candidate),
 1.0.0 (Phase 7 public release), 1.1.0 (Phase 8 Block Shorts),
 1.2.0 (Phase 9 dashboard theme + search),
-1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts).
+1.3.0 (Phase 10 hide endscreen cards), 1.4.0 (Phase 11 hide counts),
+1.5.0 (Phase 12 hide topic chips bar).
+
+## 1.5.0 — 2026-11-09 (Hide Topic Chips Bar, Phase 12)
+
+- **Hide topic chips bar** (`layout.hideTopicChips`,
+  default off): one toggle in the Layout section. Hides the
+  topic filter chips row ("All", "Music", "Gaming", …) at
+  the top of the home feed, so the home page opens straight
+  into videos. Home page only — the watch-page sidebar
+  chips and the search chips are untouched. Class-only
+  hiding — the bar returns the moment the toggle goes off
+  or the user leaves home. Selector:
+  `ytd-feed-filter-chip-bar-renderer` (see
+  `tests/manual-checklist.md` Phase 12 for the live check
+  and the frosted-glass gap risk).
 
 ## 1.4.0 — 2026-11-09 (Hide Counts, Phase 11)
 

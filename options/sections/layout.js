@@ -31,6 +31,14 @@
         keywords: ['shorts', 'hide', 'watch'],
       },
       {
+        key: 'layout.hideTopicChips',
+        type: 'toggle',
+        label: 'Hide topic chips bar on Home',
+        description:
+          'Hide the topic filter chips row ("All", "Music", "Gaming", …) at the top of the home feed. Home page only.',
+        keywords: ['topic', 'chips', 'filter', 'home', 'hide'],
+      },
+      {
         key: 'layout.homeColumns',
         type: 'number',
         label: 'Homepage columns',

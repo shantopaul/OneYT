@@ -20,6 +20,16 @@ html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts] {
   display: none;
 }
 
+/* Hide topic chips bar (layout.hideTopicChips, v1.5): the
+ * topic filter row ("All", "Music", ...) at the top of the
+ * home feed. Home only — the class is set on home pages
+ * alone, so the watch sidebar chips and the search chips
+ * stay. Verify live — if the frosted-glass header leaves an
+ * empty strip where the bar was, collapse that too. */
+html.oneyt-enabled.oneyt-hide-topic-chips ytd-feed-filter-chip-bar-renderer {
+  display: none;
+}
+
 /* Block Shorts everywhere (layout.blockShorts, v1.1): one class,
  * every page. Shelves on home/watch (rich shelf) and on search /
  * subscriptions (reel shelf), the Shorts entries in the guide and

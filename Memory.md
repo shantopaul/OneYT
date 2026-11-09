@@ -16,11 +16,11 @@
 | Item | Value |
 |------|-------|
 | **Date** | 2026-11-09 |
-| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (code complete, branch `feature/hide-counts` — not merged yet) |
-| **Version** | 1.3.0 in `main`; 1.4.0 in progress (hide counts) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `dc3061b` (Phases 1–10 + YouTube domains merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`); branch `feature/hide-counts` (Phase 11, complete, not merged) |
-| **Code written** | Phases 1–10 + YouTube domains: all modules + dashboard (9 sections, 101 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + 5 audit docs + release packaging (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 11 complete; waiting for Shanto's merge of PR #13 and the browser check) |
+| **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · Phase 5 ✅ (merged) · Phase 6 ✅ (merged, PR #6) · Phase 7 ✅ (merged, PR #7) · Phase 8 ✅ (merged, PR #9) · YouTube domains ✅ (merged, PR #10) · Phase 9 ✅ (merged, PR #11) · Phase 10 ✅ (merged, PR #12) · Phase 11 ✅ (merged, PR #13) · Phase 12 ✅ (code complete, branch `feature/hide-topic-chips` — not merged yet) |
+| **Version** | 1.4.0 in `main`; 1.5.0 in progress (hide topic chips) |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `6f0b965` (Phases 1–11 + YouTube domains merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`, PR #6 `383e35a`, PR #7 `4ca8a88`, PR #8 docs `713cf6c`, PR #9 `c04274e`, PR #10 `c8acec4`, PR #11 `7b70b80`, PR #12 `dc3061b`, PR #13 `6f0b965`); branch `feature/hide-topic-chips` (Phase 12, complete, not merged) |
+| **Code written** | Phases 1–11 + YouTube domains: all modules + dashboard (9 sections, 102 controls) + final popup + sync + Block Shorts + all-youtube.com hosts + dashboard theme + optimised search + hide endscreen cards + hide like/view/subscriber counts + hide topic chips bar + 5 audit docs + release packaging (see "What Has Been Completed") |
+| **Currently working on** | — (Phase 12 complete; waiting for Shanto's merge and the browser check) |
 | **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–6 sections) — cross-browser (6.2), viewports (6.3), fullscreen/theater (6.5), sync across two profiles, live selectors and memory are browser-only and stay open; real screenshots (7.3), the privacy-policy URL decision and the Chrome Web Store submission (7.8) need Shanto (his browser + his developer account) |
 | **Last verified** | 2026-11-09 — `npm test` 121/121 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
