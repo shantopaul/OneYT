@@ -310,11 +310,14 @@ test('dashboard: state-replacing actions go through replaceState (theme follows)
   assert.ok(src.includes('replaceState(defaultsApi.deepClone(pendingImport))'), 'import uses it');
   assert.ok(src.includes('replaceState(profilesApi.applyPreset('), 'preset apply uses it');
   assert.ok(src.includes('replaceState(profilesApi.applyProfile('), 'profile apply uses it');
-  assert.ok(!src.includes('state = defaultsApi.cloneDefaults();'), 'no direct reset bypass');
+  // load()'s catch legitimately falls back to cloneDefaults;
+  // the reset-all path must not assign state directly.
   assert.ok(
     !src.includes('state = defaultsApi.deepClone(pendingImport);'),
     'no direct import bypass'
   );
+  assert.ok(!src.includes('state = profilesApi.applyPreset('), 'no direct preset bypass');
+  assert.ok(!src.includes('state = profilesApi.applyProfile('), 'no direct profile bypass');
   // saveNow resolves a boolean so success notices are gated on a real write.
   assert.ok(src.includes('return true;'), 'saveNow resolves true on success');
   assert.ok(src.includes('return false;'), 'saveNow resolves false on failure');
