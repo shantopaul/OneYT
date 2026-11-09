@@ -430,3 +430,38 @@ real element here and fix the selector.
 
 Notes / failures:
 - _…_
+
+---
+
+## Phase 15 — Hide Live / Mixes / News Shelves (v1.7) — live on a real home page
+
+Selectors under test:
+`ytd-rich-shelf-renderer[title*='Live now' i]`,
+`ytd-rich-shelf-renderer[title*='Mixes' i]`,
+`ytd-rich-item-renderer:has(a[href*='start_radio=1'])`,
+`ytd-rich-shelf-renderer[title*='News' i]`.
+Known risks: the titles are English UI text — a
+non-English YouTube UI may use different titles, and
+YouTube may rename a shelf. If a row does not hide,
+note its real title from DevTools (inspect the shelf
+element's `title` attribute). A hidden shelf may also
+leave an empty gap where its section wrapper
+(`ytd-rich-section-renderer`) stays — note it if so.
+
+- [ ] Open the home page — the "Live now" shelf, Mixes,
+      and the "Breaking news" shelf are visible
+- [ ] Turn on "Hide Live shelf on Home" — the "Live now"
+      row disappears (and nothing else does), no empty
+      gap left behind
+- [ ] Turn on "Hide Mixes on Home" — the mix cards
+      disappear from the grid (and a Mixes shelf too,
+      if one renders)
+- [ ] Turn on "Hide News shelf on Home" — the "Breaking
+      news" row disappears
+- [ ] Turn each toggle off again — its row returns
+      exactly (class-only hiding)
+- [ ] Open a video — the watch page is unaffected (the
+      classes are home-only)
+
+Notes / failures:
+- _…_
