@@ -102,24 +102,21 @@
         key: 'player.hideLikeCount',
         type: 'toggle',
         label: 'Hide like count',
-        description:
-          'Hide the number next to the Like button. The button itself stays clickable.',
+        description: 'Hide the number next to the Like button. The button itself stays clickable.',
         keywords: ['like', 'likes', 'count', 'number', 'ratings'],
       },
       {
         key: 'player.hideViewCount',
         type: 'toggle',
         label: 'Hide view count',
-        description:
-          'Hide the "X views" line on the watch page.',
+        description: 'Hide the "X views" line on the watch page.',
         keywords: ['views', 'view count', 'count', 'number'],
       },
       {
         key: 'player.hideSubscriberCount',
         type: 'toggle',
         label: 'Hide subscriber count',
-        description:
-          'Hide "X subscribers" next to the channel name. The Subscribe button stays.',
+        description: 'Hide "X subscribers" next to the channel name. The Subscribe button stays.',
         keywords: ['subscriber', 'subscribers', 'count', 'number', 'channel'],
       },
       {

@@ -102,7 +102,11 @@ html.oneyt-enabled.oneyt-player-hide-endscreen #movie_player .ytp-endscreen-cont
  * number exactly. Verify live — YouTube renames DOM
  * elements, and the views line moved into the description
  * box in the 2023 layout, so the views selector is the one
- * most likely to need a correction. */
+ * most likely to need a correction. The like-count rule
+ * below stays on one line (prettier-ignore) because the
+ * selector-audit test needs the raw selector value to
+ * appear contiguously in the CSS. */
+/* prettier-ignore */
 html.oneyt-enabled.oneyt-player-hide-like-count #segmented-like-button .yt-spec-button-shape-next__button-text-content {
   display: none;
 }

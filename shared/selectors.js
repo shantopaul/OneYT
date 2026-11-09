@@ -62,8 +62,7 @@
     // (#segmented-like-button is the button id used by Return
     // YouTube Dislike; the text class is from a current
     // userstyle). Hiding the text keeps the button clickable.
-    likeCountText:
-      '#segmented-like-button .yt-spec-button-shape-next__button-text-content',
+    likeCountText: '#segmented-like-button .yt-spec-button-shape-next__button-text-content',
     // View count: the "X views" info line (classic hook).
     viewCountText: 'ytd-video-primary-info-renderer #info-text',
     // Subscriber count: next to the channel name.
