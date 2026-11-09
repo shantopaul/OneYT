@@ -18,10 +18,10 @@
 | **Date** | 2026-11-09 |
 | **Phase** | Phase 0 ✅ · Phase 1 ✅ (merged) · Phase 2 ✅ (merged) · Phase 3 ✅ (merged) · Phase 4 ✅ (merged) · **Phase 5 — Settings Dashboard ✅ code complete, pushed to branch** (browser check still open) |
 | **Version** | 0.1.0 (foundation + layout + appearance + playback/productivity + dashboard, sync still Phase 6) |
-| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `33d9e08` (Phases 1–4 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`); branch `feature/Settings` pushed 2026-11-09, **not merged** |
+| **Repo** | `github.com/shantopaul/OneYT` (private) — `main` @ `5b44c9e` (Phases 1–5 merged by Shanto: PR #1 `79aa279`, PR #2 `d6d2df1`, PR #3 `d49ac19`, PR #4 `33d9e08`, PR #5 `5b44c9e`); branch `feature/Optimisation` in progress |
 | **Code written** | Phases 1–5: all modules + dashboard (9 sections, 96 controls) + final popup + tests (see "What Has Been Completed") |
-| **Currently working on** | — (Phase 5 code done; waiting for browser check + Phase 6 go-ahead) |
-| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–5 sections); Phase 6 start decision |
+| **Currently working on** | Phase 6 — Optimisation & Testing (branch `feature/Optimisation`) |
+| **Blocked on** | Browser verification needs Chrome on Shanto's PC (see `tests/manual-checklist.md` Phase 1–5 sections) — cross-browser (6.2), viewport (6.3), fullscreen/theater (6.5) and the full manual checklist are browser-only and stay open |
 | **Last verified** | 2026-11-09 — `npm test` 93/93 pass, `npm run lint` clean, `npm run format` clean, manifest valid (all files exist), no polling/network (grep) |
 
 ---
