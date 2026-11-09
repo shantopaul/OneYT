@@ -6,6 +6,12 @@
  * there — the player, captions and the rest of YouTube are
  * never touched.
  *
+ * Custom font (Phase 24): appearance.typography.customFont
+ * names any font installed on this device; when valid it wins
+ * over the fontFamily select. Resolution lives in
+ * themes.resolveFontFamily — the module never applies a raw
+ * custom name, and an invalid one falls back to the select.
+ *
  * A setting of 0 (or empty family) means "YouTube default":
  * the variable is removed, not set to a guess. Out-of-range
  * values are ignored with a warning, never applied.
@@ -20,11 +26,12 @@
       error: function () {},
     };
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
-    var fontStacks =
-      (deps.themes && deps.themes.FONT_STACKS) ||
+    var themes =
+      deps.themes ||
       (typeof globalThis !== 'undefined' && globalThis.OneYT.themes
-        ? globalThis.OneYT.themes.FONT_STACKS
-        : {});
+        ? globalThis.OneYT.themes
+        : null);
+    var fontStacks = (themes && themes.FONT_STACKS) || {};
 
     function root() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -39,15 +46,24 @@
       var typo = (settings.appearance || {}).typography || {};
       var changed = false;
 
-      if (typeof typo.fontFamily === 'string' && typo.fontFamily) {
-        var stack = fontStacks[typo.fontFamily];
-        if (stack) {
-          setOrRemove(el, '--oneyt-font-family', stack);
-          changed = true;
-        } else {
-          logger.warn('typography: unknown font family "' + typo.fontFamily + '" ignored');
-          setOrRemove(el, '--oneyt-font-family', null);
-        }
+      // Custom font (Phase 24) wins over the select when
+      // valid; an invalid custom name falls back to the
+      // select, and the raw string is never applied.
+      var stack = null;
+      if (themes && typeof themes.resolveFontFamily === 'function') {
+        stack = themes.resolveFontFamily(typo.fontFamily, typo.customFont);
+      } else if (typeof typo.fontFamily === 'string' && typo.fontFamily) {
+        stack = fontStacks[typo.fontFamily] || null;
+      }
+      if (stack) {
+        setOrRemove(el, '--oneyt-font-family', stack);
+        changed = true;
+      } else if (typeof typo.customFont === 'string' && typo.customFont.trim()) {
+        logger.warn('typography: custom font "' + typo.customFont + '" ignored');
+        setOrRemove(el, '--oneyt-font-family', null);
+      } else if (typeof typo.fontFamily === 'string' && typo.fontFamily) {
+        logger.warn('typography: unknown font family "' + typo.fontFamily + '" ignored');
+        setOrRemove(el, '--oneyt-font-family', null);
       } else {
         setOrRemove(el, '--oneyt-font-family', null);
       }
