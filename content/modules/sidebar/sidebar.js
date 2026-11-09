@@ -38,6 +38,7 @@
     var waitPending = false;
     var wheelEl = null;
     var wheelHandler = null;
+    var wheelSensitivity = null;
 
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -70,6 +71,7 @@
       }
       wheelEl = null;
       wheelHandler = null;
+      wheelSensitivity = null;
     }
 
     function clampSensitivity(value) {
@@ -121,9 +123,14 @@
     }
 
     function bindWheel(el, sensitivity) {
-      unbindWheel();
-      if (!el || typeof el.addEventListener !== 'function') return;
       sensitivity = clampSensitivity(sensitivity);
+      // Already bound to this element at this sensitivity:
+      // re-binding on every apply churned listeners for
+      // nothing (and each apply re-attached the same one).
+      if (wheelEl === el && wheelSensitivity === sensitivity) return;
+      unbindWheel();
+      wheelSensitivity = null;
+      if (!el || typeof el.addEventListener !== 'function') return;
       if (sensitivity === 1) return; // native scrolling is fine
       wheelHandler = function (event) {
         try {
@@ -135,6 +142,7 @@
       };
       el.addEventListener('wheel', wheelHandler, { passive: false });
       wheelEl = el;
+      wheelSensitivity = sensitivity;
     }
 
     function cleanup() {

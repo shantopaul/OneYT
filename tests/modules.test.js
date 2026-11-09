@@ -786,3 +786,24 @@ test('player: a stale theater waiter never clears a newer video\'s waiter', asyn
   mod.apply(settings, 'watch');
   assert.equal(state.resolvers.length, 2);
 });
+
+test('sidebar: wheel handler is not re-bound when element and sensitivity are unchanged', () => {
+  const doc = createFakeDocument();
+  const secondary = createFakeElement();
+  const mod = createSidebarModule({
+    dom: createFakeDom({ secondary }),
+    logger: quietLogger,
+    document: doc,
+  });
+  const settings = settingsWith({ sidebar: { scrollSensitivity: 2 } });
+  mod.apply(settings, 'watch');
+  assert.equal((secondary._listeners.wheel || []).length, 1);
+  const first = secondary._listeners.wheel[0];
+  mod.apply(settings, 'watch');
+  assert.equal(secondary._listeners.wheel.length, 1);
+  assert.equal(secondary._listeners.wheel[0], first);
+  // A changed sensitivity re-binds with a new handler.
+  mod.apply(settingsWith({ sidebar: { scrollSensitivity: 3 } }), 'watch');
+  assert.equal(secondary._listeners.wheel.length, 1);
+  assert.notEqual(secondary._listeners.wheel[0], first);
+});

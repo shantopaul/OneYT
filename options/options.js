@@ -1665,6 +1665,10 @@
       var section = sectionById(sectionId);
       if (!section) return;
       currentSection = sectionId;
+      // Drop the old inputs: renderControlRow rebuilds them
+      // below, and a stale entry would point refreshValues
+      // at a detached node.
+      inputsByKey = {};
       navEl.querySelectorAll('.nav-item').forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
       });
