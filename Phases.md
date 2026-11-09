@@ -1195,7 +1195,7 @@ checklist, `d5f7a65` version 1.15.0, docs (this commit).
 **Browser verification still open** — the live DOM is
 the proof (`tests/manual-checklist.md` Phase 23).
 
-## Phase 24 — Custom Font (v1.16) ✅ CODE COMPLETE (2026-11-09)
+## Phase 24 — Custom Font (v1.16) ✅ MERGED (2026-11-09)
 
 **Goal:** the font list stops at five built-ins. A user
 whose font is not in the list — `Hind Siliguri`, `Noto
@@ -1238,7 +1238,9 @@ sans-serif; the check for "is it installed" is the
 user seeing the titles change.
 **Status 2026-11-09:** code complete on branch
 `feature/custom-font` (10 part-by-part commits on top
-of `main` `4a2bcea`, pushed after completion).
+of `main` `4a2bcea`, pushed after completion) and **merged
+to `main` — merge `7c0f22d`, `main` now `7c0f22d`** (per
+the standing rule: feature complete → merge to main).
 `npm test` 220/220 pass (217 baseline + 3 new), lint +
 format clean, manifest valid, `npm run package` builds
 a clean `oneyt-1.16.0.zip` (runtime files only).
