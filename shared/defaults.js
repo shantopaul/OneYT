@@ -94,6 +94,7 @@
       autoplay: null, // null = YouTube default
       defaultQuality: 'auto', // auto | 1080p | 720p | ... (best-effort)
       captions: null, // null = YouTube default
+      captionFontSize: 0, // % , 0 = YouTube default
     },
 
     recommendations: {

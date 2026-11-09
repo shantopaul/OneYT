@@ -67,6 +67,15 @@
     if (ns.modules && ns.modules.typography) {
       moduleManager.register(ns.modules.typography.createTypographyModule({ logger: logger }));
     }
+    if (ns.modules && ns.modules.playback) {
+      moduleManager.register(
+        ns.modules.playback.createPlaybackModule({
+          dom: domManager,
+          logger: logger,
+          storage: storage,
+        })
+      );
+    }
 
     var app = ns.app.createApp({
       logger: logger,

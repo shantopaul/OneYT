@@ -1,0 +1,7 @@
+/* OneYT — playback module styles (Phase 4).
+ * Caption font size only (playback.captionFontSize, %).
+ * Verify live: YouTube renders captions in .ytp-caption-segment. */
+
+html.oneyt-enabled.oneyt-caption-sized .ytp-caption-segment {
+  font-size: var(--oneyt-caption-font-size);
+}

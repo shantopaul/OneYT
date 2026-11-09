@@ -9,7 +9,8 @@
         "content/modules/player/player.css",
         "content/modules/layout/layout.css",
         "content/modules/appearance/appearance.css",
-        "content/modules/typography/typography.css"
+        "content/modules/typography/typography.css",
+        "content/modules/playback/playback.css"
       ],
       "js": [
         "shared/constants.js",
@@ -29,6 +30,7 @@
         "content/modules/layout/layout.js",
         "content/modules/appearance/appearance.js",
         "content/modules/typography/typography.js",
+        "content/modules/playback/playback.js",
         "content/core/app.js",
         "content/index.js"
       ],
