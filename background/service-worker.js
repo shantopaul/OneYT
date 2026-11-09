@@ -2,6 +2,8 @@
  *
  * Manifest V3 service worker. Kept deliberately thin:
  * - onInstalled: seed default settings when none exist yet.
+ * - onInstalled (install only): open the welcome setup
+ *   once (Phase 17). Update installs never open it.
  *
  * No onMessage relay: popup and dashboard write storage
  * directly, so no relay is needed. (Phase 6 security review
@@ -44,6 +46,25 @@ try {
         var migrated = defaultsApi.migrateSettings(stored);
         if (stored === undefined || JSON.stringify(stored) !== JSON.stringify(migrated)) {
           return storage().set({ [STORAGE_KEY]: migrated });
+        }
+        return undefined;
+      })
+      .then(function () {
+        // Welcome setup (Phase 17): open the page once, on
+        // a fresh install only. An update install never
+        // opens it — existing users are never interrupted.
+        // If the page was already finished or skipped
+        // (ui.onboarded), the page itself shows the last
+        // step instead of restarting the setup.
+        if (details.reason !== 'install') return undefined;
+        if (
+          typeof chrome !== 'undefined' &&
+          chrome.tabs &&
+          chrome.tabs.create &&
+          chrome.runtime &&
+          chrome.runtime.getURL
+        ) {
+          chrome.tabs.create({ url: chrome.runtime.getURL('onboarding/onboarding.html') });
         }
         return undefined;
       })
