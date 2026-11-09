@@ -747,3 +747,42 @@ test('sidebar: numeric values are clamped, invalid maxHeight falls back', () => 
   mod.apply(settingsWith({ sidebar: { maxHeight: '50vh' } }), 'watch');
   assert.equal(doc._root._vars.get('--oneyt-sidebar-max-height'), '50vh');
 });
+
+test('player: a stale theater waiter never clears a newer video\'s waiter', async () => {
+  const doc = createFakeDocument();
+  const flexy = createFakeElement();
+  const container = createFakeElement({
+    rect: { width: 800, height: 450, left: 100, top: 60 },
+  });
+  const moviePlayer = createFakeElement();
+  const theaterBtn = createFakeElement();
+  const state = { btn: null, resolvers: [] };
+  const dom = {
+    query: (key) => {
+      if (key === 'watchFlexy') return flexy;
+      if (key === 'playerContainer') return container;
+      if (key === 'player') return moviePlayer;
+      if (key === 'theaterButton') return state.btn;
+      return null;
+    },
+    waitFor: () =>
+      new Promise((resolve) => {
+        state.resolvers.push(resolve);
+      }),
+  };
+  const loc = { href: 'https://www.youtube.com/watch?v=AAAAAAAAAAA' };
+  const mod = createPlayerModule({ dom, logger: quietLogger, document: doc, location: loc });
+  const settings = settingsWith({ player: { defaultTheater: true } });
+  mod.apply(settings, 'watch'); // waiter 1, video A (button absent)
+  assert.equal(state.resolvers.length, 1);
+  loc.href = 'https://www.youtube.com/watch?v=BBBBBBBBBBB';
+  mod.apply(settings, 'watch'); // waiter 2, video B
+  assert.equal(state.resolvers.length, 2);
+  // Video A's waiter resolves late: it must not clear B's
+  // flag, or the next re-apply would start a third waiter.
+  state.resolvers[0]();
+  await Promise.resolve();
+  await Promise.resolve();
+  mod.apply(settings, 'watch');
+  assert.equal(state.resolvers.length, 2);
+});

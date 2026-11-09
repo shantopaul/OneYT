@@ -200,7 +200,11 @@
         dom
           .waitFor('theaterButton')
           .then(function () {
-            theaterPendingUrl = null;
+            // Clear only if this waiter still owns the flag:
+            // a newer video may have started its own waiter
+            // while this one was pending, and clearing its
+            // flag would let a third waiter start.
+            if (theaterPendingUrl === url) theaterPendingUrl = null;
             if (
               lastSettings &&
               lastSettings.player &&
@@ -220,7 +224,7 @@
             }
           })
           .catch(function () {
-            theaterPendingUrl = null;
+            if (theaterPendingUrl === url) theaterPendingUrl = null;
           });
       }
     }
