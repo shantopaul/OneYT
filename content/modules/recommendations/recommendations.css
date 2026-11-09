@@ -1,0 +1,19 @@
+/* OneYT — recommendations module styles (Phase 4).
+ * Watch-page sidebar only. Verify live: YouTube's compact
+ * renderer spacing changes over time. */
+
+html.oneyt-enabled.oneyt-rec-hide-sidebar #secondary {
+  display: none;
+}
+
+html.oneyt-enabled.oneyt-rec-compact #secondary ytd-compact-video-renderer {
+  margin-bottom: 2px;
+}
+
+html.oneyt-enabled.oneyt-rec-card-sized #secondary ytd-compact-video-renderer ytd-thumbnail {
+  width: var(--oneyt-rec-card-size);
+}
+
+html.oneyt-enabled.oneyt-rec-hide-meta #secondary ytd-compact-video-renderer #metadata {
+  display: none;
+}

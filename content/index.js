@@ -83,6 +83,11 @@
       focusModule = ns.modules.focus.createFocusModule({ logger: logger });
       moduleManager.register(focusModule);
     }
+    if (ns.modules && ns.modules.recommendations) {
+      moduleManager.register(
+        ns.modules.recommendations.createRecommendationsModule({ logger: logger })
+      );
+    }
 
     var app = ns.app.createApp({
       logger: logger,
