@@ -29,7 +29,7 @@
   var section = {
     id: 'appearance',
     title: 'Appearance',
-    description: 'Themes, colours, typography, custom CSS and ready-made CSS templates.',
+    description: 'Themes, colours, typography, custom CSS, ready-made CSS templates and saved themes.',
     controls: [
       {
         key: 'appearance.theme',

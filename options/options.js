@@ -342,11 +342,15 @@
     var healthApi = deps.healthApi || null;
     var HEALTH_KEY = constants.HEALTH_STORAGE_KEY || 'oneyt.health.v1';
     var cssTemplatesApi = deps.cssTemplatesApi || null;
+    var savedThemesApi = deps.savedThemesApi || null;
+    var SAVED_THEMES_KEY = constants.SAVED_THEMES_STORAGE_KEY || 'oneyt.themes.v1';
 
     var state = defaultsApi.cloneDefaults();
     var profiles = [];
     var profilesNotice = '';
     var templatesNotice = '';
+    var savedThemes = [];
+    var savedThemesNotice = '';
     var healthRecord = {};
     var saveTimer = null;
     var navEl = doc.getElementById('options-nav');
@@ -1273,6 +1277,300 @@
       sectionEl.appendChild(box);
     }
 
+    // Saved themes (Phase 21, PL-21). Mirrors
+    // renderProfilesTools: tool-boxes built with el(),
+    // no innerHTML. A saved theme is theme-only — base
+    // preset + custom colours — so applying one writes
+    // appearance.theme + appearance.colors and nothing
+    // else (see shared/savedThemes.js). Export downloads
+    // the theme as JSON; import validates first and only
+    // adds it when you confirm (mirroring the Advanced
+    // import flow).
+    function renderSavedThemeTools(sectionEl) {
+      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
+      if (savedThemesNotice) {
+        msgEl.textContent = savedThemesNotice;
+        msgEl.style.display = 'block';
+        savedThemesNotice = '';
+      }
+      sectionEl.appendChild(msgEl);
+      if (!savedThemesApi) {
+        sectionEl.appendChild(
+          el(doc, 'p', {
+            text: 'Saved themes are unavailable — the saved-themes module did not load.',
+          })
+        );
+        return;
+      }
+      var themesApi = apis.themes;
+
+      // Save the current theme.
+      var saveBox = el(doc, 'div', { class: 'tool-box' });
+      saveBox.appendChild(el(doc, 'h3', { text: 'Save current theme' }));
+      saveBox.appendChild(
+        el(doc, 'p', {
+          text:
+            'Saves the theme preset and colours as they are right now — up to ' +
+            savedThemesApi.MAX_SAVED_THEMES +
+            ' saved themes. Applying one later changes only the theme and colours, nothing else.',
+        })
+      );
+      var nameInput = el(doc, 'input', {
+        type: 'text',
+        class: 'control-input',
+        placeholder: 'Theme name',
+        maxlength: String(savedThemesApi.MAX_SAVED_THEME_NAME_LENGTH),
+      });
+      nameInput.setAttribute('aria-label', 'Theme name');
+      var saveBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-primary',
+        text: 'Save theme',
+      });
+      saveBtn.addEventListener('click', function () {
+        var result = savedThemesApi.createSavedTheme(
+          nameInput.value,
+          state,
+          savedThemes,
+          defaultsApi,
+          themesApi
+        );
+        if (result.error) {
+          msgEl.textContent = result.error;
+          msgEl.style.display = 'block';
+          return;
+        }
+        savedThemes = result.themes;
+        saveSavedThemes().then(function () {
+          savedThemesNotice = 'Saved theme "' + nameInput.value.trim() + '".';
+          renderSection(currentSection);
+        });
+      });
+      saveBox.appendChild(nameInput);
+      saveBox.appendChild(saveBtn);
+      sectionEl.appendChild(saveBox);
+
+      // Saved themes.
+      var listBox = el(doc, 'div', { class: 'tool-box' });
+      listBox.appendChild(
+        el(doc, 'h3', {
+          text:
+            'Your saved themes (' +
+            savedThemes.length +
+            '/' +
+            savedThemesApi.MAX_SAVED_THEMES +
+            ')',
+        })
+      );
+      if (savedThemes.length === 0) {
+        listBox.appendChild(
+          el(doc, 'p', { text: 'No saved themes yet — save one above to apply it later.' })
+        );
+      }
+      savedThemes.forEach(function (savedTheme) {
+        var row = el(doc, 'div', { class: 'profile-row' });
+        row.appendChild(el(doc, 'strong', { text: savedTheme.name }));
+        var colourCount = Object.keys(savedTheme.colors || {}).length;
+        row.appendChild(
+          el(doc, 'p', {
+            text:
+              'Base: ' +
+              savedTheme.theme +
+              ' · ' +
+              colourCount +
+              ' custom colour' +
+              (colourCount === 1 ? '' : 's') +
+              '.',
+          })
+        );
+        var applyBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn btn-primary',
+          text: 'Apply',
+        });
+        applyBtn.addEventListener('click', function () {
+          state = savedThemesApi.applySavedTheme(state, savedTheme, defaultsApi, themesApi);
+          saveNow().then(function () {
+            refreshValues();
+            savedThemesNotice = 'Applied theme "' + savedTheme.name + '".';
+            renderSection(currentSection);
+          });
+        });
+        var exportBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Export' });
+        exportBtn.addEventListener('click', function () {
+          var exported = savedThemesApi.exportSavedTheme(savedTheme);
+          var blob = new Blob([exported.json], { type: 'application/json' });
+          var url = URL.createObjectURL(blob);
+          var a = doc.createElement('a');
+          a.href = url;
+          a.download = exported.filename;
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+        var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
+        renameBtn.addEventListener('click', function () {
+          row.textContent = '';
+          var editInput = el(doc, 'input', {
+            type: 'text',
+            class: 'control-input',
+            maxlength: String(savedThemesApi.MAX_SAVED_THEME_NAME_LENGTH),
+          });
+          editInput.value = savedTheme.name;
+          editInput.setAttribute('aria-label', 'New theme name');
+          var confirmBtn = el(doc, 'button', {
+            type: 'button',
+            class: 'btn btn-primary',
+            text: 'Save name',
+          });
+          confirmBtn.addEventListener('click', function () {
+            var result = savedThemesApi.renameSavedTheme(
+              savedThemes,
+              savedTheme.name,
+              editInput.value,
+              themesApi
+            );
+            if (result.error) {
+              savedThemesNotice = result.error;
+              renderSection(currentSection);
+              return;
+            }
+            savedThemes = result.themes;
+            saveSavedThemes().then(function () {
+              savedThemesNotice = 'Renamed theme to "' + editInput.value.trim() + '".';
+              renderSection(currentSection);
+            });
+          });
+          var cancelBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Cancel' });
+          cancelBtn.addEventListener('click', function () {
+            renderSection(currentSection);
+          });
+          row.appendChild(editInput);
+          row.appendChild(confirmBtn);
+          row.appendChild(cancelBtn);
+        });
+        var deleteBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'btn btn-danger',
+          text: 'Delete',
+        });
+        deleteBtn.addEventListener('click', function () {
+          savedThemes = savedThemesApi.deleteSavedTheme(savedThemes, savedTheme.name, themesApi);
+          saveSavedThemes().then(function () {
+            savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
+            renderSection(currentSection);
+          });
+        });
+        row.appendChild(applyBtn);
+        row.appendChild(exportBtn);
+        row.appendChild(renameBtn);
+        row.appendChild(deleteBtn);
+        listBox.appendChild(row);
+      });
+      sectionEl.appendChild(listBox);
+
+      // Import a shared theme file.
+      var importBox = el(doc, 'div', { class: 'tool-box' });
+      importBox.appendChild(el(doc, 'h3', { text: 'Import a shared theme' }));
+      importBox.appendChild(
+        el(doc, 'p', {
+          text: 'Import validates the file first and shows what it holds — the theme is only added when you confirm.',
+        })
+      );
+      var importFile = el(doc, 'input', { type: 'file', accept: '.json,application/json' });
+      var importText = el(doc, 'textarea', {
+        class: 'control-input control-textarea',
+        rows: '6',
+        placeholder: '…or paste exported theme JSON here',
+      });
+      var importMsg = el(doc, 'p', { class: 'control-warning', text: '' });
+      var previewEl = el(doc, 'div', { class: 'import-preview' });
+      var addBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-primary',
+        text: 'Add theme',
+      });
+      addBtn.style.display = 'none';
+      var pendingTheme = null;
+      var handleImportText = function (text) {
+        importMsg.textContent = '';
+        previewEl.textContent = '';
+        addBtn.style.display = 'none';
+        pendingTheme = null;
+        var maxBytes = (constants && constants.MAX_IMPORT_BYTES) || 200000;
+        if (text.length > maxBytes) {
+          importMsg.textContent =
+            'Import is too large (' + text.length + ' characters, max ' + maxBytes + ').';
+          importMsg.style.display = 'block';
+          return;
+        }
+        var result = savedThemesApi.parseSavedThemeImport(text, savedThemes, themesApi);
+        if (result.error) {
+          importMsg.textContent = 'Import rejected: ' + result.error;
+          importMsg.style.display = 'block';
+          return;
+        }
+        pendingTheme = result.theme;
+        var count = Object.keys(result.theme.colors || {}).length;
+        previewEl.appendChild(
+          el(doc, 'p', {
+            text:
+              'Theme "' +
+              result.theme.name +
+              '" — base ' +
+              result.theme.theme +
+              ', ' +
+              count +
+              ' custom colour' +
+              (count === 1 ? '' : 's') +
+              '.',
+          })
+        );
+        addBtn.style.display = 'inline-block';
+      };
+      importFile.addEventListener('change', function () {
+        var file = importFile.files && importFile.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          handleImportText(String(reader.result || ''));
+        };
+        reader.readAsText(file);
+      });
+      var importBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn',
+        text: 'Validate & preview',
+      });
+      importBtn.addEventListener('click', function () {
+        handleImportText(importText.value);
+      });
+      addBtn.addEventListener('click', function () {
+        if (!pendingTheme) return;
+        if (savedThemes.length >= savedThemesApi.MAX_SAVED_THEMES) {
+          importMsg.textContent =
+            'You already have ' +
+            savedThemesApi.MAX_SAVED_THEMES +
+            ' saved themes — delete one first.';
+          importMsg.style.display = 'block';
+          return;
+        }
+        savedThemes = savedThemes.concat([pendingTheme]);
+        saveSavedThemes().then(function () {
+          savedThemesNotice = 'Added theme "' + pendingTheme.name + '".';
+          renderSection(currentSection);
+        });
+      });
+      importBox.appendChild(el(doc, 'p', { text: 'Import from a file:' }));
+      importBox.appendChild(importFile);
+      importBox.appendChild(el(doc, 'p', { text: 'Import from pasted JSON:' }));
+      importBox.appendChild(importText);
+      importBox.appendChild(importBtn);
+      importBox.appendChild(importMsg);
+      importBox.appendChild(previewEl);
+      importBox.appendChild(addBtn);
+      sectionEl.appendChild(importBox);
+    }
+
     function renderSection(sectionId) {
       var section = sectionById(sectionId);
       if (!section) return;
@@ -1310,6 +1608,7 @@
       if (section.id === 'profiles') renderProfilesTools(mainEl);
       if (section.id === 'health') renderHealthTools(mainEl);
       if (section.id === 'appearance') renderCssTemplateTools(mainEl);
+      if (section.id === 'appearance') renderSavedThemeTools(mainEl);
       checkShortcutWarnings();
     }
 
@@ -1545,16 +1844,21 @@
         storage.get(STORAGE_KEY),
         storage.get(PROFILES_KEY),
         storage.get(HEALTH_KEY),
+        storage.get(SAVED_THEMES_KEY),
       ])
         .then(function (results) {
           state = defaultsApi.migrateSettings(results[0]);
           profiles = profilesApi ? profilesApi.validateProfiles(results[1], defaultsApi) : [];
           healthRecord = healthApi ? healthApi.validateHealthRecord(results[2]) : {};
+          savedThemes = savedThemesApi
+            ? savedThemesApi.validateSavedThemes(results[3], apis.themes)
+            : [];
         })
         .catch(function () {
           state = defaultsApi.cloneDefaults();
           profiles = [];
           healthRecord = {};
+          savedThemes = [];
         });
     }
 
@@ -1579,6 +1883,14 @@
     function saveProfiles() {
       return storage.set({ [PROFILES_KEY]: profiles }).catch(function () {
         profilesNotice = 'Could not save profiles — please try again.';
+      });
+    }
+
+    // Persist the saved-themes list (local only — never
+    // synced). Same failure shape as saveProfiles.
+    function saveSavedThemes() {
+      return storage.set({ [SAVED_THEMES_KEY]: savedThemes }).catch(function () {
+        savedThemesNotice = 'Could not save themes — please try again.';
       });
     }
 
@@ -1711,6 +2023,7 @@
       profilesApi: ns.profiles,
       healthApi: ns.health,
       cssTemplatesApi: ns.cssTemplates,
+      savedThemesApi: ns.savedThemes,
       keyboardApi: ns.modules && ns.modules.keyboard,
       sections: sections,
       constants: ns.constants,
