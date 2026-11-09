@@ -117,9 +117,10 @@ test('channel Shorts tab: selector, CSS rule, toggle copy and health metadata', 
   assert.equal(meta.presence, 'sometimes');
   assert.equal(meta.feature, 'Shorts tab (channel)');
   assert.deepEqual(health.selectorsForPage('channel'), ['channelShortsTab']);
-  const record = health.checkHealth('channel', () => false, 1000);
+  const now = Date.now();
+  const record = health.checkHealth('channel', () => false, now);
   assert.equal(record.results.channelShortsTab, 'missing');
-  const summary = health.summarizeHealth({ channel: record });
+  const summary = health.summarizeHealth({ channel: record }, now);
   // A sometimes-only record cannot say "all OK" —
   // nothing was actually verified there (this is the
   // Phase 19 fix to the Phase 18 rule).

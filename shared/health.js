@@ -186,8 +186,8 @@
   //   match; 'working' when at least one selector
   //   matched and none of its always-selectors is
   //   missing.
-  function summarizeHealth(record) {
-    var clean = validateHealthRecord(record);
+  function summarizeHealth(record, now) {
+    var clean = validateHealthRecord(record, now);
     var checked = {};
     var brokenKeys = [];
     var seenKeys = {};
