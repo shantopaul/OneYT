@@ -144,6 +144,7 @@ and must work flawlessly before anything else ships.
 | PL-13 | Hide topic chips bar (home) | Toggle; the topic filter chips row ("All", "Music", "Gaming", …) at the top of the home feed is hidden; live apply, home page only |
 | PL-14 | Default theater mode | Toggle; every video opens in theater mode automatically; watch page only |
 | PL-15 | Hide live / mixes / news shelves | Three toggles; the "Live now" shelf, Mixes (shelf + mix cards), and the "Breaking news" shelf are hidden on the home feed; live apply |
+| PL-16 | Presets / Profiles | Four built-in presets (Stock YouTube, Focus, Clean, Cinema) applied in one click, plus named custom profiles that save the current settings as a snapshot and restore them exactly; dashboard Profiles section + popup picker; live apply; profiles stay on this device (never synced) |
 
 **Rule:** positioning must never overlap the sidebar, break
 responsive layout, or hide native player controls.

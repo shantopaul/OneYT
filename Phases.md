@@ -664,11 +664,59 @@ theater (merged); Phase 13 is disable ambient mode
 commits). v1.7.0 assumed 1.5.0 and 1.6.0 merge first —
 they did.
 
+## Phase 16 — Presets / Profiles (v1.8) ⏳ IN PROGRESS (2026-11-09)
+
+**Goal:** one click to a whole YouTube setup — four built-in
+presets (Stock YouTube, Focus, Clean, Cinema) plus named
+custom profiles that save the current settings as a snapshot
+and restore them exactly, from a new dashboard Profiles
+section and from the popup.
+
+**Deliverable:** v1.8.0.
+
+**Plan (part-by-part, push only when complete):** new pure
+module `shared/profiles.js` (`OneYT.profiles`, Node-testable):
+`BUILTIN_PRESETS` with partial `overrides` per preset,
+deep-merged onto the CURRENT settings (a preset changes
+only what it names — everything else the user set is kept);
+`applyPreset(current, id)` (unknown id → current unchanged);
+custom profiles `{name, createdAt, settings}` as full
+migrated snapshots — `createProfile` (name trimmed 1–40
+chars, no case-insensitive duplicates, not a built-in
+id/name, max 10 profiles), `applyProfile` (full replace —
+a profile restores exactly), `validateProfiles` (repairs /
+drops corrupt entries, caps at 10), `renameProfile`,
+`deleteProfile`. Storage key `oneyt.profiles.v1` (new
+`PROFILES_STORAGE_KEY` in `shared/constants.js`), local
+only, never synced (profiles hold full snapshots; the
+storage sync-mirror only acts on values with a `.sync`
+object, which a profiles value never has). Dashboard: new
+section `options/sections/profiles.js` (id `profiles`,
+after `general` in the options order, `controls: []` —
+profiles are not in `DEFAULT_SETTINGS`), rendered by a
+`renderProfilesTools` block in `options.js` called from
+`renderSection` exactly like `renderAdvancedTools`;
+preset buttons, save-name input, profile list with
+Apply / Rename / Delete. Popup: a preset picker `<select>`
+(built-ins + saved profile names) in `popup.html` /
+`popup.js`, applying on change via the shared helper.
+No content-script changes — applying only writes settings
+and the existing storage onChanged live-apply path does
+the rest. No new permission, no network, no new selector.
+Module tests + manual checklist item. **Browser
+verification still open** — the dashboard section and the
+popup picker need a real browser on Shanto's PC.
+Numbering note: this phase takes Phase 16 because Phase
+12 is hide topic chips (merged), Phase 14 is default
+theater (merged) and Phase 15 is hide shelves (merged);
+Phase 13 is disable ambient mode (parked, branch
+`feature/disable-ambient-mode` with no commits). v1.8.0
+assumes 1.7.0 is in `main` — it is.
+
 ## Future (v1.1+, not in scope now)
 
 - Popup dark/light theme to match the dashboard (follow-up to Phase 9)
 - Channel-page Shorts tab hiding (follow-up to Block Shorts)
-- Workspace presets / saved profiles (per-page profiles)
 - Multiple saved themes + community theme sharing (exportable presets)
 - Advanced layout editor
 - Optional cloud sync / cross-device backup (opt-in, explicit)
