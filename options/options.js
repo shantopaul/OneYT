@@ -102,7 +102,26 @@
     'modules.recommendations': { id: 'sidebar', label: 'Sidebar' },
     'modules.focus': { id: 'productivity', label: 'Productivity' },
     'modules.keyboard': { id: 'keyboard', label: 'Keyboard' },
-    'modules.navigation': { id: 'productivity', label: 'Productivity' },
+    'modules.navigation': { id: 'layout', label: 'Layout' },
+  };
+
+  var SECTION_MODULE_DEPS = {
+    player: [{ key: 'modules.player', label: 'Player' }],
+    sidebar: [
+      { key: 'modules.sidebar', label: 'Sidebar' },
+      { key: 'modules.recommendations', label: 'Recommendations' },
+    ],
+    layout: [
+      { key: 'modules.layout', label: 'Layout' },
+      { key: 'modules.navigation', label: 'Navigation' },
+    ],
+    appearance: [
+      { key: 'modules.appearance', label: 'Appearance' },
+      { key: 'modules.typography', label: 'Typography' },
+    ],
+    playback: [{ key: 'modules.playback', label: 'Playback' }],
+    productivity: [{ key: 'modules.focus', label: 'Focus' }],
+    keyboard: [{ key: 'modules.keyboard', label: 'Keyboard' }],
   };
 
   var SECTION_GROUPS = {
@@ -2025,6 +2044,55 @@
       sectionEl.appendChild(importBox);
     }
 
+    function renderModuleStatusBanner(sectionEl, sectionId) {
+      var deps = SECTION_MODULE_DEPS[sectionId];
+      if (!deps || deps.length === 0) return;
+      var masterOff = !getPath(state, 'enabled');
+      var disabledDeps = deps.filter(function (dep) {
+        return !getPath(state, dep.key);
+      });
+      if (!masterOff && disabledDeps.length === 0) return;
+      var banner = el(doc, 'div', { class: 'module-status-banner', role: 'status' });
+      var msg;
+      var btnText;
+      if (masterOff) {
+        msg =
+          'OneYT is turned off in General — these settings are saved but will not run on YouTube until enabled.';
+        btnText = 'Turn on OneYT';
+      } else {
+        var names = disabledDeps
+          .map(function (dep) {
+            return dep.label;
+          })
+          .join(' & ');
+        msg =
+          names +
+          (disabledDeps.length === 1 ? ' module is' : ' modules are') +
+          ' disabled in General — turn ' +
+          (disabledDeps.length === 1 ? 'it' : 'them') +
+          ' on for changes here to apply.';
+        btnText = 'Enable ' + names;
+      }
+      banner.appendChild(el(doc, 'span', { class: 'module-status-text', text: msg }));
+      var enableBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small',
+        text: btnText,
+      });
+      enableBtn.addEventListener('click', function () {
+        var next = defaultsApi.deepClone(state);
+        if (masterOff) setPath(next, 'enabled', true);
+        disabledDeps.forEach(function (dep) {
+          setPath(next, dep.key, true);
+        });
+        replaceState(next).then(function () {
+          renderSection(sectionId);
+        });
+      });
+      banner.appendChild(enableBtn);
+      sectionEl.appendChild(banner);
+    }
+
     function renderSection(sectionId) {
       var section = sectionById(sectionId);
       if (!section) return;
@@ -2062,6 +2130,7 @@
         header.appendChild(resetSectionBtn);
       }
       mainEl.appendChild(header);
+      if (section.id !== 'general') renderModuleStatusBanner(mainEl, section.id);
       if (section.id === 'general') {
         var coreControls = (section.controls || []).filter(function (c) {
           return c.key.indexOf('modules.') !== 0;
@@ -2827,6 +2896,7 @@
     countHealthStatuses: countHealthStatuses,
     MODULE_SECTION_MAP: MODULE_SECTION_MAP,
     SECTION_GROUPS: SECTION_GROUPS,
+    SECTION_MODULE_DEPS: SECTION_MODULE_DEPS,
     createOptionsApp: createOptionsApp,
   };
 

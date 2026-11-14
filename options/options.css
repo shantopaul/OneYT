@@ -1314,8 +1314,29 @@ body {
   margin: 22px 0 12px;
 }
 
-.section-header + .section-group-head {
+.section-header + .section-group-head,
+.module-status-banner + .section-group-head {
   margin-top: 6px;
+}
+
+.module-status-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--ui-warning-soft);
+  border: 1px solid var(--ui-warning);
+  border-left: 3px solid var(--ui-warning);
+  border-radius: var(--ui-radius);
+  color: var(--ui-text);
+  font-size: 13px;
+}
+
+.module-status-text {
+  flex: 1 1 260px;
 }
 
 .section-group-title {
