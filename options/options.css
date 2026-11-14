@@ -732,16 +732,21 @@ body {
 }
 
 .speed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 6px 4px 10px;
   background: var(--ui-bg);
   border: 1px solid var(--ui-border);
   border-radius: 999px;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 
 .speed-remove {
   background: none;
   border: none;
+  border-radius: 999px;
   color: var(--ui-text-secondary);
   cursor: pointer;
   font-size: 15px;
@@ -752,9 +757,13 @@ body {
   color: var(--ui-danger);
 }
 
+.speed-remove:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
+}
+
 .speed-add-input {
   min-width: 120px;
-  margin-right: 8px;
 }
 
 /* --- Buttons & tool boxes --- */

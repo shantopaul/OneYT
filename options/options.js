@@ -524,9 +524,43 @@
       return saveNow();
     }
 
+    function updateLayoutPreview() {
+      if (!layoutPresetsApi || !mainEl) return;
+      var summaryEl = mainEl.querySelector('.layout-preview-summary');
+      var gridEl = mainEl.querySelector('.layout-preview-grid');
+      if (!summaryEl || !gridEl) return;
+      var summary = layoutPresetsApi.layoutPreviewSummary(state);
+      summaryEl.textContent =
+        summary.columns +
+        ' columns · ' +
+        summary.gap +
+        ' px gap · ' +
+        (summary.maxWidth > 0 ? 'max-width ' + summary.maxWidth + ' px' : 'full width') +
+        '.';
+      gridEl.setAttribute(
+        'style',
+        'display: flex; gap: ' + Math.min(summary.gap, 24) + 'px; margin-top: 8px;'
+      );
+      gridEl.textContent = '';
+      for (var i = 0; i < summary.columns; i++) {
+        var cell = el(doc, 'div', { class: 'layout-preview-cell' });
+        cell.setAttribute(
+          'style',
+          'flex: 1; height: 48px; background: var(--ui-accent-soft, rgba(255, 0, 51, 0.12)); border: 1px solid var(--ui-border, #2a2a2a); border-radius: 6px;'
+        );
+        gridEl.appendChild(cell);
+      }
+    }
+
     function setValue(key, value, delay) {
       setPath(state, key, value);
       if (key === 'ui.dashboardTheme') applyDashboardTheme();
+      if (key === 'playback.speedPresets' && inputsByKey['playback.defaultSpeed']) {
+        inputsByKey['playback.defaultSpeed'].set(getPath(state, 'playback.defaultSpeed'));
+      }
+      if (currentSection === 'layout' && key.indexOf('layout.') === 0) {
+        updateLayoutPreview();
+      }
       saveSoon(delay);
     }
 
@@ -764,6 +798,7 @@
         },
         bind: function (row) {
           picker.addEventListener('input', function () {
+            showWarning(row, '');
             text.value = picker.value;
             apply(picker.value);
           });
@@ -779,6 +814,7 @@
             apply(v);
           });
           clear.addEventListener('click', function () {
+            showWarning(row, '');
             apply('');
             text.value = '';
             picker.value = '#000000';
@@ -827,14 +863,21 @@
         placeholder: 'e.g. 1.75',
       });
       var addBtn = el(doc, 'button', { type: 'button', class: 'btn btn-small', text: 'Add speed' });
+      var addRow = el(doc, 'div', { class: 'tool-inline-form' });
+      addRow.appendChild(addInput);
+      addRow.appendChild(addBtn);
       wrap.appendChild(listEl);
-      wrap.appendChild(addInput);
-      wrap.appendChild(addBtn);
+      wrap.appendChild(addRow);
       var render = function (values) {
         listEl.textContent = '';
         (values || []).forEach(function (v) {
           var chip = el(doc, 'span', { class: 'speed-chip', text: v + 'x ' });
-          var x = el(doc, 'button', { type: 'button', class: 'speed-remove', text: '×' });
+          var x = el(doc, 'button', {
+            type: 'button',
+            class: 'speed-remove',
+            text: '×',
+            'aria-label': 'Remove ' + v + 'x speed',
+          });
           x.addEventListener('click', function () {
             var next = (getPath(state, control.key) || []).filter(function (n) {
               return n !== v;
@@ -852,7 +895,7 @@
           render(Array.isArray(value) ? value : []);
         },
         bind: function (row) {
-          addBtn.addEventListener('click', function () {
+          var addSpeed = function () {
             var num = Number(addInput.value);
             if (!validators) return;
             var check = validators.validateSpeedPresets([num]);
@@ -870,6 +913,13 @@
             setValue(control.key, next, 0);
             render(next);
             addInput.value = '';
+          };
+          addBtn.addEventListener('click', addSpeed);
+          addInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              addSpeed();
+            }
           });
         },
       };
@@ -1866,35 +1916,17 @@
         );
         return;
       }
-      var summary = layoutPresetsApi.layoutPreviewSummary(state);
       var previewBox = el(doc, 'div', { class: 'tool-box' });
       previewBox.appendChild(el(doc, 'h3', { text: 'Preview' }));
       previewBox.appendChild(
         el(doc, 'p', {
-          text:
-            summary.columns +
-            ' columns · ' +
-            summary.gap +
-            ' px gap · ' +
-            (summary.maxWidth > 0 ? 'max-width ' + summary.maxWidth + ' px' : 'full width') +
-            '.',
+          class: 'layout-preview-summary',
+          text: '',
         })
       );
-      var grid = el(doc, 'div', { class: 'layout-preview-grid' });
-      grid.setAttribute(
-        'style',
-        'display: flex; gap: ' + Math.min(summary.gap, 24) + 'px; margin-top: 8px;'
-      );
-      for (var i = 0; i < summary.columns; i++) {
-        var cell = el(doc, 'div', { class: 'layout-preview-cell' });
-        cell.setAttribute(
-          'style',
-          'flex: 1; height: 48px; background: var(--ui-accent-soft, rgba(255, 0, 51, 0.12)); border: 1px solid var(--ui-border, #2a2a2a); border-radius: 6px;'
-        );
-        grid.appendChild(cell);
-      }
-      previewBox.appendChild(grid);
+      previewBox.appendChild(el(doc, 'div', { class: 'layout-preview-grid' }));
       sectionEl.appendChild(previewBox);
+      updateLayoutPreview();
 
       var presetBox = el(doc, 'div', { class: 'tool-box' });
       presetBox.appendChild(el(doc, 'h3', { text: 'Layout presets' }));
