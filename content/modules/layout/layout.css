@@ -160,9 +160,16 @@ html.oneyt-enabled.oneyt-channel-shelf-items {
   }
 }
 
-html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer {
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer,
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer > #contents {
   --ytd-rich-grid-items-per-row: var(--oneyt-effective-home-columns) !important;
   --ytd-rich-grid-mini-game-cards-per-row: var(--oneyt-effective-home-columns) !important;
+}
+
+/* Unwrap fixed-size <ytd-rich-grid-row> wrappers so cards reflow evenly across custom column counts. */
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row,
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row > #contents {
+  display: contents !important;
 }
 
 /* Match skeleton loading placeholders to the chosen column count to avoid layout jump. */
@@ -190,7 +197,7 @@ html.oneyt-enabled.oneyt-shelf-items ytd-rich-grid-renderer {
   --ytd-rich-grid-game-cards-per-row: var(--oneyt-effective-shelf-items) !important;
 }
 
-html.oneyt-enabled.oneyt-shelf-items :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media] {
+html.oneyt-enabled.oneyt-shelf-items :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:is([is-slim-media], :has(ytm-shorts-lockup-view-model)) {
   width: calc(
     100% / var(--oneyt-effective-shelf-items) - var(--ytd-rich-grid-item-margin, 16px) - 0.01px
   ) !important;
@@ -225,15 +232,26 @@ html.oneyt-enabled.oneyt-channel-wide [page-subtype='channels'] ytd-two-column-b
   padding-inline: 20px;
 }
 
-html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer {
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]),
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]) > #contents {
   --ytd-rich-grid-items-per-row: var(--oneyt-effective-channel-columns) !important;
+}
+
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row,
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row > #contents {
+  display: contents !important;
 }
 
 html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-grid-renderer {
   --ytd-rich-grid-slim-items-per-row: var(--oneyt-effective-channel-shelf-items) !important;
 }
 
-html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media] {
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-grid-renderer[is-shorts-grid],
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-grid-renderer[is-shorts-grid] > #contents {
+  --ytd-rich-grid-items-per-row: var(--oneyt-effective-channel-shelf-items) !important;
+}
+
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:is([is-slim-media], :has(ytm-shorts-lockup-view-model)) {
   width: calc(
     100% / var(--oneyt-effective-channel-shelf-items) - var(--ytd-rich-grid-item-margin, 16px) - 0.01px
   ) !important;
