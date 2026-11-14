@@ -232,25 +232,53 @@
       },
     ],
     'productivity.focusHideComments': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'productivity.focusHideChat': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'productivity.focusHideRecommendations': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'productivity.focusHideShorts': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'productivity.focusHideButtons': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'productivity.focusHideMetadata': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'productivity.focusHideNav': [
-      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
     ],
     'layout.hideShortsHome': [
       {
@@ -331,6 +359,16 @@
     }
     return '';
   }
+
+  var FOCUS_HIDE_KEYS = [
+    'productivity.focusHideComments',
+    'productivity.focusHideChat',
+    'productivity.focusHideRecommendations',
+    'productivity.focusHideShorts',
+    'productivity.focusHideButtons',
+    'productivity.focusHideMetadata',
+    'productivity.focusHideNav',
+  ];
 
   var SECTION_GROUPS = {
     player: {
@@ -1143,6 +1181,19 @@
       btn.textContent = count > 0 ? 'Clear all (' + count + ')' : 'Clear all';
     }
 
+    function updateProductivitySummary() {
+      if (currentSection !== 'productivity' || !mainEl) return;
+      var hiddenCount = FOCUS_HIDE_KEYS.filter(function (k) {
+        return !!getPath(state, k);
+      }).length;
+      var countEl = mainEl.querySelector('.focus-hidden-count');
+      if (countEl) countEl.textContent = hiddenCount + ' of ' + FOCUS_HIDE_KEYS.length + ' hidden';
+      var hideAllBtn = mainEl.querySelector('.focus-hide-all-btn');
+      if (hideAllBtn) hideAllBtn.disabled = hiddenCount === FOCUS_HIDE_KEYS.length;
+      var showAllBtn = mainEl.querySelector('.focus-show-all-btn');
+      if (showAllBtn) showAllBtn.disabled = hiddenCount === 0;
+    }
+
     function updateControlModifiedState(key) {
       if (!mainEl) return;
       var row = mainEl.querySelector('[data-control-key="' + key + '"]');
@@ -1214,6 +1265,12 @@
       if (key === 'enabled' || key.indexOf('modules.') === 0) {
         updateModulesSummary();
       }
+      if (
+        currentSection === 'productivity' &&
+        (key.indexOf('productivity.') === 0 || key === 'keyboard.shortcuts.toggleFocus')
+      ) {
+        updateProductivitySummary();
+      }
       updateControlModifiedState(key);
       updateControlPresetChips(key);
       updateControlDependencies();
@@ -1256,6 +1313,7 @@
         });
       });
       updateModulesSummary();
+      updateProductivitySummary();
       updateSidebarPreview();
       updateThemeContrastPreview();
       updateColorClearAllBtn();
@@ -2817,6 +2875,37 @@
                 });
               });
               subHead.appendChild(clearAllBtn);
+            } else if (control.key === 'productivity.focusHideComments') {
+              subTitle.appendChild(el(doc, 'span', { class: 'focus-hidden-count', text: '' }));
+              var quickWrap = el(doc, 'div', { class: 'focus-quick-actions' });
+              var setAllFocusHidden = function (val) {
+                var next = defaultsApi.deepClone(state);
+                FOCUS_HIDE_KEYS.forEach(function (k) {
+                  setPath(next, k, val);
+                });
+                replaceState(next).then(function () {
+                  refreshValues();
+                });
+              };
+              var hideAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small focus-hide-all-btn',
+                text: 'Hide all',
+              });
+              hideAllBtn.addEventListener('click', function () {
+                setAllFocusHidden(true);
+              });
+              var showAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small focus-show-all-btn',
+                text: 'Show all',
+              });
+              showAllBtn.addEventListener('click', function () {
+                setAllFocusHidden(false);
+              });
+              quickWrap.appendChild(hideAllBtn);
+              quickWrap.appendChild(showAllBtn);
+              subHead.appendChild(quickWrap);
             }
             mainEl.appendChild(subHead);
           }
@@ -2843,6 +2932,7 @@
         });
         flushGridRun();
         updateColorClearAllBtn();
+        updateProductivitySummary();
       }
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);
@@ -3581,6 +3671,7 @@
     SECTION_GROUPS: SECTION_GROUPS,
     TOGGLE_GRID_KEYS: TOGGLE_GRID_KEYS,
     SECTION_MODULE_DEPS: SECTION_MODULE_DEPS,
+    FOCUS_HIDE_KEYS: FOCUS_HIDE_KEYS,
     createOptionsApp: createOptionsApp,
   };
 

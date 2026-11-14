@@ -1669,9 +1669,27 @@ body {
   justify-content: space-between;
 }
 
-.colors-clear-all-btn:disabled {
+.colors-clear-all-btn:disabled,
+.focus-hide-all-btn:disabled,
+.focus-show-all-btn:disabled {
   opacity: 0.45;
   cursor: default;
+}
+
+.focus-hidden-count {
+  padding: 2px 9px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.focus-quick-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .control-grid-modules.is-master-paused {
