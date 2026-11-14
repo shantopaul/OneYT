@@ -41,6 +41,15 @@
     return obj;
   }
 
+  function countHealthStatuses(features) {
+    var counts = { total: 0, working: 0, broken: 0, 'not-seen': 0, unchecked: 0 };
+    (features || []).forEach(function (item) {
+      counts.total++;
+      if (counts[item.status] !== undefined) counts[item.status]++;
+    });
+    return counts;
+  }
+
   function isPlainObject(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
   }
@@ -437,6 +446,7 @@
     var savedThemes = [];
     var savedThemesNotice = '';
     var healthRecord = {};
+    var healthFilter = 'all';
     var saveTimer = null;
     var navEl = doc.getElementById('options-nav');
     var mainEl = doc.getElementById('options-main');
@@ -1918,55 +1928,157 @@
         return;
       }
       var summary = healthApi.summarizeHealth(healthRecord);
+      var counts = countHealthStatuses(summary.features);
 
-      var statusBox = el(doc, 'div', { class: 'tool-box' });
-      var statusText =
-        summary.status === 'ok'
-          ? 'All checked features are working.'
-          : summary.status === 'broken'
-            ? 'Some features are not working — YouTube may have changed its layout. Nothing is disabled; the features below simply cannot find what they look for.'
-            : 'No health data yet — open YouTube, wait a few seconds, then come back here.';
-      statusBox.appendChild(el(doc, 'h3', { text: 'Status' }));
-      statusBox.appendChild(el(doc, 'p', { text: statusText }));
-      var checkedPages = Object.keys(summary.checked);
-      if (checkedPages.length > 0) {
-        checkedPages.forEach(function (pageType) {
-          statusBox.appendChild(
-            el(doc, 'p', {
-              text:
-                pageType +
-                ' page checked ' +
-                new Date(summary.checked[pageType]).toLocaleString() +
-                '.',
-            })
-          );
-        });
-      }
+      var statusMeta = {
+        ok: {
+          badge: 'Healthy',
+          message: 'All checked features are working.',
+        },
+        broken: {
+          badge: 'Attention needed',
+          message:
+            'Some features are not working — YouTube may have changed its layout. Nothing is disabled; the features below simply cannot find what they look for.',
+        },
+        unknown: {
+          badge: 'Waiting for data',
+          message: 'No health data yet — open YouTube, wait a few seconds, then come back here.',
+        },
+      };
+      var bannerMeta = statusMeta[summary.status] || statusMeta.unknown;
+
+      var statusBox = el(doc, 'div', {
+        class: 'tool-box health-banner health-status-' + summary.status,
+      });
+      var bannerHead = el(doc, 'div', { class: 'health-banner-head' });
+      var bannerTitleGroup = el(doc, 'div', { class: 'health-banner-title' });
+      bannerTitleGroup.appendChild(
+        el(doc, 'span', {
+          class: 'health-badge health-badge--' + (summary.status === 'ok' ? 'working' : summary.status === 'broken' ? 'broken' : 'unchecked'),
+          text: bannerMeta.badge,
+        })
+      );
+      bannerTitleGroup.appendChild(el(doc, 'h3', { text: 'Overview' }));
+      bannerHead.appendChild(bannerTitleGroup);
+
       var refreshBtn = el(doc, 'button', {
         type: 'button',
-        class: 'btn',
+        class: 'btn btn-small',
         text: 'Check again',
       });
       refreshBtn.addEventListener('click', function () {
         refreshHealth();
       });
-      statusBox.appendChild(refreshBtn);
+      bannerHead.appendChild(refreshBtn);
+      statusBox.appendChild(bannerHead);
+      statusBox.appendChild(el(doc, 'p', { class: 'health-banner-desc', text: bannerMeta.message }));
+
+      var checkedPages = Object.keys(summary.checked);
+      if (checkedPages.length > 0) {
+        var checkedWrap = el(doc, 'div', { class: 'health-checked-list' });
+        checkedPages.forEach(function (pageType) {
+          checkedWrap.appendChild(
+            el(doc, 'span', {
+              class: 'health-checked-pill',
+              text:
+                pageType +
+                ' checked ' +
+                new Date(summary.checked[pageType]).toLocaleString(),
+            })
+          );
+        });
+        statusBox.appendChild(checkedWrap);
+      }
       sectionEl.appendChild(statusBox);
 
-      var listBox = el(doc, 'div', { class: 'tool-box' });
-      listBox.appendChild(el(doc, 'h3', { text: 'Features' }));
+      // Summary stat & filter chips.
+      var statsBar = el(doc, 'div', {
+        class: 'health-stats',
+        role: 'group',
+        'aria-label': 'Filter features by status',
+      });
+      var filterSpecs = [
+        { id: 'all', label: 'All', count: counts.total },
+        { id: 'working', label: 'Working', count: counts.working },
+        { id: 'broken', label: 'Not working', count: counts.broken },
+        { id: 'not-seen', label: 'Not seen', count: counts['not-seen'] },
+        { id: 'unchecked', label: 'Not checked', count: counts.unchecked },
+      ];
+      var filterButtons = [];
+
+      var listBox = el(doc, 'div', { class: 'tool-box health-list-box' });
+      var listHead = el(doc, 'div', { class: 'health-list-head' });
+      listHead.appendChild(el(doc, 'h3', { text: 'Features' }));
+      var showingEl = el(doc, 'span', { class: 'health-showing' });
+      listHead.appendChild(showingEl);
+      listBox.appendChild(listHead);
+
+      var grid = el(doc, 'div', { class: 'health-grid' });
+      listBox.appendChild(grid);
+
       var statusLabels = {
         working: 'Working',
         broken: 'Not working',
-        'not-seen': 'Not seen on this visit',
-        unchecked: 'Not checked yet',
+        'not-seen': 'Not seen',
+        unchecked: 'Not checked',
       };
-      summary.features.forEach(function (row) {
-        var item = el(doc, 'div', { class: 'profile-row' });
-        item.appendChild(el(doc, 'strong', { text: row.feature }));
-        item.appendChild(el(doc, 'p', { text: statusLabels[row.status] || row.status }));
-        listBox.appendChild(item);
+
+      function renderFeatureCards() {
+        var filtered = summary.features.filter(function (row) {
+          return healthFilter === 'all' || row.status === healthFilter;
+        });
+        showingEl.textContent =
+          'Showing ' + filtered.length + ' of ' + summary.features.length;
+        grid.textContent = '';
+        if (filtered.length === 0) {
+          grid.appendChild(
+            el(doc, 'p', {
+              class: 'health-empty',
+              text: 'No features match this status filter.',
+            })
+          );
+          return;
+        }
+        filtered.forEach(function (row) {
+          var card = el(doc, 'div', {
+            class: 'health-card health-card--' + row.status,
+          });
+          card.appendChild(el(doc, 'span', { class: 'health-card-name', text: row.feature }));
+          var badge = el(doc, 'span', { class: 'health-badge health-badge--' + row.status }, [
+            el(doc, 'span', { class: 'health-dot', 'aria-hidden': 'true' }),
+            statusLabels[row.status] || row.status,
+          ]);
+          card.appendChild(badge);
+          grid.appendChild(card);
+        });
+      }
+
+      filterSpecs.forEach(function (spec) {
+        var btn = el(doc, 'button', {
+          type: 'button',
+          class:
+            'health-stat-card health-stat-' +
+            spec.id +
+            (healthFilter === spec.id ? ' active' : ''),
+          'aria-pressed': healthFilter === spec.id ? 'true' : 'false',
+        });
+        btn.appendChild(el(doc, 'span', { class: 'health-stat-count', text: String(spec.count) }));
+        btn.appendChild(el(doc, 'span', { class: 'health-stat-label', text: spec.label }));
+        btn.addEventListener('click', function () {
+          healthFilter = spec.id;
+          filterButtons.forEach(function (entry) {
+            var isActive = entry.id === healthFilter;
+            entry.btn.classList.toggle('active', isActive);
+            entry.btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          });
+          renderFeatureCards();
+        });
+        filterButtons.push({ id: spec.id, btn: btn });
+        statsBar.appendChild(btn);
       });
+
+      sectionEl.appendChild(statsBar);
+      renderFeatureCards();
       sectionEl.appendChild(listBox);
     }
 
@@ -2391,6 +2503,7 @@
     splitHighlight: splitHighlight,
     searchKeyAction: searchKeyAction,
     resolveDashboardTheme: resolveDashboardTheme,
+    countHealthStatuses: countHealthStatuses,
     createOptionsApp: createOptionsApp,
   };
 
