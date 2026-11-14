@@ -629,13 +629,45 @@ body {
 
 .control-warning {
   display: none;
-  margin: 8px 0 0;
-  padding: 8px 10px;
+  margin: 8px 0 12px;
+  padding: 8px 12px;
   background: var(--ui-warning-soft);
   border-left: 3px solid var(--ui-warning);
   border-radius: var(--ui-radius-sm);
   color: var(--ui-warning);
   font-size: 13px;
+}
+
+.control-warning.notice-success {
+  background: var(--ui-success-soft);
+  border-left-color: var(--ui-success);
+  color: var(--ui-success);
+}
+
+.control-warning.notice-error {
+  background: var(--ui-danger-soft);
+  border-left-color: var(--ui-danger);
+  color: var(--ui-danger);
+}
+
+.theme-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-swatches {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.theme-swatch-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border-strong);
+  display: inline-block;
 }
 
 .control-input {

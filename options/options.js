@@ -444,6 +444,34 @@
 
   function createOptionsApp(deps) {
     var doc = deps.document;
+
+    function createToolNoticeEl(text) {
+      var msg = text || '';
+      var cls = 'control-warning';
+      if (
+        msg.indexOf('Applied ') === 0 ||
+        msg.indexOf('Saved ') === 0 ||
+        msg.indexOf('Added ') === 0 ||
+        msg.indexOf('Renamed ') === 0 ||
+        msg.indexOf('Deleted ') === 0
+      ) {
+        cls += ' notice-success';
+      } else if (msg.indexOf('Could not') !== -1 || msg.indexOf('rejected') !== -1) {
+        cls += ' notice-error';
+      }
+      var node = el(doc, 'p', { class: cls, text: msg });
+      if (msg) node.style.display = 'block';
+      return node;
+    }
+
+    function bindEnterSubmit(inputEl, btnEl) {
+      inputEl.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          btnEl.click();
+        }
+      });
+    }
     var storage = deps.storage;
     var defaultsApi = deps.defaultsApi;
     var validators = deps.validators;
@@ -1366,12 +1394,8 @@
     // A preset changes only the settings it names; a profile
     // restores its snapshot exactly (see shared/profiles.js).
     function renderProfilesTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (profilesNotice) {
-        msgEl.textContent = profilesNotice;
-        msgEl.style.display = 'block';
-        profilesNotice = '';
-      }
+      var msgEl = createToolNoticeEl(profilesNotice);
+      if (profilesNotice) profilesNotice = '';
       sectionEl.appendChild(msgEl);
       if (!profilesApi) {
         sectionEl.appendChild(
@@ -1454,6 +1478,7 @@
         var saveForm = el(doc, 'div', { class: 'tool-inline-form' });
         saveForm.appendChild(nameInput);
         saveForm.appendChild(saveBtn);
+        bindEnterSubmit(nameInput, saveBtn);
         saveBox.appendChild(saveForm);
         sectionEl.appendChild(saveBox);
 
@@ -1534,6 +1559,7 @@
             renameForm.appendChild(editInput);
             renameForm.appendChild(confirmBtn);
             renameForm.appendChild(cancelBtn);
+            bindEnterSubmit(editInput, confirmBtn);
             row.appendChild(renameForm);
           });
           var deleteBtn = el(doc, 'button', {
@@ -1568,12 +1594,8 @@
     // Removal is manual: delete the template's block
     // from the Custom CSS box.
     function renderCssTemplateTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (templatesNotice) {
-        msgEl.textContent = templatesNotice;
-        msgEl.style.display = 'block';
-        templatesNotice = '';
-      }
+      var msgEl = createToolNoticeEl(templatesNotice);
+      if (templatesNotice) templatesNotice = '';
       sectionEl.appendChild(msgEl);
       if (!cssTemplatesApi) {
         sectionEl.appendChild(
@@ -1642,12 +1664,8 @@
     // adds it when you confirm (mirroring the Advanced
     // import flow).
     function renderSavedThemeTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (savedThemesNotice) {
-        msgEl.textContent = savedThemesNotice;
-        msgEl.style.display = 'block';
-        savedThemesNotice = '';
-      }
+      var msgEl = createToolNoticeEl(savedThemesNotice);
+      if (savedThemesNotice) savedThemesNotice = '';
       sectionEl.appendChild(msgEl);
       if (!savedThemesApi) {
         sectionEl.appendChild(
@@ -1704,6 +1722,7 @@
       var saveForm = el(doc, 'div', { class: 'tool-inline-form' });
       saveForm.appendChild(nameInput);
       saveForm.appendChild(saveBtn);
+      bindEnterSubmit(nameInput, saveBtn);
       saveBox.appendChild(saveForm);
       sectionEl.appendChild(saveBox);
 
@@ -1726,7 +1745,19 @@
       }
       savedThemes.forEach(function (savedTheme) {
         var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: savedTheme.name }));
+        var titleRow = el(doc, 'div', { class: 'theme-title-row' });
+        titleRow.appendChild(el(doc, 'strong', { text: savedTheme.name }));
+        var swatchHexes = Object.values(savedTheme.colors || {}).slice(0, 4);
+        if (swatchHexes.length > 0) {
+          var swatches = el(doc, 'span', { class: 'theme-swatches', 'aria-hidden': 'true' });
+          swatchHexes.forEach(function (hex) {
+            var dot = el(doc, 'span', { class: 'theme-swatch-dot' });
+            dot.style.backgroundColor = hex;
+            swatches.appendChild(dot);
+          });
+          titleRow.appendChild(swatches);
+        }
+        row.appendChild(titleRow);
         var colourCount = Object.keys(savedTheme.colors || {}).length;
         row.appendChild(
           el(doc, 'p', {
@@ -1805,6 +1836,7 @@
           renameForm.appendChild(editInput);
           renameForm.appendChild(confirmBtn);
           renameForm.appendChild(cancelBtn);
+          bindEnterSubmit(editInput, confirmBtn);
           row.appendChild(renameForm);
         });
         var deleteBtn = el(doc, 'button', {
@@ -2026,12 +2058,8 @@
     // The preview is a diagram of the numbers, not a
     // screenshot of YouTube.
     function renderLayoutEditorTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (layoutEditorNotice) {
-        msgEl.textContent = layoutEditorNotice;
-        msgEl.style.display = 'block';
-        layoutEditorNotice = '';
-      }
+      var msgEl = createToolNoticeEl(layoutEditorNotice);
+      if (layoutEditorNotice) layoutEditorNotice = '';
       sectionEl.appendChild(msgEl);
       if (!layoutPresetsApi) {
         sectionEl.appendChild(
