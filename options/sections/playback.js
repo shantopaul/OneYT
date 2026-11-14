@@ -39,6 +39,13 @@
         max: 100,
         step: 1,
         unit: '%',
+        presets: [
+          { label: 'Mute (0%)', value: 0 },
+          { label: '25%', value: 25 },
+          { label: '50%', value: 50 },
+          { label: '75%', value: 75 },
+          { label: '100%', value: 100 },
+        ],
         keywords: ['volume', 'playback', 'loudness'],
       },
       {
@@ -81,6 +88,12 @@
         max: 200,
         step: 5,
         unit: '%',
+        presets: [
+          { label: 'Default (0)', value: 0 },
+          { label: '100%', value: 100 },
+          { label: '125%', value: 125 },
+          { label: '150%', value: 150 },
+        ],
         keywords: ['captions', 'font', 'size', 'subtitles'],
       },
     ],
