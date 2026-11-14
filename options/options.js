@@ -786,12 +786,17 @@
         max: control.max !== undefined ? String(control.max) : '',
         step: control.step !== undefined ? String(control.step) : '',
       });
-      var out = el(doc, 'output', { class: 'control-value' });
-      wrap.appendChild(input);
-      wrap.appendChild(out);
+      var out = null;
       var updateOut = function () {
-        out.textContent = input.value + (control.unit ? ' ' + control.unit : '');
+        if (out) out.textContent = input.value + (control.unit ? ' ' + control.unit : '');
       };
+      wrap.appendChild(input);
+      if (isRange) {
+        out = el(doc, 'output', { class: 'control-value' });
+        wrap.appendChild(out);
+      } else if (control.unit) {
+        wrap.appendChild(el(doc, 'span', { class: 'control-number-unit', text: control.unit }));
+      }
       return {
         node: wrap,
         set: function (value) {
@@ -1118,15 +1123,16 @@
 
     function renderControlRow(control) {
       var isToggle = control.type === 'toggle';
+      var isStacked = control.type === 'textarea' || control.type === 'speedList';
+      var isInline = !isToggle && !isStacked;
       var classes = ['control-row'];
       if (isToggle) classes.push('control-row-toggle');
+      if (isInline) classes.push('control-row-inline');
       if (control.key === 'enabled') classes.push('control-row-master');
       var row = el(doc, 'div', {
         class: classes.join(' '),
         'data-control-key': control.key,
       });
-      var head = el(doc, 'div', { class: 'control-head' });
-      head.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
       var resetBtn = el(doc, 'button', {
         type: 'button',
         class: 'btn btn-small control-reset',
@@ -1143,17 +1149,34 @@
       var input = makeInput(control);
       inputsByKey[control.key] = input;
       if (isToggle) {
-        var actions = el(doc, 'div', { class: 'control-actions' });
-        actions.appendChild(resetBtn);
-        actions.appendChild(input.node);
-        head.appendChild(actions);
+        var head = el(doc, 'div', { class: 'control-head' });
+        head.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+        var toggleActions = el(doc, 'div', { class: 'control-actions' });
+        toggleActions.appendChild(resetBtn);
+        toggleActions.appendChild(input.node);
+        head.appendChild(toggleActions);
         row.appendChild(head);
         if (control.description) {
           row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
         }
+      } else if (isInline) {
+        var grid = el(doc, 'div', { class: 'control-row-grid' });
+        var copy = el(doc, 'div', { class: 'control-copy' });
+        copy.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+        if (control.description) {
+          copy.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
+        }
+        var inlineActions = el(doc, 'div', { class: 'control-actions' });
+        inlineActions.appendChild(input.node);
+        inlineActions.appendChild(resetBtn);
+        grid.appendChild(copy);
+        grid.appendChild(inlineActions);
+        row.appendChild(grid);
       } else {
-        head.appendChild(resetBtn);
-        row.appendChild(head);
+        var stackHead = el(doc, 'div', { class: 'control-head' });
+        stackHead.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+        stackHead.appendChild(resetBtn);
+        row.appendChild(stackHead);
         if (control.description) {
           row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
         }

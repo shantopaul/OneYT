@@ -599,9 +599,52 @@ body {
   font-size: 13px;
 }
 
+.control-row-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.control-copy {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.control-row-inline .control-label {
+  display: block;
+}
+
+.control-row-inline .control-desc {
+  margin: 4px 0 0;
+  max-width: 60ch;
+}
+
+.control-row-inline .control-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.control-row-inline .control-input {
+  min-width: 170px;
+}
+
 .control-row-toggle .control-desc {
   margin-bottom: 6px;
   max-width: 68ch;
+}
+
+@media (max-width: 640px) {
+  .control-row-grid {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .control-row-inline .control-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .control-foot {
@@ -766,8 +809,14 @@ body {
   outline-offset: 2px;
 }
 
+.control-input[type='number'] {
+  width: 104px;
+  min-width: 88px;
+  font-variant-numeric: tabular-nums;
+}
+
 .control-input[type='range'] {
-  min-width: 220px;
+  min-width: 170px;
   padding: 0;
   background: transparent;
   border: none;
@@ -776,10 +825,16 @@ body {
 }
 
 .control-number-wrap {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.control-number-unit {
+  color: var(--ui-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .control-value {
@@ -787,7 +842,7 @@ body {
   font-size: 13px;
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  min-width: 52px;
+  min-width: 48px;
 }
 
 .control-textarea {
@@ -799,9 +854,10 @@ body {
 }
 
 .control-color-wrap {
-  display: flex;
+  display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .control-color {
@@ -814,8 +870,10 @@ body {
   cursor: pointer;
 }
 
-.control-color-text {
-  min-width: 140px;
+.control-color-wrap .control-color-text {
+  width: 120px;
+  min-width: 110px;
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
 }
 
 .control-shortcut {
