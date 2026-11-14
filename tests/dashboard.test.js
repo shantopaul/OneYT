@@ -741,3 +741,45 @@ test('dashboard: Advanced notice, file picker, Copy JSON, danger zone & live sto
   assert.ok(css.includes('.reset-danger-box'), 'danger zone emphasis styled');
   assert.ok(css.includes('.about-storage-pill.is-synced'), 'synced storage pill state styled');
 });
+
+test('dashboard: row-fixer parity — feed rows, responsive columns, avatars, titles and channel layout', () => {
+  const layoutSection = require('../options/sections/layout');
+  const layoutCss = fs.readFileSync(
+    path.join(__dirname, '..', 'content', 'modules', 'layout', 'layout.css'),
+    'utf8'
+  );
+
+  const expectedKeys = [
+    'responsiveColumns',
+    'postsPerRow',
+    'shelfItemsPerRow',
+    'hideChannelProfile',
+    'fullVideoTitles',
+    'channelWide',
+    'channelColumns',
+    'channelShelfItemsPerRow',
+  ];
+  expectedKeys.forEach((k) => {
+    assert.ok(Object.prototype.hasOwnProperty.call(defaults.DEFAULT_SETTINGS.layout, k), k);
+    assert.ok(
+      layoutSection.controls.some((c) => c.key === 'layout.' + k),
+      'layout section has control for layout.' + k
+    );
+  });
+
+  const homeCols = layoutSection.controls.find((c) => c.key === 'layout.homeColumns');
+  assert.equal(homeCols.max, 15);
+  assert.equal(options.SECTION_GROUPS.layout['layout.channelWide'], 'Channel page');
+  assert.equal(options.TOGGLE_GRID_KEYS['layout.hideChannelProfile'], true);
+  assert.equal(options.TOGGLE_GRID_KEYS['layout.fullVideoTitles'], true);
+
+  const blockState = defaults.cloneDefaults();
+  blockState.layout.blockShorts = true;
+  assert.ok(options.getControlHint('layout.shelfItemsPerRow', blockState).length > 0);
+
+  assert.ok(layoutCss.includes('--oneyt-effective-home-columns'));
+  assert.ok(layoutCss.includes('ytd-rich-item-renderer[is-post]'));
+  assert.ok(layoutCss.includes('.yt-lockup-metadata-view-model__avatar'));
+  assert.ok(layoutCss.includes('oneyt-full-video-titles'));
+  assert.ok(layoutCss.includes('oneyt-channel-wide'));
+});

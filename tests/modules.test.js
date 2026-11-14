@@ -803,3 +803,89 @@ test('sidebar: wheel handler is not re-bound when element and sensitivity are un
   assert.equal(secondary._listeners.wheel.length, 1);
   assert.notEqual(secondary._listeners.wheel[0], first);
 });
+
+test('layout: feed rows, responsiveColumns, hideChannelProfile and fullVideoTitles across pages', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  const cfg = settingsWith({
+    layout: {
+      homeColumns: 15,
+      responsiveColumns: true,
+      postsPerRow: 4,
+      shelfItemsPerRow: 10,
+      hideChannelProfile: true,
+      fullVideoTitles: true,
+      hideTopicChips: true,
+      homeMaxWidth: 1600,
+    },
+  });
+  mod.apply(cfg, 'home');
+  assert.equal(doc._root._classes.has('oneyt-home-columns'), true);
+  assert.equal(doc._root._vars.get('--oneyt-home-columns'), '15');
+  assert.equal(doc._root._classes.has('oneyt-responsive-columns'), true);
+  assert.equal(doc._root._classes.has('oneyt-posts-per-row'), true);
+  assert.equal(doc._root._vars.get('--oneyt-posts-per-row'), '4');
+  assert.equal(doc._root._classes.has('oneyt-shelf-items'), true);
+  assert.equal(doc._root._vars.get('--oneyt-shelf-items-per-row'), '10');
+  assert.equal(doc._root._classes.has('oneyt-hide-channel-profile'), true);
+  assert.equal(doc._root._classes.has('oneyt-full-video-titles'), true);
+
+  // Subscriptions keeps grid/feed cosmetics, clears home-only toggles/max-width.
+  mod.apply(cfg, 'subscriptions');
+  assert.equal(doc._root._classes.has('oneyt-home-columns'), true);
+  assert.equal(doc._root._classes.has('oneyt-posts-per-row'), true);
+  assert.equal(doc._root._classes.has('oneyt-shelf-items'), true);
+  assert.equal(doc._root._classes.has('oneyt-hide-channel-profile'), true);
+  assert.equal(doc._root._classes.has('oneyt-hide-topic-chips'), false);
+  assert.equal(doc._root._classes.has('oneyt-home-max-width'), false);
+
+  // Watch clears feed grid & avatars, preserves fullVideoTitles for recommendations.
+  mod.apply(cfg, 'watch');
+  assert.equal(doc._root._classes.has('oneyt-home-columns'), false);
+  assert.equal(doc._root._classes.has('oneyt-responsive-columns'), false);
+  assert.equal(doc._root._classes.has('oneyt-hide-channel-profile'), false);
+  assert.equal(doc._root._classes.has('oneyt-full-video-titles'), true);
+
+  // Out-of-bounds row counts are ignored.
+  mod.apply(
+    settingsWith({ layout: { homeColumns: 16, postsPerRow: 9, shelfItemsPerRow: 20 } }),
+    'home'
+  );
+  assert.equal(doc._root._classes.has('oneyt-home-columns'), false);
+  assert.equal(doc._root._classes.has('oneyt-posts-per-row'), false);
+  assert.equal(doc._root._classes.has('oneyt-shelf-items'), false);
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+});
+
+test('layout: channelWide, channelColumns and channelShelfItemsPerRow apply on channel pages only', () => {
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({ document: doc });
+  const cfg = settingsWith({
+    layout: {
+      channelWide: true,
+      channelColumns: 6,
+      channelShelfItemsPerRow: 9,
+      responsiveColumns: true,
+      hideChannelProfile: true,
+      fullVideoTitles: true,
+    },
+  });
+  mod.apply(cfg, 'channel');
+  assert.equal(doc._root._classes.has('oneyt-channel-wide'), true);
+  assert.equal(doc._root._classes.has('oneyt-channel-columns'), true);
+  assert.equal(doc._root._vars.get('--oneyt-channel-columns'), '6');
+  assert.equal(doc._root._classes.has('oneyt-channel-shelf-items'), true);
+  assert.equal(doc._root._vars.get('--oneyt-channel-shelf-items-per-row'), '9');
+  assert.equal(doc._root._classes.has('oneyt-responsive-columns'), true);
+  assert.equal(doc._root._classes.has('oneyt-home-columns'), false);
+
+  // Leaving channel clears channel classes/vars.
+  mod.apply(cfg, 'home');
+  assert.equal(doc._root._classes.has('oneyt-channel-wide'), false);
+  assert.equal(doc._root._classes.has('oneyt-channel-columns'), false);
+  assert.equal(doc._root._classes.has('oneyt-channel-shelf-items'), false);
+  assert.equal(doc._root._vars.has('--oneyt-channel-columns'), false);
+  mod.disable();
+  assert.equal(doc._root._classes.size, 0);
+});
