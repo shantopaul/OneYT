@@ -1279,6 +1279,26 @@
       wrap.appendChild(picker);
       wrap.appendChild(text);
       wrap.appendChild(clear);
+      var fallbackHex = function () {
+        if (control.key.indexOf('appearance.colors.') === 0 && apis.themes) {
+          var cname = control.key.slice('appearance.colors.'.length);
+          var tok = apis.themes.CUSTOM_COLOR_KEYS && apis.themes.CUSTOM_COLOR_KEYS[cname];
+          if (tok) {
+            var themeName = getPath(state, 'appearance.theme');
+            var resolved = apis.themes.resolveThemeVars(themeName, {});
+            if (resolved[tok]) return resolved[tok];
+            if (apis.themes.THEMES && apis.themes.THEMES.dark && apis.themes.THEMES.dark[tok]) {
+              return apis.themes.THEMES.dark[tok];
+            }
+          }
+        }
+        return '#000000';
+      };
+      var syncEmptyUi = function (hex) {
+        var fb = fallbackHex();
+        picker.value = hex || fb;
+        text.placeholder = fb !== '#000000' ? 'Preset (' + fb + ')' : '#rrggbb or empty';
+      };
       var apply = function (hex) {
         setValue(control.key, hex, 0);
       };
@@ -1287,7 +1307,7 @@
         set: function (value) {
           var hex = typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value) ? value : '';
           text.value = hex;
-          picker.value = hex || '#000000';
+          syncEmptyUi(hex);
         },
         bind: function (row) {
           picker.addEventListener('input', function () {
@@ -1303,14 +1323,14 @@
               return;
             }
             showWarning(row, '');
-            picker.value = v || '#000000';
+            syncEmptyUi(v);
             apply(v);
           });
           clear.addEventListener('click', function () {
             showWarning(row, '');
             apply('');
             text.value = '';
-            picker.value = '#000000';
+            syncEmptyUi('');
           });
         },
       };
