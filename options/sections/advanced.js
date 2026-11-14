@@ -11,11 +11,7 @@
     id: 'advanced',
     title: 'Advanced',
     description:
-      'Import/export, reset and sync. Sync is opt-in (AD-08): when ' +
-      'enabled, your settings sync across browsers except Custom CSS ' +
-      '(too large for sync limits — it stays on this device) and ' +
-      'remembered speed/volume (per-device by design). Local storage ' +
-      'stays the source of truth if a sync write fails.',
+      'Back up or restore settings as JSON, manage Chrome Sync, or reset everything to defaults.',
     controls: [
       {
         key: 'sync.enabled',

@@ -839,7 +839,8 @@
         msg.indexOf('Saved ') === 0 ||
         msg.indexOf('Added ') === 0 ||
         msg.indexOf('Renamed ') === 0 ||
-        msg.indexOf('Deleted ') === 0
+        msg.indexOf('Deleted ') === 0 ||
+        msg.indexOf('Restored ') === 0
       ) {
         cls += ' notice-success';
       } else if (msg.indexOf('Could not') !== -1 || msg.indexOf('rejected') !== -1) {
@@ -882,6 +883,7 @@
     var templatesNotice = '';
     var savedThemes = [];
     var savedThemesNotice = '';
+    var advancedNotice = '';
     var healthRecord = {};
     var healthFilter = 'all';
     var saveTimer = null;
@@ -2211,6 +2213,9 @@
     }
 
     function renderAdvancedTools(sectionEl) {
+      var advMsgEl = createToolNoticeEl(advancedNotice);
+      if (advancedNotice) advancedNotice = '';
+      sectionEl.appendChild(advMsgEl);
       // Import / export.
       var importBox = el(doc, 'div', { class: 'tool-box' });
       importBox.appendChild(el(doc, 'h3', { text: 'Import / Export' }));
@@ -2342,11 +2347,8 @@
       applyBtn.addEventListener('click', function () {
         if (!pendingImport) return;
         replaceState(defaultsApi.deepClone(pendingImport)).then(function (saved) {
+          if (saved) advancedNotice = 'Applied imported settings.';
           renderSection(currentSection);
-          if (saved) {
-            importMsg.textContent = 'Import applied.';
-            importMsg.style.display = 'block';
-          }
         });
       });
       importBox.appendChild(exportBtn);
@@ -2373,7 +2375,8 @@
       });
       resetAllBtn.addEventListener('click', function () {
         if (!window.confirm('Reset ALL OneYT settings to defaults?')) return;
-        replaceState(defaultsApi.cloneDefaults()).then(function () {
+        replaceState(defaultsApi.cloneDefaults()).then(function (saved) {
+          if (saved) advancedNotice = 'Restored all settings to defaults.';
           renderSection(currentSection);
         });
       });
