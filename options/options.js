@@ -459,6 +459,10 @@
       'productivity.focusMode': 'Focus mode',
       'productivity.focusHideComments': 'Hidden elements in focus mode',
     },
+    keyboard: {
+      'keyboard.shortcuts.toggleFocus': 'Workspace & player shortcuts',
+      'keyboard.shortcuts.speedUp': 'Playback speed shortcuts',
+    },
   };
 
   var TOGGLE_GRID_KEYS = {
