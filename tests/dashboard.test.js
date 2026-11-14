@@ -702,3 +702,24 @@ test('dashboard: Productivity hidden counter, focus presets, shortcut status & i
   assert.ok(src.includes('renderFocusVisualPanel('), 'focus interactive preview helper exists');
   assert.ok(src.includes('updateProductivitySummary('), 'focus live summary updater exists');
 });
+
+test('dashboard: Keyboard groups, Unbind button, conflict pill & summary', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const keyboard = require('../options/sections/keyboard');
+
+  assert.equal(keyboard.controls.length, 7);
+  keyboard.controls.forEach((c) => {
+    assert.ok(!c.description.includes('Click the field, then press'), 'concise per-row copy');
+  });
+  assert.ok(options.SECTION_GROUPS.keyboard['keyboard.shortcuts.toggleFocus']);
+  assert.ok(options.SECTION_GROUPS.keyboard['keyboard.shortcuts.speedUp']);
+
+  assert.ok(css.includes('.control-shortcut-wrap'), 'shortcut + Unbind wrapper styled');
+  assert.ok(css.includes('.control-shortcut.is-unbound'), 'unbound keycap state styled');
+  assert.ok(css.includes('.keyboard-bound-count'), 'bound shortcut counter badge styled');
+  assert.ok(css.includes('.keyboard-health-pill.is-ok'), 'keyboard conflict status pill styled');
+  assert.ok(src.includes('updateKeyboardSummary('), 'live keyboard summary helper exists');
+  assert.ok(src.includes("event.key === 'Enter' || event.key === ' '"), 'Enter/Space starts recording');
+  assert.ok(src.includes('keyboard-unbind-all-btn'), 'Unbind all button exists');
+});
