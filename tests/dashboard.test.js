@@ -620,3 +620,53 @@ test('dashboard: Appearance swatches, contrast preview, 2-col colour grid & typo
   assert.ok(src.includes('updateThemeContrastPreview('), 'live theme contrast updater exists');
   assert.ok(src.includes('updateColorClearAllBtn('), 'bulk colour clear button helper exists');
 });
+
+test('dashboard: Playback speed chips, precedence hints, captions dep & quick-picks', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const playback = require('../options/sections/playback');
+
+  assert.equal(options.formatDefaultValue(1, { source: 'speedPresets' }), '1x');
+
+  const captionsOff = defaults.cloneDefaults();
+  captionsOff.playback.captions = false;
+  assert.ok(
+    options.getControlInactiveReason('playback.captionFontSize', captionsOff).length > 0,
+    'captionFontSize dims when captions are forced Off'
+  );
+  const captionsAuto = defaults.cloneDefaults();
+  captionsAuto.playback.captions = null;
+  assert.equal(options.getControlInactiveReason('playback.captionFontSize', captionsAuto), '');
+  const captionsOn = defaults.cloneDefaults();
+  captionsOn.playback.captions = true;
+  assert.equal(options.getControlInactiveReason('playback.captionFontSize', captionsOn), '');
+
+  const rememberState = defaults.cloneDefaults();
+  rememberState.playback.rememberSpeed = true;
+  rememberState.playback.rememberVolume = true;
+  assert.ok(options.getControlHint('playback.defaultSpeed', rememberState).length > 0);
+  assert.ok(options.getControlHint('playback.defaultVolume', rememberState).length > 0);
+  rememberState.playback.rememberSpeed = false;
+  rememberState.playback.rememberVolume = false;
+  assert.equal(options.getControlHint('playback.defaultSpeed', rememberState), '');
+  assert.equal(options.getControlHint('playback.defaultVolume', rememberState), '');
+
+  const allDefaults = new Set(leafPaths(defaults.DEFAULT_SETTINGS));
+  Object.entries(options.CONTROL_HINTS).forEach(([targetKey, rules]) => {
+    assert.ok(allDefaults.has(targetKey), 'hint key exists in DEFAULT_SETTINGS: ' + targetKey);
+    rules.forEach((r) => {
+      assert.ok(allDefaults.has(r.key), 'hint parent exists in DEFAULT_SETTINGS: ' + r.key);
+      assert.ok(typeof r.hint === 'string' && r.hint.length > 0);
+    });
+  });
+
+  const volCtrl = playback.controls.find((c) => c.key === 'playback.defaultVolume');
+  const capSizeCtrl = playback.controls.find((c) => c.key === 'playback.captionFontSize');
+  assert.ok(Array.isArray(volCtrl.presets) && volCtrl.presets.length >= 4);
+  assert.ok(Array.isArray(capSizeCtrl.presets) && capSizeCtrl.presets.length >= 4);
+
+  assert.ok(css.includes('.speed-chip.is-default'), 'active default speed chip styled');
+  assert.ok(css.includes('.speed-chip-select'), 'clickable speed chip selector styled');
+  assert.ok(css.includes('.control-hint-badge'), 'subtle non-dimming precedence badge styled');
+  assert.ok(src.includes('Keep at least one speed preset.'), 'guards against deleting last speed preset');
+});
