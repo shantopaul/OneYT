@@ -1299,118 +1299,124 @@
         class: 'btn btn-primary',
         text: 'Save profile',
       });
-      saveBtn.addEventListener('click', function () {
-        var result = profilesApi.createProfile(nameInput.value, state, profiles, defaultsApi);
-        if (result.error) {
-          msgEl.textContent = result.error;
-          msgEl.style.display = 'block';
-          return;
-        }
-        profiles = result.profiles;
-        saveProfiles().then(function () {
-          profilesNotice = 'Saved profile "' + nameInput.value.trim() + '".';
-          renderSection(currentSection);
-        });
-      });
-      saveBox.appendChild(nameInput);
-      saveBox.appendChild(saveBtn);
-      sectionEl.appendChild(saveBox);
-
-      // Saved profiles.
-      var listBox = el(doc, 'div', { class: 'tool-box' });
-      listBox.appendChild(
-        el(doc, 'h3', {
-          text: 'Your profiles (' + profiles.length + '/' + profilesApi.MAX_PROFILES + ')',
-        })
-      );
-      if (profiles.length === 0) {
-        listBox.appendChild(
-          el(doc, 'p', { text: 'No saved profiles yet — save one above to restore it later.' })
-        );
-      }
-      profiles.forEach(function (profile) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: profile.name }));
-        var saved = profile.createdAt
-          ? new Date(profile.createdAt).toLocaleDateString()
-          : 'date unknown';
-        row.appendChild(el(doc, 'p', { text: 'Saved ' + saved + '.' }));
-        var applyBtn = el(doc, 'button', {
-          type: 'button',
-          class: 'btn btn-primary',
-          text: 'Apply',
-        });
-        applyBtn.addEventListener('click', function () {
-          replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(
-            function (saved) {
-              refreshValues();
-              if (saved) {
-                profilesNotice =
-                  'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
-              }
-              renderSection(currentSection);
-            }
-          );
-        });
-        var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
-        renameBtn.addEventListener('click', function () {
-          row.textContent = '';
-          var editInput = el(doc, 'input', {
-            type: 'text',
-            class: 'control-input',
-            maxlength: String(profilesApi.MAX_PROFILE_NAME_LENGTH),
+        saveBtn.addEventListener('click', function () {
+          var result = profilesApi.createProfile(nameInput.value, state, profiles, defaultsApi);
+          if (result.error) {
+            msgEl.textContent = result.error;
+            msgEl.style.display = 'block';
+            return;
+          }
+          profiles = result.profiles;
+          saveProfiles().then(function (saved) {
+            if (saved) profilesNotice = 'Saved profile "' + nameInput.value.trim() + '".';
+            renderSection(currentSection);
           });
-          editInput.value = profile.name;
-          editInput.setAttribute('aria-label', 'New profile name');
-          var confirmBtn = el(doc, 'button', {
+        });
+        var saveForm = el(doc, 'div', { class: 'tool-inline-form' });
+        saveForm.appendChild(nameInput);
+        saveForm.appendChild(saveBtn);
+        saveBox.appendChild(saveForm);
+        sectionEl.appendChild(saveBox);
+
+        // Saved profiles.
+        var listBox = el(doc, 'div', { class: 'tool-box' });
+        listBox.appendChild(
+          el(doc, 'h3', {
+            text: 'Your profiles (' + profiles.length + '/' + profilesApi.MAX_PROFILES + ')',
+          })
+        );
+        if (profiles.length === 0) {
+          listBox.appendChild(
+            el(doc, 'p', { text: 'No saved profiles yet — save one above to restore it later.' })
+          );
+        }
+        profiles.forEach(function (profile) {
+          var row = el(doc, 'div', { class: 'profile-row' });
+          row.appendChild(el(doc, 'strong', { text: profile.name }));
+          var saved = profile.createdAt
+            ? new Date(profile.createdAt).toLocaleDateString()
+            : 'date unknown';
+          row.appendChild(el(doc, 'p', { text: 'Saved ' + saved + '.' }));
+          var applyBtn = el(doc, 'button', {
             type: 'button',
             class: 'btn btn-primary',
-            text: 'Save name',
+            text: 'Apply',
           });
-          confirmBtn.addEventListener('click', function () {
-            var result = profilesApi.renameProfile(
-              profiles,
-              profile.name,
-              editInput.value,
-              defaultsApi
+          applyBtn.addEventListener('click', function () {
+            replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(
+              function (applied) {
+                refreshValues();
+                if (applied) {
+                  profilesNotice =
+                    'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+                }
+                renderSection(currentSection);
+              }
             );
-            if (result.error) {
-              profilesNotice = result.error;
+          });
+          var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
+          renameBtn.addEventListener('click', function () {
+            row.textContent = '';
+            var editInput = el(doc, 'input', {
+              type: 'text',
+              class: 'control-input',
+              maxlength: String(profilesApi.MAX_PROFILE_NAME_LENGTH),
+            });
+            editInput.value = profile.name;
+            editInput.setAttribute('aria-label', 'New profile name');
+            var confirmBtn = el(doc, 'button', {
+              type: 'button',
+              class: 'btn btn-primary',
+              text: 'Save name',
+            });
+            confirmBtn.addEventListener('click', function () {
+              var result = profilesApi.renameProfile(
+                profiles,
+                profile.name,
+                editInput.value,
+                defaultsApi
+              );
+              if (result.error) {
+                profilesNotice = result.error;
+                renderSection(currentSection);
+                return;
+              }
+              profiles = result.profiles;
+              saveProfiles().then(function (ok) {
+                if (ok) profilesNotice = 'Renamed profile to "' + editInput.value.trim() + '".';
+                renderSection(currentSection);
+              });
+            });
+            var cancelBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Cancel' });
+            cancelBtn.addEventListener('click', function () {
               renderSection(currentSection);
-              return;
-            }
-            profiles = result.profiles;
-            saveProfiles().then(function () {
-              profilesNotice = 'Renamed profile to "' + editInput.value.trim() + '".';
+            });
+            var renameForm = el(doc, 'div', { class: 'tool-inline-form' });
+            renameForm.appendChild(editInput);
+            renameForm.appendChild(confirmBtn);
+            renameForm.appendChild(cancelBtn);
+            row.appendChild(renameForm);
+          });
+          var deleteBtn = el(doc, 'button', {
+            type: 'button',
+            class: 'btn btn-danger',
+            text: 'Delete',
+          });
+          deleteBtn.addEventListener('click', function () {
+            if (!window.confirm('Delete profile "' + profile.name + '"?')) return;
+            profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
+            saveProfiles().then(function (ok) {
+              if (ok) profilesNotice = 'Deleted profile "' + profile.name + '".';
               renderSection(currentSection);
             });
           });
-          var cancelBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Cancel' });
-          cancelBtn.addEventListener('click', function () {
-            renderSection(currentSection);
-          });
-          row.appendChild(editInput);
-          row.appendChild(confirmBtn);
-          row.appendChild(cancelBtn);
+          var actions = el(doc, 'div', { class: 'tool-actions' });
+          actions.appendChild(applyBtn);
+          actions.appendChild(renameBtn);
+          actions.appendChild(deleteBtn);
+          row.appendChild(actions);
+          listBox.appendChild(row);
         });
-        var deleteBtn = el(doc, 'button', {
-          type: 'button',
-          class: 'btn btn-danger',
-          text: 'Delete',
-        });
-        deleteBtn.addEventListener('click', function () {
-          if (!window.confirm('Delete profile "' + profile.name + '"?')) return;
-          profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
-          saveProfiles().then(function () {
-            profilesNotice = 'Deleted profile "' + profile.name + '".';
-            renderSection(currentSection);
-          });
-        });
-        row.appendChild(applyBtn);
-        row.appendChild(renameBtn);
-        row.appendChild(deleteBtn);
-        listBox.appendChild(row);
-      });
       sectionEl.appendChild(listBox);
     }
 
@@ -1469,9 +1475,11 @@
           }
           setValue('appearance.customCSS', result.css);
           setValue('appearance.customCSSEnabled', true);
-          saveNow().then(function () {
+          saveNow().then(function (saved) {
             refreshValues();
-            templatesNotice = 'Applied template "' + template.name + '" — custom CSS is now on.';
+            if (saved) {
+              templatesNotice = 'Applied template "' + template.name + '" — custom CSS is now on.';
+            }
             renderSection(currentSection);
           });
         });
@@ -1545,13 +1553,15 @@
           return;
         }
         savedThemes = result.themes;
-        saveSavedThemes().then(function () {
-          savedThemesNotice = 'Saved theme "' + nameInput.value.trim() + '".';
+        saveSavedThemes().then(function (saved) {
+          if (saved) savedThemesNotice = 'Saved theme "' + nameInput.value.trim() + '".';
           renderSection(currentSection);
         });
       });
-      saveBox.appendChild(nameInput);
-      saveBox.appendChild(saveBtn);
+      var saveForm = el(doc, 'div', { class: 'tool-inline-form' });
+      saveForm.appendChild(nameInput);
+      saveForm.appendChild(saveBtn);
+      saveBox.appendChild(saveForm);
       sectionEl.appendChild(saveBox);
 
       // Saved themes.
@@ -1594,9 +1604,9 @@
         });
         applyBtn.addEventListener('click', function () {
           state = savedThemesApi.applySavedTheme(state, savedTheme, defaultsApi, themesApi);
-          saveNow().then(function () {
+          saveNow().then(function (saved) {
             refreshValues();
-            savedThemesNotice = 'Applied theme "' + savedTheme.name + '".';
+            if (saved) savedThemesNotice = 'Applied theme "' + savedTheme.name + '".';
             renderSection(currentSection);
           });
         });
@@ -1639,8 +1649,8 @@
               return;
             }
             savedThemes = result.themes;
-            saveSavedThemes().then(function () {
-              savedThemesNotice = 'Renamed theme to "' + editInput.value.trim() + '".';
+            saveSavedThemes().then(function (ok) {
+              if (ok) savedThemesNotice = 'Renamed theme to "' + editInput.value.trim() + '".';
               renderSection(currentSection);
             });
           });
@@ -1648,9 +1658,11 @@
           cancelBtn.addEventListener('click', function () {
             renderSection(currentSection);
           });
-          row.appendChild(editInput);
-          row.appendChild(confirmBtn);
-          row.appendChild(cancelBtn);
+          var renameForm = el(doc, 'div', { class: 'tool-inline-form' });
+          renameForm.appendChild(editInput);
+          renameForm.appendChild(confirmBtn);
+          renameForm.appendChild(cancelBtn);
+          row.appendChild(renameForm);
         });
         var deleteBtn = el(doc, 'button', {
           type: 'button',
@@ -1660,15 +1672,17 @@
         deleteBtn.addEventListener('click', function () {
           if (!window.confirm('Delete theme "' + savedTheme.name + '"?')) return;
           savedThemes = savedThemesApi.deleteSavedTheme(savedThemes, savedTheme.name, themesApi);
-          saveSavedThemes().then(function () {
-            savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
+          saveSavedThemes().then(function (ok) {
+            if (ok) savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
             renderSection(currentSection);
           });
         });
-        row.appendChild(applyBtn);
-        row.appendChild(exportBtn);
-        row.appendChild(renameBtn);
-        row.appendChild(deleteBtn);
+        var actions = el(doc, 'div', { class: 'tool-actions' });
+        actions.appendChild(applyBtn);
+        actions.appendChild(exportBtn);
+        actions.appendChild(renameBtn);
+        actions.appendChild(deleteBtn);
+        row.appendChild(actions);
         listBox.appendChild(row);
       });
       sectionEl.appendChild(listBox);
@@ -1763,8 +1777,8 @@
           return;
         }
         savedThemes = savedThemes.concat([pendingTheme]);
-        saveSavedThemes().then(function () {
-          savedThemesNotice = 'Added theme "' + pendingTheme.name + '".';
+        saveSavedThemes().then(function (saved) {
+          if (saved) savedThemesNotice = 'Added theme "' + pendingTheme.name + '".';
           renderSection(currentSection);
         });
       });
@@ -1900,9 +1914,9 @@
         });
         applyBtn.addEventListener('click', function () {
           state = layoutPresetsApi.applyLayoutPreset(state, preset.id, defaultsApi);
-          saveNow().then(function () {
+          saveNow().then(function (saved) {
             refreshValues();
-            layoutEditorNotice = 'Applied layout preset "' + preset.name + '".';
+            if (saved) layoutEditorNotice = 'Applied layout preset "' + preset.name + '".';
             renderSection(currentSection);
           });
         });
@@ -2361,17 +2375,29 @@
     // A failure never touches the settings; the notice is
     // shown the next time the Profiles section renders.
     function saveProfiles() {
-      return storage.set({ [PROFILES_KEY]: profiles }).catch(function () {
-        profilesNotice = 'Could not save profiles — please try again.';
-      });
+      return storage
+        .set({ [PROFILES_KEY]: profiles })
+        .then(function () {
+          return true;
+        })
+        .catch(function () {
+          profilesNotice = 'Could not save profiles — please try again.';
+          return false;
+        });
     }
 
     // Persist the saved-themes list (local only — never
     // synced). Same failure shape as saveProfiles.
     function saveSavedThemes() {
-      return storage.set({ [SAVED_THEMES_KEY]: savedThemes }).catch(function () {
-        savedThemesNotice = 'Could not save themes — please try again.';
-      });
+      return storage
+        .set({ [SAVED_THEMES_KEY]: savedThemes })
+        .then(function () {
+          return true;
+        })
+        .catch(function () {
+          savedThemesNotice = 'Could not save themes — please try again.';
+          return false;
+        });
     }
 
     function init() {

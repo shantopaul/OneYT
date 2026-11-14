@@ -835,6 +835,30 @@ body {
   margin: 4px 8px 4px 0;
 }
 
+.tool-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tool-inline-form .btn {
+  margin: 0;
+}
+
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tool-actions .btn {
+  margin: 0;
+}
+
 .profile-row {
   padding: 12px 0;
   border-top: 1px solid var(--ui-border);
@@ -845,7 +869,7 @@ body {
 }
 
 .profile-row p {
-  margin: 4px 0 8px;
+  margin: 4px 0 6px;
 }
 
 .import-preview {
