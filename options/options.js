@@ -969,6 +969,128 @@
       updateSidebarPreview();
     }
 
+    function updateThemeContrastPreview() {
+      if (!apis.themes || !mainEl) return;
+      var activeTheme = String(getPath(state, 'appearance.theme') || 'default');
+      mainEl.querySelectorAll('.theme-preset-pill').forEach(function (pill) {
+        pill.classList.toggle('is-active', pill.getAttribute('data-theme-name') === activeTheme);
+      });
+      var card = mainEl.querySelector('.theme-contrast-card');
+      if (!card) return;
+      var customColors = getPath(state, 'appearance.colors') || {};
+      var vars = apis.themes.resolveThemeVars(activeTheme, customColors);
+      var hasTokens = vars && vars.bg && vars.text;
+      var surface = card.querySelector('.theme-preview-surface');
+      var sampleTitle = card.querySelector('.theme-preview-title');
+      var sampleSub = card.querySelector('.theme-preview-sub');
+      var sampleAccent = card.querySelector('.theme-preview-accent');
+      var ratioBadge = card.querySelector('.theme-contrast-ratio');
+      if (!hasTokens) {
+        if (surface) surface.removeAttribute('style');
+        if (sampleTitle) sampleTitle.removeAttribute('style');
+        if (sampleSub) sampleSub.removeAttribute('style');
+        if (sampleAccent) sampleAccent.removeAttribute('style');
+        if (ratioBadge) {
+          ratioBadge.textContent = "YouTube's native theme";
+          ratioBadge.className = 'theme-contrast-ratio';
+        }
+        return;
+      }
+      if (surface) {
+        surface.setAttribute(
+          'style',
+          'background: ' +
+            vars.bg +
+            '; border-color: ' +
+            (vars.border || '#2a2a2a') +
+            ';'
+        );
+      }
+      if (sampleTitle) sampleTitle.setAttribute('style', 'color: ' + vars.text + ';');
+      if (sampleSub && vars.textSecondary) {
+        sampleSub.setAttribute('style', 'color: ' + vars.textSecondary + ';');
+      }
+      if (sampleAccent && vars.accent) {
+        sampleAccent.setAttribute('style', 'background: ' + vars.accent + ';');
+      }
+      if (ratioBadge) {
+        var ratio = apis.themes.contrastRatio(vars.text, vars.bg);
+        var ok = apis.themes.textContrastOk(vars);
+        if (ratio === null) {
+          ratioBadge.textContent = '';
+          ratioBadge.className = 'theme-contrast-ratio';
+        } else if (ok) {
+          ratioBadge.textContent = 'Text contrast ' + ratio.toFixed(1) + ':1 · AA Pass';
+          ratioBadge.className = 'theme-contrast-ratio is-pass';
+        } else {
+          ratioBadge.textContent =
+            'Low contrast ' + ratio.toFixed(1) + ':1 (< 4.5:1) — hard to read';
+          ratioBadge.className = 'theme-contrast-ratio is-warn';
+        }
+      }
+    }
+
+    function renderThemeVisualPanel(sectionEl) {
+      if (!apis.themes) return;
+      var box = el(doc, 'div', { class: 'tool-box theme-visual-box' });
+      var pillsWrap = el(doc, 'div', { class: 'theme-preset-pills' });
+      var names = apis.themes.THEME_NAMES || [];
+      names.forEach(function (name) {
+        var vars = apis.themes.resolveThemeVars(name, name === 'custom' ? getPath(state, 'appearance.colors') : {});
+        var label =
+          name === 'amoled'
+            ? 'AMOLED'
+            : name.charAt(0).toUpperCase() + name.slice(1);
+        var pill = el(doc, 'button', {
+          type: 'button',
+          class: 'theme-preset-pill',
+          'data-theme-name': name,
+        });
+        var dots = el(doc, 'span', { class: 'theme-pill-dots' });
+        var palette =
+          vars && vars.bg
+            ? [vars.bg, vars.surface || vars.bg, vars.accent || '#ff0033']
+            : ['#202020', '#484848', '#ff0033'];
+        palette.forEach(function (hex) {
+          var dot = el(doc, 'span', { class: 'theme-pill-dot' });
+          dot.setAttribute('style', 'background: ' + hex + ';');
+          dots.appendChild(dot);
+        });
+        pill.appendChild(dots);
+        pill.appendChild(el(doc, 'span', { class: 'theme-pill-name', text: label }));
+        pill.addEventListener('click', function () {
+          if (inputsByKey['appearance.theme']) {
+            inputsByKey['appearance.theme'].set(name);
+          }
+          setValue('appearance.theme', name, 0);
+          refreshValues();
+        });
+        pillsWrap.appendChild(pill);
+      });
+      box.appendChild(pillsWrap);
+
+      var card = el(doc, 'div', { class: 'theme-contrast-card' });
+      var surface = el(doc, 'div', { class: 'theme-preview-surface' });
+      surface.appendChild(el(doc, 'span', { class: 'theme-preview-accent' }));
+      var copy = el(doc, 'div', { class: 'theme-preview-copy' });
+      copy.appendChild(
+        el(doc, 'strong', { class: 'theme-preview-title', text: 'Sample video title' })
+      );
+      copy.appendChild(
+        el(doc, 'span', {
+          class: 'theme-preview-sub',
+          text: 'Channel name · 12K views',
+        })
+      );
+      surface.appendChild(copy);
+      card.appendChild(surface);
+      card.appendChild(el(doc, 'span', { class: 'theme-contrast-ratio', text: '' }));
+      box.appendChild(card);
+
+      sectionEl.appendChild(box);
+      updateThemeContrastPreview();
+    }
+
     function updateControlModifiedState(key) {
       if (!mainEl) return;
       var row = mainEl.querySelector('[data-control-key="' + key + '"]');
@@ -1027,6 +1149,9 @@
       ) {
         updateSidebarPreview();
       }
+      if (currentSection === 'appearance' && key.indexOf('appearance.') === 0) {
+        updateThemeContrastPreview();
+      }
       if (key === 'enabled' || key.indexOf('modules.') === 0) {
         updateModulesSummary();
       }
@@ -1073,6 +1198,7 @@
       });
       updateModulesSummary();
       updateSidebarPreview();
+      updateThemeContrastPreview();
       updateControlDependencies();
     }
 
@@ -2585,6 +2711,9 @@
           } else {
             flushToggleRun();
             mainEl.appendChild(renderControlRow(control));
+            if (section.id === 'appearance' && control.key === 'appearance.theme') {
+              renderThemeVisualPanel(mainEl);
+            }
           }
         });
         flushToggleRun();
