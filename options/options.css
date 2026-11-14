@@ -915,6 +915,49 @@ body {
   margin-bottom: 10px;
 }
 
+.control-preset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.control-preset-label {
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  margin-right: 2px;
+}
+
+.control-preset-chip {
+  padding: 3px 9px;
+  background: var(--ui-bg);
+  color: var(--ui-text-secondary);
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.control-preset-chip:hover {
+  color: var(--ui-text);
+  border-color: var(--ui-border-strong);
+  background: var(--ui-surface-hover);
+}
+
+.control-preset-chip.is-active {
+  color: var(--ui-text);
+  border-color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+}
+
+.control-preset-chip:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
 .speed-chip {
   display: inline-flex;
   align-items: center;

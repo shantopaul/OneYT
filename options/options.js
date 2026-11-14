@@ -853,8 +853,19 @@
         updateModulesSummary();
       }
       updateControlModifiedState(key);
+      updateControlPresetChips(key);
       updateControlDependencies();
       saveSoon(delay);
+    }
+
+    function updateControlPresetChips(key) {
+      if (!mainEl) return;
+      var row = mainEl.querySelector('[data-control-key="' + key + '"]');
+      if (!row) return;
+      var cur = String(getPath(state, key) || '').trim();
+      row.querySelectorAll('.control-preset-chip').forEach(function (chip) {
+        chip.classList.toggle('is-active', chip.getAttribute('data-preset-value') === cur);
+      });
     }
 
     function systemPrefersDark() {
@@ -878,6 +889,7 @@
           if (!input || !input.set) return;
           input.set(getPath(state, control.key));
           updateControlModifiedState(control.key);
+          updateControlPresetChips(control.key);
         });
       });
       updateModulesSummary();
@@ -1391,6 +1403,27 @@
           row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
         }
         row.appendChild(input.node);
+      }
+      if (Array.isArray(control.presets) && control.presets.length > 0) {
+        var presetBar = el(doc, 'div', { class: 'control-preset-bar' });
+        presetBar.appendChild(el(doc, 'span', { class: 'control-preset-label', text: 'Quick pick:' }));
+        var curPresetVal = String(getPath(state, control.key) || '').trim();
+        control.presets.forEach(function (preset) {
+          var chip = el(doc, 'button', {
+            type: 'button',
+            class:
+              'control-preset-chip' + (preset.value === curPresetVal ? ' is-active' : ''),
+            text: preset.label,
+            'data-preset-value': preset.value,
+          });
+          chip.addEventListener('click', function () {
+            showWarning(row, '');
+            if (input.set) input.set(preset.value);
+            setValue(control.key, preset.value, 0);
+          });
+          presetBar.appendChild(chip);
+        });
+        row.appendChild(presetBar);
       }
       var foot = el(doc, 'div', { class: 'control-foot' });
       foot.appendChild(

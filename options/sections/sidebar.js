@@ -30,9 +30,15 @@
         key: 'sidebar.maxHeight',
         type: 'text',
         label: 'Sidebar max height',
-        description: 'CSS height, e.g. calc(100vh - 100px).',
+        description: 'CSS height of the scrollable sidebar, e.g. calc(100vh - 100px).',
         placeholder: 'calc(100vh - 100px)',
         cssProperty: 'maxHeight',
+        presets: [
+          { label: 'Viewport (100vh - 100px)', value: 'calc(100vh - 100px)' },
+          { label: 'Tall (80vh)', value: '80vh' },
+          { label: 'Compact (65vh)', value: '65vh' },
+          { label: 'Fixed 600px', value: '600px' },
+        ],
         keywords: ['sidebar', 'height', 'max'],
       },
       {
