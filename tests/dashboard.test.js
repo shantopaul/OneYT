@@ -448,3 +448,27 @@ test('dashboard: UI/UX enhancements — responsive nav icons, Health grid, react
   );
   assert.ok(src.includes('health-stat-card'), 'health filter chips rendered');
 });
+
+test('dashboard: isControlModified, formatValue, and General MODULE_SECTION_MAP cover modules', () => {
+  assert.equal(options.formatValue(true), 'On');
+  assert.equal(options.formatValue(false), 'Off');
+  assert.equal(options.formatValue(null), 'YouTube default');
+  assert.equal(options.formatValue(''), '(empty)');
+  assert.equal(options.formatValue('system'), 'system');
+  assert.equal(options.isControlModified(true, true), false);
+  assert.equal(options.isControlModified(false, true), true);
+  assert.equal(options.isControlModified(undefined, ''), false);
+  assert.equal(options.isControlModified([1, 1.5], [1, 1.5]), false);
+  assert.equal(options.isControlModified([1, 2], [1, 1.5]), true);
+
+  const general = require('../options/sections/general');
+  const sectionIds = new Set(SECTION_FILES);
+  const moduleKeys = general.controls
+    .filter((c) => c.key.indexOf('modules.') === 0)
+    .map((c) => c.key);
+  moduleKeys.forEach((key) => {
+    const target = options.MODULE_SECTION_MAP[key];
+    assert.ok(target, 'missing MODULE_SECTION_MAP target for ' + key);
+    assert.ok(sectionIds.has(target.id), 'unknown target section ' + target.id);
+  });
+});
