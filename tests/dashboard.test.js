@@ -599,3 +599,24 @@ test('dashboard: 2-col toggle grids, Layout Shorts deps, quick-picks & active pr
   assert.ok(css.includes('.layout-preview-thumb'), 'layout preview card thumbs styled');
   assert.ok(src.includes('isLayoutPresetMatches('), 'layout preset matching helper exists');
 });
+
+test('dashboard: Appearance swatches, contrast preview, 2-col colour grid & typography presets', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const appearance = require('../options/sections/appearance');
+
+  const sizeCtrl = appearance.controls.find((c) => c.key === 'appearance.typography.fontSize');
+  const radiusCtrl = appearance.controls.find((c) => c.key === 'appearance.borderRadius');
+  const spacingCtrl = appearance.controls.find((c) => c.key === 'appearance.spacing');
+  assert.ok(Array.isArray(sizeCtrl.presets) && sizeCtrl.presets.length >= 4);
+  assert.ok(Array.isArray(radiusCtrl.presets) && radiusCtrl.presets.length >= 3);
+  assert.ok(Array.isArray(spacingCtrl.presets) && spacingCtrl.presets.length >= 3);
+
+  assert.ok(css.includes('.control-grid-colors'), '2-column custom colour grid styled');
+  assert.ok(css.includes('.theme-preset-pill'), 'visual theme preset pills styled');
+  assert.ok(css.includes('.theme-contrast-ratio.is-pass'), 'contrast AA pass badge styled');
+  assert.ok(css.includes('.theme-contrast-ratio.is-warn'), 'low contrast warning badge styled');
+  assert.ok(src.includes('renderThemeVisualPanel('), 'theme visual swatch panel exists');
+  assert.ok(src.includes('updateThemeContrastPreview('), 'live theme contrast updater exists');
+  assert.ok(src.includes('updateColorClearAllBtn('), 'bulk colour clear button helper exists');
+});
