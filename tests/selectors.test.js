@@ -86,3 +86,12 @@ test('selectors: no module JS hard-codes a YouTube selector', () => {
   }
   assert.deepEqual(offenders, []);
 });
+
+test('selectors: modern and legacy YouTube hooks exist for sidebarItems, likeCountText and subscriberCount', () => {
+  assert.ok(SELECTORS.sidebarItems.includes('yt-lockup-view-model'));
+  assert.ok(SELECTORS.sidebarItems.includes('ytd-compact-video-renderer'));
+  assert.ok(SELECTORS.likeCountText.includes('like-button-view-model'));
+  assert.ok(SELECTORS.likeCountText.includes('#segmented-like-button'));
+  assert.ok(SELECTORS.subscriberCount.includes('#owner-sub-count'));
+  assert.ok(SELECTORS.subscriberCount.includes('#subscriber-count'));
+});
