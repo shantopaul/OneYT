@@ -1015,7 +1015,8 @@
       if (!mainEl) return;
       var row = mainEl.querySelector('[data-control-key="' + key + '"]');
       if (!row) return;
-      var cur = String(getPath(state, key) || '').trim();
+      var raw = getPath(state, key);
+      var cur = raw === undefined || raw === null ? '' : String(raw).trim();
       row.querySelectorAll('.control-preset-chip').forEach(function (chip) {
         chip.classList.toggle('is-active', chip.getAttribute('data-preset-value') === cur);
       });
@@ -1561,14 +1562,17 @@
       if (Array.isArray(control.presets) && control.presets.length > 0) {
         var presetBar = el(doc, 'div', { class: 'control-preset-bar' });
         presetBar.appendChild(el(doc, 'span', { class: 'control-preset-label', text: 'Quick pick:' }));
-        var curPresetVal = String(getPath(state, control.key) || '').trim();
+        var rawPresetVal = getPath(state, control.key);
+        var curPresetVal =
+          rawPresetVal === undefined || rawPresetVal === null ? '' : String(rawPresetVal).trim();
         control.presets.forEach(function (preset) {
+          var presetStr = String(preset.value);
           var chip = el(doc, 'button', {
             type: 'button',
             class:
-              'control-preset-chip' + (preset.value === curPresetVal ? ' is-active' : ''),
+              'control-preset-chip' + (presetStr === curPresetVal ? ' is-active' : ''),
             text: preset.label,
-            'data-preset-value': preset.value,
+            'data-preset-value': presetStr,
           });
           chip.addEventListener('click', function () {
             showWarning(row, '');

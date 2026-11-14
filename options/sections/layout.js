@@ -67,6 +67,13 @@
         min: 0,
         max: 12,
         step: 1,
+        presets: [
+          { label: 'YouTube auto (0)', value: 0 },
+          { label: '3 columns', value: 3 },
+          { label: '4 columns', value: 4 },
+          { label: '5 columns', value: 5 },
+          { label: '6 columns', value: 6 },
+        ],
         keywords: ['home', 'columns', 'grid'],
       },
       {
@@ -101,6 +108,12 @@
         max: 2560,
         step: 1,
         unit: 'px',
+        presets: [
+          { label: 'Full width (0)', value: 0 },
+          { label: '1280 px', value: 1280 },
+          { label: '1600 px', value: 1600 },
+          { label: '1920 px', value: 1920 },
+        ],
         keywords: ['home', 'max', 'width', 'ultrawide', 'centre', 'center'],
       },
       {
