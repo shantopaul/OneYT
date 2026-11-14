@@ -799,4 +799,6 @@ test('dashboard: row-fixer parity — Home section, feed rows, responsive column
   assert.ok(layoutCss.includes('.yt-lockup-metadata-view-model__avatar'));
   assert.ok(layoutCss.includes('oneyt-full-video-titles'));
   assert.ok(layoutCss.includes('oneyt-channel-wide'));
+  assert.ok(layoutCss.includes('ytd-rich-grid-row'));
+  assert.ok(layoutCss.includes('ytd-rich-grid-renderer[is-shorts-grid]'));
 });
