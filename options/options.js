@@ -578,9 +578,19 @@
     // ----- control inputs -----
 
     function makeToggle(control) {
-      var input = el(doc, 'input', { type: 'checkbox', class: 'control-input' });
+      var wrap = el(doc, 'label', { class: 'toggle-switch' });
+      var input = el(doc, 'input', {
+        type: 'checkbox',
+        class: 'control-input toggle-input',
+        'aria-label': control.label,
+      });
+      var track = el(doc, 'span', { class: 'toggle-track', 'aria-hidden': 'true' }, [
+        el(doc, 'span', { class: 'toggle-thumb' }),
+      ]);
+      wrap.appendChild(input);
+      wrap.appendChild(track);
       return {
-        node: input,
+        node: wrap,
         set: function (value) {
           input.checked = !!value;
         },
@@ -961,7 +971,11 @@
     // ----- sections -----
 
     function renderControlRow(control) {
-      var row = el(doc, 'div', { class: 'control-row', 'data-control-key': control.key });
+      var isToggle = control.type === 'toggle';
+      var row = el(doc, 'div', {
+        class: isToggle ? 'control-row control-row-toggle' : 'control-row',
+        'data-control-key': control.key,
+      });
       var head = el(doc, 'div', { class: 'control-head' });
       head.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
       var resetBtn = el(doc, 'button', {
@@ -977,14 +991,25 @@
         if (input) input.set(def);
         if (control.key.indexOf('keyboard.shortcuts.') === 0) checkShortcutWarnings();
       });
-      head.appendChild(resetBtn);
-      row.appendChild(head);
-      if (control.description) {
-        row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
-      }
       var input = makeInput(control);
       inputsByKey[control.key] = input;
-      row.appendChild(input.node);
+      if (isToggle) {
+        var actions = el(doc, 'div', { class: 'control-actions' });
+        actions.appendChild(resetBtn);
+        actions.appendChild(input.node);
+        head.appendChild(actions);
+        row.appendChild(head);
+        if (control.description) {
+          row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
+        }
+      } else {
+        head.appendChild(resetBtn);
+        row.appendChild(head);
+        if (control.description) {
+          row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
+        }
+        row.appendChild(input.node);
+      }
       row.appendChild(
         el(doc, 'p', {
           class: 'control-default',
