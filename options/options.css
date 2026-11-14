@@ -683,6 +683,19 @@ body {
   display: none;
 }
 
+.control-hint-badge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-bg);
+  color: var(--ui-text-secondary);
+  font-size: 11px;
+}
+
+.control-hint-badge[hidden] {
+  display: none;
+}
+
 .control-row.is-inactive-dep {
   opacity: 0.58;
 }

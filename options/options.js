@@ -280,14 +280,53 @@
         reason: 'Overridden while "Compact guide" is On',
       },
     ],
+    'playback.captionFontSize': [
+      {
+        key: 'playback.captions',
+        notEquals: false,
+        reason: 'Captions are forced Off',
+      },
+    ],
   };
 
   function getControlInactiveReason(key, currentState) {
     var rules = CONTROL_DEPENDENCIES[key];
     if (!rules || !currentState) return '';
     for (var i = 0; i < rules.length; i++) {
-      if (getPath(currentState, rules[i].key) !== rules[i].equals) {
-        return rules[i].reason;
+      var rule = rules[i];
+      var val = getPath(currentState, rule.key);
+      if (rule.notEquals !== undefined) {
+        if (val === rule.notEquals) return rule.reason;
+      } else if (val !== rule.equals) {
+        return rule.reason;
+      }
+    }
+    return '';
+  }
+
+  var CONTROL_HINTS = {
+    'playback.defaultSpeed': [
+      {
+        key: 'playback.rememberSpeed',
+        equals: true,
+        hint: 'Remember speed is On — takes over once changed on YouTube',
+      },
+    ],
+    'playback.defaultVolume': [
+      {
+        key: 'playback.rememberVolume',
+        equals: true,
+        hint: 'Remember volume is On — takes over once changed on YouTube',
+      },
+    ],
+  };
+
+  function getControlHint(key, currentState) {
+    var rules = CONTROL_HINTS[key];
+    if (!rules || !currentState) return '';
+    for (var i = 0; i < rules.length; i++) {
+      if (getPath(currentState, rules[i].key) === rules[i].equals) {
+        return rules[i].hint;
       }
     }
     return '';
@@ -1144,6 +1183,12 @@
           depBadge.textContent = reason;
           depBadge.hidden = !reason;
         }
+        var hint = getControlHint(key, state);
+        var hintBadge = row.querySelector('.control-hint-badge');
+        if (hintBadge) {
+          hintBadge.textContent = hint;
+          hintBadge.hidden = !hint;
+        }
       });
     }
 
@@ -1820,6 +1865,12 @@
       });
       depBadge.hidden = true;
       foot.appendChild(depBadge);
+      var hintBadge = el(doc, 'span', {
+        class: 'control-hint-badge',
+        text: '',
+      });
+      hintBadge.hidden = true;
+      foot.appendChild(hintBadge);
       var targetSection = MODULE_SECTION_MAP[control.key];
       if (targetSection) {
         var jumpBtn = el(doc, 'button', {
@@ -3515,6 +3566,8 @@
     isControlModified: isControlModified,
     getControlInactiveReason: getControlInactiveReason,
     CONTROL_DEPENDENCIES: CONTROL_DEPENDENCIES,
+    getControlHint: getControlHint,
+    CONTROL_HINTS: CONTROL_HINTS,
     resolveSelectOptions: resolveSelectOptions,
     selectToSetting: selectToSetting,
     settingToSelect: settingToSelect,
