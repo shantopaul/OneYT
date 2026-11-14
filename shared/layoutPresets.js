@@ -107,7 +107,7 @@
   function layoutPreviewSummary(settings) {
     var layout = (settings && settings.layout) || {};
     var columns =
-      typeof layout.homeColumns === 'number' && layout.homeColumns >= 1 && layout.homeColumns <= 12
+      typeof layout.homeColumns === 'number' && layout.homeColumns >= 1 && layout.homeColumns <= 15
         ? layout.homeColumns
         : 4;
     var gap =

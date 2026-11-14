@@ -72,6 +72,10 @@
           hideLiveShelf: false,
           hideMixesShelf: false,
           hideNewsShelf: false,
+          hideChannelProfile: false,
+          fullVideoTitles: false,
+          responsiveColumns: false,
+          channelWide: false,
           hideComments: false,
         },
         appearance: {
