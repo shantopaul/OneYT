@@ -1178,6 +1178,13 @@ body {
   font-size: 13px;
 }
 
+.import-preview:not(:empty) {
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  background: var(--ui-bg);
+}
+
 .import-preview ul {
   margin: 6px 0;
   padding-left: 20px;
@@ -1187,6 +1194,80 @@ body {
 
 .import-preview li {
   word-break: break-word;
+}
+
+.advanced-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 6px;
+}
+
+.advanced-card-head h3 {
+  margin: 0;
+}
+
+.advanced-diff-count {
+  padding: 2px 9px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--ui-bg);
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.advanced-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.advanced-action-row .btn {
+  margin: 0;
+}
+
+.advanced-sub-label {
+  margin: 14px 0 6px;
+  font-weight: 500;
+  color: var(--ui-text) !important;
+}
+
+.file-picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-picker-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 !important;
+}
+
+.file-picker-btn:focus-within {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 2px;
+}
+
+.file-picker-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.file-picked-name {
+  font-size: 12px;
+  color: var(--ui-text-secondary);
 }
 
 /* --- Health dashboard --- */

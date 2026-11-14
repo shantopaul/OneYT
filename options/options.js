@@ -2218,10 +2218,13 @@
       sectionEl.appendChild(advMsgEl);
       // Import / export.
       var importBox = el(doc, 'div', { class: 'tool-box' });
-      importBox.appendChild(el(doc, 'h3', { text: 'Import / Export' }));
+      var importHead = el(doc, 'div', { class: 'advanced-card-head' });
+      importHead.appendChild(el(doc, 'h3', { text: 'Import / Export' }));
+      importHead.appendChild(el(doc, 'span', { class: 'advanced-diff-count', text: '' }));
+      importBox.appendChild(importHead);
       importBox.appendChild(
         el(doc, 'p', {
-          text: 'Export downloads your settings as JSON. Import validates the file first, shows what would change, and only applies it when you confirm.',
+          text: 'Back up settings as JSON, or validate an import file to preview every change before applying.',
         })
       );
       var exportBtn = el(doc, 'button', {
@@ -2229,11 +2232,32 @@
         class: 'btn',
         text: 'Export settings (JSON)',
       });
-      var importFile = el(doc, 'input', { type: 'file', accept: '.json,application/json' });
+      var copyBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn advanced-copy-btn',
+        text: 'Copy JSON',
+      });
+      var backupRow = el(doc, 'div', { class: 'advanced-action-row' }, [exportBtn, copyBtn]);
+
+      var fileRow = el(doc, 'div', { class: 'file-picker-row' });
+      var fileLabel = el(doc, 'label', { class: 'btn file-picker-btn' });
+      fileLabel.appendChild(el(doc, 'span', { text: 'Choose JSON file' }));
+      var importFile = el(doc, 'input', {
+        type: 'file',
+        class: 'file-picker-input',
+        accept: '.json,application/json',
+        'aria-label': 'Choose settings JSON file',
+      });
+      fileLabel.appendChild(importFile);
+      var fileNameEl = el(doc, 'span', { class: 'file-picked-name', text: 'No file selected' });
+      fileRow.appendChild(fileLabel);
+      fileRow.appendChild(fileNameEl);
+
       var importText = el(doc, 'textarea', {
         class: 'control-input control-textarea',
-        rows: '6',
+        rows: '5',
         placeholder: '…or paste exported JSON here',
+        'aria-label': 'Paste exported settings JSON',
       });
       var importMsg = el(doc, 'p', { class: 'control-warning', text: '' });
       var previewEl = el(doc, 'div', { class: 'import-preview' });
@@ -2253,8 +2277,29 @@
         a.click();
         URL.revokeObjectURL(url);
       });
+      copyBtn.addEventListener('click', function () {
+        var nav = typeof navigator !== 'undefined' ? navigator : null;
+        if (!nav || !nav.clipboard || typeof nav.clipboard.writeText !== 'function') {
+          importMsg.textContent = 'Clipboard copy unavailable — use Export settings (JSON) instead.';
+          importMsg.style.display = 'block';
+          return;
+        }
+        nav.clipboard.writeText(JSON.stringify(state, null, 2)).then(
+          function () {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function () {
+              copyBtn.textContent = 'Copy JSON';
+            }, 1600);
+          },
+          function () {
+            importMsg.textContent = 'Could not copy JSON to clipboard.';
+            importMsg.style.display = 'block';
+          }
+        );
+      });
       var handleImportText = function (text) {
         importMsg.textContent = '';
+        importMsg.style.display = 'none';
         previewEl.textContent = '';
         applyBtn.style.display = 'none';
         pendingImport = null;
@@ -2308,6 +2353,7 @@
         }
         if (diff.length === 0) {
           previewEl.textContent = 'No changes — the file matches your current settings.';
+          applyBtn.style.display = 'none';
         } else {
           var list = el(doc, 'ul', {});
           diff.forEach(function (change) {
@@ -2324,12 +2370,17 @@
           });
           previewEl.appendChild(el(doc, 'p', { text: diff.length + ' setting(s) would change:' }));
           previewEl.appendChild(list);
+          applyBtn.style.display = 'inline-block';
         }
-        applyBtn.style.display = 'inline-block';
       };
       importFile.addEventListener('change', function () {
         var file = importFile.files && importFile.files[0];
-        if (!file) return;
+        if (!file) {
+          fileNameEl.textContent = 'No file selected';
+          return;
+        }
+        var kb = Math.max(1, Math.round(file.size / 1024));
+        fileNameEl.textContent = file.name + ' (' + kb + ' KB)';
         var reader = new FileReader();
         reader.onload = function () {
           handleImportText(String(reader.result || ''));
@@ -2341,8 +2392,23 @@
         class: 'btn',
         text: 'Validate & preview',
       });
+      var clearImportBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small advanced-clear-import-btn',
+        text: 'Clear',
+      });
       importBtn.addEventListener('click', function () {
         handleImportText(importText.value);
+      });
+      clearImportBtn.addEventListener('click', function () {
+        importText.value = '';
+        importFile.value = '';
+        fileNameEl.textContent = 'No file selected';
+        importMsg.textContent = '';
+        importMsg.style.display = 'none';
+        previewEl.textContent = '';
+        pendingImport = null;
+        applyBtn.style.display = 'none';
       });
       applyBtn.addEventListener('click', function () {
         if (!pendingImport) return;
@@ -2351,15 +2417,19 @@
           renderSection(currentSection);
         });
       });
-      importBox.appendChild(exportBtn);
-      importBox.appendChild(el(doc, 'p', { text: 'Import from a file:' }));
-      importBox.appendChild(importFile);
-      importBox.appendChild(el(doc, 'p', { text: 'Import from pasted JSON:' }));
+      var importActions = el(doc, 'div', { class: 'advanced-action-row' }, [
+        importBtn,
+        clearImportBtn,
+        applyBtn,
+      ]);
+      importBox.appendChild(backupRow);
+      importBox.appendChild(el(doc, 'p', { class: 'advanced-sub-label', text: 'Import from a file' }));
+      importBox.appendChild(fileRow);
+      importBox.appendChild(el(doc, 'p', { class: 'advanced-sub-label', text: 'Or paste exported JSON' }));
       importBox.appendChild(importText);
-      importBox.appendChild(importBtn);
+      importBox.appendChild(importActions);
       importBox.appendChild(importMsg);
       importBox.appendChild(previewEl);
-      importBox.appendChild(applyBtn);
       sectionEl.appendChild(importBox);
 
       // Reset all.
