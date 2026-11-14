@@ -78,8 +78,18 @@
   function formatValue(value) {
     if (value === undefined) return '—';
     if (value === null) return 'YouTube default';
-    if (typeof value === 'string' && value === '') return '(empty)';
+    if (typeof value === 'boolean') return value ? 'On' : 'Off';
+    if (typeof value === 'string') return value === '' ? '(empty)' : value;
+    if (Array.isArray(value)) return value.join(', ');
     return JSON.stringify(value);
+  }
+
+  function isControlModified(currentValue, defaultValue) {
+    if (currentValue === undefined && defaultValue === '') return false;
+    if (Array.isArray(currentValue) || Array.isArray(defaultValue)) {
+      return JSON.stringify(currentValue) !== JSON.stringify(defaultValue);
+    }
+    return currentValue !== defaultValue;
   }
 
   // Select option sources. `settings` supplies dynamic lists
@@ -552,6 +562,16 @@
       }
     }
 
+    function updateControlModifiedState(key) {
+      if (!mainEl) return;
+      var row = mainEl.querySelector('[data-control-key="' + key + '"]');
+      if (!row) return;
+      var modified = isControlModified(getPath(state, key), getDefault(key));
+      row.classList.toggle('is-modified', modified);
+      var badge = row.querySelector('.control-modified-badge');
+      if (badge) badge.hidden = !modified;
+    }
+
     function setValue(key, value, delay) {
       setPath(state, key, value);
       if (key === 'ui.dashboardTheme') applyDashboardTheme();
@@ -561,6 +581,7 @@
       if (currentSection === 'layout' && key.indexOf('layout.') === 0) {
         updateLayoutPreview();
       }
+      updateControlModifiedState(key);
       saveSoon(delay);
     }
 
@@ -584,6 +605,7 @@
           var input = inputsByKey[control.key];
           if (!input || !input.set) return;
           input.set(getPath(state, control.key));
+          updateControlModifiedState(control.key);
         });
       });
     }
@@ -1070,15 +1092,27 @@
         }
         row.appendChild(input.node);
       }
-      row.appendChild(
-        el(doc, 'p', {
+      var foot = el(doc, 'div', { class: 'control-foot' });
+      foot.appendChild(
+        el(doc, 'span', {
           class: 'control-default',
           text: 'Default: ' + formatValue(getDefault(control.key)),
         })
       );
+      var modBadge = el(doc, 'span', {
+        class: 'control-modified-badge',
+        text: 'Modified',
+      });
+      modBadge.hidden = !isControlModified(getPath(state, control.key), getDefault(control.key));
+      foot.appendChild(modBadge);
+      row.appendChild(foot);
       row.appendChild(el(doc, 'p', { class: 'control-warning', text: '' }));
       input.bind(row);
       input.set(getPath(state, control.key));
+      row.classList.toggle(
+        'is-modified',
+        isControlModified(getPath(state, control.key), getDefault(control.key))
+      );
       return row;
     }
 
@@ -2581,6 +2615,7 @@
     clampSettingsToControls: clampSettingsToControls,
     diffSettings: diffSettings,
     formatValue: formatValue,
+    isControlModified: isControlModified,
     resolveSelectOptions: resolveSelectOptions,
     selectToSetting: selectToSetting,
     settingToSelect: settingToSelect,

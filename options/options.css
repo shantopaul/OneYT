@@ -554,6 +554,10 @@ body {
   border-color: var(--ui-border-strong);
 }
 
+.control-row.is-modified {
+  border-left: 3px solid var(--ui-accent);
+}
+
 .control-row.highlight {
   border-color: var(--ui-accent);
   box-shadow: 0 0 0 2px var(--ui-accent-soft);
@@ -573,6 +577,18 @@ body {
   flex-shrink: 0;
 }
 
+.control-reset {
+  opacity: 0.65;
+  background: transparent;
+}
+
+.control-row:hover .control-reset,
+.control-reset:focus-visible,
+.control-row.is-modified .control-reset {
+  opacity: 1;
+  background: var(--ui-surface-hover);
+}
+
 .control-label {
   font-weight: 500;
 }
@@ -588,10 +604,27 @@ body {
   max-width: 68ch;
 }
 
+.control-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .control-default {
-  margin: 8px 0 0;
   color: var(--ui-text-muted);
   font-size: 12px;
+}
+
+.control-modified-badge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-accent);
+  background: var(--ui-accent-soft);
+  color: var(--ui-text);
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .control-warning {
