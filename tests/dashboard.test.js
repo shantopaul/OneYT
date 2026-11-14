@@ -670,3 +670,35 @@ test('dashboard: Playback speed chips, precedence hints, captions dep & quick-pi
   assert.ok(css.includes('.control-hint-badge'), 'subtle non-dimming precedence badge styled');
   assert.ok(src.includes('Keep at least one speed preset.'), 'guards against deleting last speed preset');
 });
+
+test('dashboard: Productivity hidden counter, focus presets, shortcut status & interactive diagram', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const allDefaults = new Set(leafPaths(defaults.DEFAULT_SETTINGS));
+
+  assert.equal(options.FOCUS_HIDE_KEYS.length, 7);
+  options.FOCUS_HIDE_KEYS.forEach((k) => {
+    assert.ok(allDefaults.has(k), 'focus hide key exists in DEFAULT_SETTINGS: ' + k);
+  });
+
+  assert.equal(options.FOCUS_PRESETS.length, 3);
+  const deep = options.FOCUS_PRESETS.find((p) => p.id === 'deep');
+  const study = options.FOCUS_PRESETS.find((p) => p.id === 'study');
+  assert.ok(deep && study);
+  const baseState = defaults.cloneDefaults();
+  assert.equal(options.isFocusPresetMatches(baseState, deep), true);
+  assert.equal(options.isFocusPresetMatches(baseState, study), false);
+  baseState.productivity.focusHideComments = false;
+  baseState.productivity.focusHideButtons = false;
+  baseState.productivity.focusHideMetadata = false;
+  assert.equal(options.isFocusPresetMatches(baseState, study), true);
+  assert.equal(options.isFocusPresetMatches(baseState, deep), false);
+
+  assert.ok(css.includes('.focus-hidden-count'), 'focus hidden counter badge styled');
+  assert.ok(css.includes('.focus-quick-actions'), 'Hide all / Show all quick actions styled');
+  assert.ok(css.includes('.focus-status-pill.is-on'), 'focus active status pill styled');
+  assert.ok(css.includes('.focus-preset-pill.is-active'), 'focus preset pill active state styled');
+  assert.ok(css.includes('.focus-stage-tile.is-masked'), 'focus diagram masked tile state styled');
+  assert.ok(src.includes('renderFocusVisualPanel('), 'focus interactive preview helper exists');
+  assert.ok(src.includes('updateProductivitySummary('), 'focus live summary updater exists');
+});
