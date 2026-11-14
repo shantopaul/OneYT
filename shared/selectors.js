@@ -91,14 +91,14 @@
 
     // --- Watch-page counts (Phase 11) ---
     // Like count: the number text inside the Like button
-    // (#segmented-like-button is the button id used by Return
-    // YouTube Dislike; the text class is from a current
-    // userstyle). Hiding the text keeps the button clickable.
-    likeCountText: '#segmented-like-button .yt-spec-button-shape-next__button-text-content',
+    // (like-button-view-model in modern YouTube, #segmented-like-button
+    // in older/RYD DOMs). Hiding the text keeps the button clickable.
+    likeCountText: ':is(like-button-view-model, #segmented-like-button) .yt-spec-button-shape-next__button-text-content',
     // View count: the "X views" info line (classic hook).
     viewCountText: 'ytd-video-primary-info-renderer #info-text',
-    // Subscriber count: next to the channel name.
-    subscriberCount: 'ytd-video-owner-renderer #subscriber-count',
+    // Subscriber count: next to the channel name (#owner-sub-count on
+    // watch pages, #subscriber-count on older/channel DOMs).
+    subscriberCount: 'ytd-video-owner-renderer :is(#owner-sub-count, #subscriber-count)',
 
     // --- Player accent (Phase 23) ---
     // Played portion of the progress bar + the scrubber
