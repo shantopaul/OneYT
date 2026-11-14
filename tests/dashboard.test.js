@@ -472,3 +472,16 @@ test('dashboard: isControlModified, formatValue, and General MODULE_SECTION_MAP 
     assert.ok(sectionIds.has(target.id), 'unknown target section ' + target.id);
   });
 });
+
+test('dashboard: preset card grids, semantic notices, theme swatches & Enter submit exist', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(css.includes('.preset-grid'), 'preset grid layout present');
+  assert.ok(css.includes('.preset-card'), 'preset card layout present');
+  assert.ok(css.includes('.control-warning.notice-success'), 'success notice variant styled');
+  assert.ok(css.includes('.control-warning.notice-error'), 'error notice variant styled');
+  assert.ok(css.includes('.theme-swatch-dot'), 'saved theme swatches styled');
+  assert.ok(src.includes('function createToolNoticeEl('), 'tool notices routed through helper');
+  assert.ok(src.includes('function bindEnterSubmit('), 'Enter key form submission helper exists');
+  assert.ok(src.includes('theme-swatch-dot'), 'saved theme color swatch dots rendered');
+});
