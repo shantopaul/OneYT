@@ -1270,6 +1270,46 @@ body {
   color: var(--ui-text-secondary);
 }
 
+.reset-danger-box {
+  border-left: 3px solid var(--ui-danger);
+}
+
+.reset-danger-count {
+  padding: 2px 9px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--ui-bg);
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.about-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.about-pill {
+  padding: 3px 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-size: 12px;
+}
+
+.about-storage-pill.is-synced {
+  border-color: var(--ui-success);
+  background: var(--ui-success-soft);
+  color: var(--ui-success);
+}
+
+.about-note {
+  margin: 0;
+}
+
 /* --- Health dashboard --- */
 
 .health-banner {

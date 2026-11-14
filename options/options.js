@@ -1470,6 +1470,9 @@
       ) {
         updateProductivitySummary();
       }
+      if (currentSection === 'advanced') {
+        updateAdvancedSummary();
+      }
       updateControlModifiedState(key);
       updateControlPresetChips(key);
       updateControlDependencies();
@@ -1513,6 +1516,7 @@
       });
       updateModulesSummary();
       updateProductivitySummary();
+      updateAdvancedSummary();
       updateSidebarPreview();
       updateThemeContrastPreview();
       updateColorClearAllBtn();
@@ -2212,6 +2216,30 @@
       return row;
     }
 
+    function updateAdvancedSummary() {
+      if (currentSection !== 'advanced' || !mainEl) return;
+      var customized = diffSettings(defaultsApi.cloneDefaults(), state).length;
+      var diffEl = mainEl.querySelector('.advanced-diff-count');
+      if (diffEl) {
+        diffEl.textContent = customized > 0 ? customized + ' customized' : 'All defaults';
+      }
+      var resetCountEl = mainEl.querySelector('.reset-danger-count');
+      if (resetCountEl) {
+        resetCountEl.textContent =
+          customized > 0
+            ? customized + ' setting' + (customized === 1 ? '' : 's') + ' customized'
+            : 'Already at defaults';
+      }
+      var storagePill = mainEl.querySelector('.about-storage-pill');
+      if (storagePill) {
+        var syncOn = !!getPath(state, 'sync.enabled');
+        storagePill.classList.toggle('is-synced', syncOn);
+        storagePill.textContent = syncOn
+          ? 'Storage: Local + Chrome Sync (CSS stays local)'
+          : 'Storage: Local device only';
+      }
+    }
+
     function renderAdvancedTools(sectionEl) {
       var advMsgEl = createToolNoticeEl(advancedNotice);
       if (advancedNotice) advancedNotice = '';
@@ -2433,8 +2461,11 @@
       sectionEl.appendChild(importBox);
 
       // Reset all.
-      var resetBox = el(doc, 'div', { class: 'tool-box' });
-      resetBox.appendChild(el(doc, 'h3', { text: 'Reset everything' }));
+      var resetBox = el(doc, 'div', { class: 'tool-box reset-danger-box' });
+      var resetHead = el(doc, 'div', { class: 'advanced-card-head' });
+      resetHead.appendChild(el(doc, 'h3', { text: 'Reset everything' }));
+      resetHead.appendChild(el(doc, 'span', { class: 'reset-danger-count', text: '' }));
+      resetBox.appendChild(resetHead);
       resetBox.appendChild(
         el(doc, 'p', { text: 'Restore every setting to its default. This cannot be undone.' })
       );
@@ -2464,17 +2495,20 @@
       } catch {
         // Non-Chrome context (tests): keep the fallback.
       }
+      var metaRow = el(doc, 'div', { class: 'about-meta-row' }, [
+        el(doc, 'span', { class: 'about-pill', text: 'OneYT v' + version }),
+        el(doc, 'span', { class: 'about-pill', text: 'Schema v' + state.schemaVersion }),
+        el(doc, 'span', { class: 'about-pill about-storage-pill', text: '' }),
+      ]);
+      infoBox.appendChild(metaRow);
       infoBox.appendChild(
         el(doc, 'p', {
-          text:
-            'OneYT version ' +
-            version +
-            ' · Settings schema v' +
-            state.schemaVersion +
-            ' · All settings are stored locally on this device.',
+          class: 'about-note',
+          text: 'Custom CSS templates, saved themes, profiles, and remembered playback state always stay on this device.',
         })
       );
       sectionEl.appendChild(infoBox);
+      updateAdvancedSummary();
     }
 
     // Profiles (Phase 16, PL-16). Mirrors renderAdvancedTools:
