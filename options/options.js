@@ -86,8 +86,9 @@
 
   function formatDefaultValue(value, control) {
     var base = formatValue(value);
-    if (typeof value === 'number' && control && control.unit) {
-      return base + ' ' + control.unit;
+    if (typeof value === 'number' && control) {
+      if (control.unit) return base + ' ' + control.unit;
+      if (control.source === 'speedPresets') return base + 'x';
     }
     return base;
   }
@@ -1314,6 +1315,9 @@
             }
             setValue(control.key, selectToSetting(control.source, value), 0);
             if (control.key === 'appearance.theme') refreshValues();
+            if (control.key === 'playback.defaultSpeed' && inputsByKey['playback.speedPresets']) {
+              inputsByKey['playback.speedPresets'].set(getPath(state, 'playback.speedPresets'));
+            }
           });
         },
       };
@@ -1521,23 +1525,51 @@
       addRow.appendChild(addBtn);
       wrap.appendChild(listEl);
       wrap.appendChild(addRow);
+      var rowRef = null;
       var render = function (values) {
         listEl.textContent = '';
-        (values || []).forEach(function (v) {
-          var chip = el(doc, 'span', { class: 'speed-chip', text: v + 'x ' });
+        var list = values || [];
+        var defSpeed = Number(getPath(state, 'playback.defaultSpeed'));
+        list.forEach(function (v) {
+          var isDefault = v === defSpeed;
+          var chip = el(doc, 'span', {
+            class: 'speed-chip' + (isDefault ? ' is-default' : ''),
+          });
+          var selectBtn = el(doc, 'button', {
+            type: 'button',
+            class: 'speed-chip-select',
+            text: v + 'x',
+            title: isDefault ? 'Current default speed' : 'Set ' + v + 'x as default speed',
+          });
+          selectBtn.addEventListener('click', function () {
+            if (rowRef) showWarning(rowRef, '');
+            setValue('playback.defaultSpeed', v, 0);
+            if (inputsByKey['playback.defaultSpeed']) {
+              inputsByKey['playback.defaultSpeed'].set(v);
+            }
+            render(getPath(state, control.key) || list);
+          });
           var x = el(doc, 'button', {
             type: 'button',
             class: 'speed-remove',
             text: '×',
             'aria-label': 'Remove ' + v + 'x speed',
           });
+          x.disabled = list.length <= 1;
           x.addEventListener('click', function () {
-            var next = (getPath(state, control.key) || []).filter(function (n) {
+            var currentList = getPath(state, control.key) || [];
+            if (currentList.length <= 1) {
+              if (rowRef) showWarning(rowRef, 'Keep at least one speed preset.');
+              return;
+            }
+            if (rowRef) showWarning(rowRef, '');
+            var next = currentList.filter(function (n) {
               return n !== v;
             });
             setValue(control.key, next, 0);
             render(next);
           });
+          chip.appendChild(selectBtn);
           chip.appendChild(x);
           listEl.appendChild(chip);
         });
@@ -1548,6 +1580,7 @@
           render(Array.isArray(value) ? value : []);
         },
         bind: function (row) {
+          rowRef = row;
           var addSpeed = function () {
             var num = Number(addInput.value);
             if (!validators) return;

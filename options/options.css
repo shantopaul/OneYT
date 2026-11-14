@@ -961,13 +961,37 @@ body {
 .speed-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 6px 4px 10px;
+  gap: 2px;
+  padding: 2px 6px 2px 4px;
   background: var(--ui-bg);
   border: 1px solid var(--ui-border);
   border-radius: 999px;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
+}
+
+.speed-chip.is-default {
+  border-color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+}
+
+.speed-chip-select {
+  padding: 2px 6px;
+  background: none;
+  border: none;
+  border-radius: 999px;
+  color: var(--ui-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.speed-chip-select:hover {
+  background: var(--ui-surface-hover);
+}
+
+.speed-chip-select:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
 }
 
 .speed-remove {
@@ -980,7 +1004,12 @@ body {
   line-height: 1;
 }
 
-.speed-remove:hover {
+.speed-remove:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.speed-remove:hover:not(:disabled) {
   color: var(--ui-danger);
 }
 
@@ -990,7 +1019,8 @@ body {
 }
 
 .speed-add-input {
-  min-width: 120px;
+  width: 112px;
+  min-width: 96px;
 }
 
 /* --- Buttons & tool boxes --- */
