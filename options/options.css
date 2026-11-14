@@ -911,14 +911,36 @@ body {
   font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
 }
 
+.control-shortcut-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .control-shortcut {
+  min-width: 164px;
+  max-width: 210px;
   font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-weight: 500;
+  text-align: center;
   cursor: pointer;
+}
+
+.control-shortcut.is-unbound {
+  border-style: dashed;
+  color: var(--ui-text-secondary);
+  font-weight: 400;
 }
 
 .control-shortcut.capturing {
   border-color: var(--ui-accent);
   color: var(--ui-accent);
+}
+
+.control-shortcut-clear:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .speed-chips {

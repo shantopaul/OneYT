@@ -1912,22 +1912,39 @@
     }
 
     function makeShortcut(control) {
+      var wrap = el(doc, 'div', { class: 'control-shortcut-wrap' });
       var input = el(doc, 'input', {
         type: 'text',
         class: 'control-input control-shortcut',
         readonly: 'readonly',
-        placeholder: 'Click, then press keys',
+        placeholder: 'Unbound (click to record)',
+        'aria-label': control.label,
       });
+      var clearBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small control-shortcut-clear',
+        text: 'Unbind',
+        'aria-label': 'Unbind ' + control.label,
+      });
+      wrap.appendChild(input);
+      wrap.appendChild(clearBtn);
+
       var capturing = false;
+      var syncDisplay = function (val) {
+        var str = val ? String(val).trim() : '';
+        input.value = str;
+        input.classList.toggle('is-unbound', !str);
+        clearBtn.disabled = !str;
+      };
       var onKey = function (event) {
         // Escape cancels; Tab cancels too and must keep moving
         // focus — binding 'Tab' as a shortcut would trap keyboard
         // users in the field (Phase 6 accessibility pass).
         if (event.key === 'Escape' || event.key === 'Tab') {
           capturing = false;
-          input.value = getPath(state, control.key) || '';
           input.classList.remove('capturing');
           doc.removeEventListener('keydown', onKey, true);
+          syncDisplay(getPath(state, control.key));
           return;
         }
         event.preventDefault();
@@ -1947,43 +1964,59 @@
         if (keyboardApi) {
           var parsed = keyboardApi.normalizeShortcut(combo);
           if (!parsed) {
-            input.value = getPath(state, control.key) || '';
+            syncDisplay(getPath(state, control.key));
             return;
           }
         }
-        input.value = combo;
+        syncDisplay(combo);
         setValue(control.key, combo, 0);
         checkShortcutWarnings();
       };
+      var startCapture = function () {
+        if (capturing) return;
+        capturing = true;
+        input.classList.add('capturing');
+        input.classList.remove('is-unbound');
+        input.value = 'Press keys… (Esc to cancel)';
+        doc.addEventListener('keydown', onKey, true);
+      };
       return {
-        node: input,
+        node: wrap,
         set: function (value) {
-          if (!capturing) input.value = value || '';
+          if (!capturing) syncDisplay(value);
         },
         bind: function () {
-          input.addEventListener('focus', function () {
-            input.value = '';
-          });
           input.addEventListener('blur', function () {
             // Focus without capturing (keyboard tab-through)
             // blanked the field with no restore: put the
             // stored shortcut back.
             if (!capturing) input.value = getPath(state, control.key) || '';
+            if (!capturing) syncDisplay(getPath(state, control.key));
           });
-          input.addEventListener('click', function () {
-            if (capturing) return;
-            capturing = true;
-            input.classList.add('capturing');
-            input.value = 'Press keys… (Esc to cancel)';
-            doc.addEventListener('keydown', onKey, true);
-          });
+          input.addEventListener('click', startCapture);
           input.addEventListener('keydown', function (event) {
-            if ((event.key === 'Backspace' || event.key === 'Delete') && !capturing) {
+            if (capturing) return;
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              startCapture();
+              return;
+            }
+            if (event.key === 'Backspace' || event.key === 'Delete') {
               event.preventDefault();
               setValue(control.key, '', 0);
-              input.value = '';
+              syncDisplay('');
               checkShortcutWarnings();
             }
+          });
+          clearBtn.addEventListener('click', function () {
+            if (capturing) {
+              capturing = false;
+              input.classList.remove('capturing');
+              doc.removeEventListener('keydown', onKey, true);
+            }
+            setValue(control.key, '', 0);
+            syncDisplay('');
+            checkShortcutWarnings();
           });
         },
       };
