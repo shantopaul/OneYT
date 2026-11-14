@@ -143,3 +143,90 @@ test('sync: settings-manager merges sync changes, keeps local custom CSS', async
     delete globalThis.chrome;
   }
 });
+
+test('createStorage resolves cleanly on sync/async Extension context invalidated errors', async () => {
+  const ctxErr = () => new Error('Extension context invalidated.');
+  const invalidatedSyncArea = {
+    get: () => {
+      throw ctxErr();
+    },
+    set: () => {
+      throw ctxErr();
+    },
+    remove: () => {
+      throw ctxErr();
+    },
+  };
+
+  const syncThrowStorage = storageApi.createStorage(invalidatedSyncArea, invalidatedSyncArea);
+  assert.equal(await syncThrowStorage.get(KEY), undefined);
+  assert.equal(await syncThrowStorage.getFromSync(KEY), undefined);
+  assert.equal(await syncThrowStorage.set({ [KEY]: { sync: { enabled: true } } }), undefined);
+
+  const invalidatedAsyncArea = {
+    get: () => Promise.reject(ctxErr()),
+    set: () => Promise.reject(ctxErr()),
+  };
+  const asyncRejectStorage = storageApi.createStorage(invalidatedAsyncArea, null);
+  assert.equal(await asyncRejectStorage.get(KEY), undefined);
+  assert.equal(await asyncRejectStorage.set({ [KEY]: { ok: true } }), undefined);
+
+  const realFailureArea = {
+    get: () => {
+      throw new Error('Quota exceeded');
+    },
+    set: () => Promise.reject(new Error('Disk full')),
+  };
+  const realErrorStorage = storageApi.createStorage(realFailureArea, null);
+  await assert.rejects(() => realErrorStorage.get(KEY), /Quota exceeded/);
+  await assert.rejects(() => realErrorStorage.set({ [KEY]: 1 }), /Disk full/);
+});
+
+test('createStorage guards default chrome.storage and onChanged when runtime is invalidated', async () => {
+  const invalidatedErr = new Error('Extension context invalidated.');
+  globalThis.chrome = {
+    runtime: { id: undefined },
+    storage: {
+      local: {
+        get: () => {
+          throw new Error('Unexpected native failure');
+        },
+        set: () => {
+          throw new Error('Unexpected native failure');
+        },
+      },
+      onChanged: {
+        addListener: () => {
+          throw invalidatedErr;
+        },
+        removeListener: () => {
+          throw invalidatedErr;
+        },
+      },
+    },
+  };
+  try {
+    const store = storageApi.createStorage();
+    assert.equal(await store.get(KEY), undefined);
+    assert.equal(await store.set({ [KEY]: { ok: true } }), undefined);
+    const unsub = store.onChanged(() => {});
+    unsub();
+
+    // Even when runtime.id looks present initially and invalidates during listener removal
+    globalThis.chrome.runtime.id = 'ext-id';
+    let removed = false;
+    globalThis.chrome.storage.onChanged = {
+      addListener: () => {
+        throw invalidatedErr;
+      },
+      removeListener: () => {
+        removed = true;
+      },
+    };
+    const unsubThrow = store.onChanged(() => {});
+    unsubThrow();
+    assert.equal(removed, false);
+  } finally {
+    delete globalThis.chrome;
+  }
+});
