@@ -32,7 +32,7 @@
     // this map), not by dom.query — the registry documents the
     // canonical strings; tests/selectors.test.js enforces that
     // every key's value appears somewhere in the extension.
-    sidebarItems: '#secondary ytd-compact-video-renderer',
+    sidebarItems: '#secondary :is(ytd-compact-video-renderer, yt-lockup-view-model)',
 
     // --- Home / Shorts (Phase 3) ---
     shortsShelf: 'ytd-rich-shelf-renderer[is-shorts]',
