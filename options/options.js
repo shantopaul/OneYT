@@ -1388,10 +1388,11 @@
           text: 'One click applies a whole setup. A preset changes only the settings it names — everything else you set stays as it is.',
         })
       );
+      var presetGrid = el(doc, 'div', { class: 'preset-grid' });
       profilesApi.BUILTIN_PRESETS.forEach(function (preset) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: preset.name }));
-        row.appendChild(el(doc, 'p', { text: preset.description }));
+        var card = el(doc, 'div', { class: 'preset-card' });
+        card.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: preset.name }));
+        card.appendChild(el(doc, 'p', { class: 'preset-card-desc', text: preset.description }));
         var applyBtn = el(doc, 'button', {
           type: 'button',
           class: 'btn',
@@ -1406,9 +1407,12 @@
             }
           );
         });
-        row.appendChild(applyBtn);
-        presetBox.appendChild(row);
+        var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
+        cardFoot.appendChild(applyBtn);
+        card.appendChild(cardFoot);
+        presetGrid.appendChild(card);
       });
+      presetBox.appendChild(presetGrid);
       sectionEl.appendChild(presetBox);
 
       // Save the current settings as a profile.
@@ -1587,10 +1591,11 @@
         })
       );
       var currentCss = getPath(state, 'appearance.customCSS') || '';
+      var templateGrid = el(doc, 'div', { class: 'preset-grid' });
       cssTemplatesApi.listCssTemplates().forEach(function (template) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: template.name }));
-        row.appendChild(el(doc, 'p', { text: template.description }));
+        var card = el(doc, 'div', { class: 'preset-card' });
+        card.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: template.name }));
+        card.appendChild(el(doc, 'p', { class: 'preset-card-desc', text: template.description }));
         var applied = cssTemplatesApi.isCssTemplateApplied(currentCss, template.id);
         var applyBtn = el(doc, 'button', {
           type: 'button',
@@ -1618,9 +1623,12 @@
             renderSection(currentSection);
           });
         });
-        row.appendChild(applyBtn);
-        box.appendChild(row);
+        var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
+        cardFoot.appendChild(applyBtn);
+        card.appendChild(cardFoot);
+        templateGrid.appendChild(card);
       });
+      box.appendChild(templateGrid);
       sectionEl.appendChild(box);
     }
 
@@ -2052,10 +2060,22 @@
           text: 'One click sets the home grid numbers together. A preset changes only the layout numbers — hiding toggles, theme and everything else stay as they are. Fine-tune the numbers above afterwards.',
         })
       );
+      var layoutGrid = el(doc, 'div', { class: 'preset-grid' });
       layoutPresetsApi.LAYOUT_PRESETS.forEach(function (preset) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: preset.name }));
-        row.appendChild(el(doc, 'p', { text: preset.description }));
+        var card = el(doc, 'div', { class: 'preset-card' });
+        var head = el(doc, 'div', { class: 'preset-card-head' });
+        head.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: preset.name }));
+        if (preset.overrides && preset.overrides.layout) {
+          var lo = preset.overrides.layout;
+          head.appendChild(
+            el(doc, 'span', {
+              class: 'preset-card-meta',
+              text: lo.homeColumns + ' cols · ' + lo.cardSpacing + ' px',
+            })
+          );
+        }
+        card.appendChild(head);
+        card.appendChild(el(doc, 'p', { class: 'preset-card-desc', text: preset.description }));
         var applyBtn = el(doc, 'button', {
           type: 'button',
           class: 'btn',
@@ -2069,9 +2089,12 @@
             renderSection(currentSection);
           });
         });
-        row.appendChild(applyBtn);
-        presetBox.appendChild(row);
+        var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
+        cardFoot.appendChild(applyBtn);
+        card.appendChild(cardFoot);
+        layoutGrid.appendChild(card);
       });
+      presetBox.appendChild(layoutGrid);
       sectionEl.appendChild(presetBox);
     }
 
