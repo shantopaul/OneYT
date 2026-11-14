@@ -1515,6 +1515,7 @@
       updateThemeContrastPreview();
       updateColorClearAllBtn();
       updateControlDependencies();
+      checkShortcutWarnings();
     }
 
     function showWarning(row, message) {
@@ -1524,8 +1525,34 @@
       warn.style.display = message ? 'block' : 'none';
     }
 
+    function updateKeyboardSummary(conflictCount) {
+      if (currentSection !== 'keyboard' || !mainEl) return;
+      var keyboardSection = sectionById('keyboard');
+      var controls = (keyboardSection && keyboardSection.controls) || [];
+      var boundCount = controls.filter(function (c) {
+        var v = getPath(state, c.key);
+        return typeof v === 'string' && v.trim() !== '';
+      }).length;
+      var countEl = mainEl.querySelector('.keyboard-bound-count');
+      if (countEl) countEl.textContent = boundCount + ' of ' + controls.length + ' bound';
+      var unbindAllBtn = mainEl.querySelector('.keyboard-unbind-all-btn');
+      if (unbindAllBtn) unbindAllBtn.disabled = boundCount === 0;
+      var pill = mainEl.querySelector('.keyboard-health-pill');
+      if (pill && typeof conflictCount === 'number') {
+        pill.classList.toggle('is-warn', conflictCount > 0);
+        pill.classList.toggle('is-ok', conflictCount === 0);
+        pill.textContent =
+          conflictCount > 0
+            ? conflictCount + ' conflict' + (conflictCount === 1 ? '' : 's') + ' found'
+            : 'No conflicts';
+      }
+    }
+
     function checkShortcutWarnings() {
-      if (!keyboardApi) return;
+      if (!keyboardApi) {
+        updateKeyboardSummary(0);
+        return;
+      }
       var shortcuts = getPath(state, 'keyboard.shortcuts') || {};
       var dups = keyboardApi.findDuplicateShortcuts(shortcuts);
       var conflicts = keyboardApi.findNativeConflicts(shortcuts);
@@ -1546,6 +1573,7 @@
           if (row) showWarning(row, dupKeys[control.key] || '');
         });
       });
+      updateKeyboardSummary(Object.keys(dupKeys).length);
     }
 
     // ----- control inputs -----
@@ -3136,6 +3164,25 @@
               quickWrap.appendChild(hideAllBtn);
               quickWrap.appendChild(showAllBtn);
               subHead.appendChild(quickWrap);
+            } else if (control.key === 'keyboard.shortcuts.toggleFocus') {
+              subTitle.appendChild(el(doc, 'span', { class: 'keyboard-bound-count', text: '' }));
+              subTitle.appendChild(el(doc, 'span', { class: 'keyboard-health-pill', text: '' }));
+              var unbindAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small keyboard-unbind-all-btn',
+                text: 'Unbind all',
+              });
+              unbindAllBtn.addEventListener('click', function () {
+                var next = defaultsApi.deepClone(state);
+                var kSection = sectionById('keyboard');
+                ((kSection && kSection.controls) || []).forEach(function (c) {
+                  setPath(next, c.key, '');
+                });
+                replaceState(next).then(function () {
+                  refreshValues();
+                });
+              });
+              subHead.appendChild(unbindAllBtn);
             }
             mainEl.appendChild(subHead);
           }

@@ -1693,12 +1693,14 @@ body {
 
 .colors-clear-all-btn:disabled,
 .focus-hide-all-btn:disabled,
-.focus-show-all-btn:disabled {
+.focus-show-all-btn:disabled,
+.keyboard-unbind-all-btn:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
-.focus-hidden-count {
+.focus-hidden-count,
+.keyboard-bound-count {
   padding: 2px 9px;
   background: var(--ui-surface);
   border: 1px solid var(--ui-border);
@@ -1706,6 +1708,28 @@ body {
   color: var(--ui-text-secondary);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
+}
+
+.keyboard-health-pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface);
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.keyboard-health-pill.is-ok {
+  border-color: var(--ui-success);
+  background: var(--ui-success-soft);
+  color: var(--ui-success);
+}
+
+.keyboard-health-pill.is-warn {
+  border-color: var(--ui-warning);
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
 }
 
 .focus-quick-actions {
