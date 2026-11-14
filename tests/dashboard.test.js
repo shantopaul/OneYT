@@ -723,3 +723,21 @@ test('dashboard: Keyboard groups, Unbind button, conflict pill & summary', () =>
   assert.ok(src.includes("event.key === 'Enter' || event.key === ' '"), 'Enter/Space starts recording');
   assert.ok(src.includes('keyboard-unbind-all-btn'), 'Unbind all button exists');
 });
+
+test('dashboard: Advanced notice, file picker, Copy JSON, danger zone & live storage pills', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const advanced = require('../options/sections/advanced');
+
+  assert.ok(!advanced.description.includes('AD-08'), 'internal doc codes removed from user copy');
+  assert.ok(src.includes('advancedNotice'), 'persistent notice survives renderSection after import/reset');
+  assert.ok(src.includes("msg.indexOf('Restored ') === 0"), 'Restored prefix triggers green success notice');
+  assert.ok(src.includes('updateAdvancedSummary('), 'live advanced diff & storage summary helper exists');
+  assert.ok(src.includes('advanced-copy-btn'), 'Copy JSON button rendered');
+  assert.ok(src.includes('advanced-clear-import-btn'), 'Clear import button rendered');
+
+  assert.ok(css.includes('.file-picker-row'), 'custom file picker styled');
+  assert.ok(css.includes('.import-preview:not(:empty)'), 'import diff preview panel framed');
+  assert.ok(css.includes('.reset-danger-box'), 'danger zone emphasis styled');
+  assert.ok(css.includes('.about-storage-pill.is-synced'), 'synced storage pill state styled');
+});
