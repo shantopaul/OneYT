@@ -16,7 +16,9 @@ html.oneyt-enabled.oneyt-watch-spaced #below {
 }
 
 html.oneyt-enabled.oneyt-hide-shorts-watch ytd-rich-shelf-renderer[is-shorts],
-html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts] {
+html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.oneyt-enabled.oneyt-hide-shorts-home [page-subtype='home'] ytd-rich-section-renderer:has(a[href^='/shorts/']) {
   display: none;
 }
 
@@ -37,34 +39,44 @@ html.oneyt-enabled.oneyt-hide-topic-chips ytd-feed-filter-chip-bar-renderer {
  * on other pages stay. Mixes are matched two ways: a Mixes
  * shelf by title, and the individual mix cards by their
  * radio link (mixes on home are grid items, not a shelf).
- * Verify live — the title attributes are English UI text,
- * and a hidden shelf may leave an empty gap where its
- * section wrapper stays. */
-html.oneyt-enabled.oneyt-hide-live-shelf ytd-rich-shelf-renderer[title*='Live now' i] {
+ * Also hide the enclosing ytd-rich-section-renderer so custom
+ * column grids do not break onto a new row where a hidden
+ * shelf sat. */
+html.oneyt-enabled.oneyt-hide-live-shelf ytd-rich-shelf-renderer[title*='Live now' i],
+html.oneyt-enabled.oneyt-hide-live-shelf ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[title*='Live now' i]) {
   display: none;
 }
 
 html.oneyt-enabled.oneyt-hide-mixes-shelf ytd-rich-shelf-renderer[title*='Mixes' i],
+html.oneyt-enabled.oneyt-hide-mixes-shelf ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[title*='Mixes' i]),
 html.oneyt-enabled.oneyt-hide-mixes-shelf ytd-rich-item-renderer:has(a[href*='start_radio=1']) {
   display: none;
 }
 
-html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-shelf-renderer[title*='News' i] {
+html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-shelf-renderer[title*='News' i],
+html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[title*='News' i]) {
   display: none;
 }
 
 /* Block Shorts everywhere (layout.blockShorts, v1.1): one class,
- * every page. Shelves on home/watch (rich shelf) and on search /
- * subscriptions (reel shelf), the Shorts entries in the guide and
- * the mini-guide, and Shorts video cards in grids and search
- * results. Verify live — YouTube renames these elements
- * sometimes, and the Phase 6 selector audit covers them. */
+ * every page. Shelves on home/watch (rich shelf and its section
+ * wrapper) and on search / subscriptions (reel shelf), the Shorts
+ * entries in the guide and the mini-guide, and Shorts video cards
+ * in grids and search results. Verify live — YouTube renames these
+ * elements sometimes, and the Phase 6 selector audit covers them. */
 html.oneyt-enabled.oneyt-block-shorts ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-block-shorts ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='home'] ytd-rich-section-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-rich-section-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts ytd-reel-shelf-renderer,
 html.oneyt-enabled.oneyt-block-shorts ytd-guide-entry-renderer:has(a[href='/shorts']),
 html.oneyt-enabled.oneyt-block-shorts ytd-mini-guide-entry-renderer:has(a[href='/shorts']),
 html.oneyt-enabled.oneyt-block-shorts ytd-rich-item-renderer:has(a[href^='/shorts/']),
-html.oneyt-enabled.oneyt-block-shorts ytd-video-renderer:has(a[href^='/shorts/']) {
+html.oneyt-enabled.oneyt-block-shorts ytd-video-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-item-section-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-grid-video-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='channels'] ytd-item-section-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='hashtag-landing-page'] ytd-rich-item-renderer:has(a[href^='/shorts/']) {
   display: none;
 }
 
@@ -79,8 +91,232 @@ html.oneyt-enabled.oneyt-block-shorts yt-tab-shape[tab-title='Shorts'] {
   display: none;
 }
 
-html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer {
-  --ytd-rich-grid-items-per-row: var(--oneyt-home-columns);
+/* Responsive column scaling (layout.responsiveColumns):
+ * caps user column counts on narrower viewports without
+ * ever increasing above the user's chosen count. */
+html.oneyt-enabled.oneyt-home-columns {
+  --oneyt-effective-home-columns: var(--oneyt-home-columns);
+}
+
+html.oneyt-enabled.oneyt-posts-per-row {
+  --oneyt-effective-posts-per-row: var(--oneyt-posts-per-row);
+}
+
+html.oneyt-enabled.oneyt-shelf-items {
+  --oneyt-effective-shelf-items: var(--oneyt-shelf-items-per-row);
+}
+
+html.oneyt-enabled.oneyt-channel-columns {
+  --oneyt-effective-channel-columns: var(--oneyt-channel-columns);
+}
+
+html.oneyt-enabled.oneyt-channel-shelf-items {
+  --oneyt-effective-channel-shelf-items: var(--oneyt-channel-shelf-items-per-row);
+}
+
+@media (max-width: 1000px) {
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-home-columns {
+    --oneyt-effective-home-columns: min(var(--oneyt-home-columns), 4);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-posts-per-row {
+    --oneyt-effective-posts-per-row: min(var(--oneyt-posts-per-row), 4);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-shelf-items {
+    --oneyt-effective-shelf-items: min(var(--oneyt-shelf-items-per-row), 5);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-channel-columns {
+    --oneyt-effective-channel-columns: min(var(--oneyt-channel-columns), 4);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-channel-shelf-items {
+    --oneyt-effective-channel-shelf-items: min(var(--oneyt-channel-shelf-items-per-row), 5);
+  }
+}
+
+@media (max-width: 768px) {
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-home-columns {
+    --oneyt-effective-home-columns: min(var(--oneyt-home-columns), 3);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-posts-per-row {
+    --oneyt-effective-posts-per-row: min(var(--oneyt-posts-per-row), 3);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-shelf-items {
+    --oneyt-effective-shelf-items: min(var(--oneyt-shelf-items-per-row), 4);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-channel-columns {
+    --oneyt-effective-channel-columns: min(var(--oneyt-channel-columns), 3);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-channel-shelf-items {
+    --oneyt-effective-channel-shelf-items: min(var(--oneyt-channel-shelf-items-per-row), 4);
+  }
+}
+
+@media (max-width: 640px) {
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-home-columns {
+    --oneyt-effective-home-columns: min(var(--oneyt-home-columns), 2);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-posts-per-row {
+    --oneyt-effective-posts-per-row: min(var(--oneyt-posts-per-row), 2);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-shelf-items {
+    --oneyt-effective-shelf-items: min(var(--oneyt-shelf-items-per-row), 3);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-channel-columns {
+    --oneyt-effective-channel-columns: min(var(--oneyt-channel-columns), 2);
+  }
+  html.oneyt-enabled.oneyt-responsive-columns.oneyt-channel-shelf-items {
+    --oneyt-effective-channel-shelf-items: min(var(--oneyt-channel-shelf-items-per-row), 3);
+  }
+}
+
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer,
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer > #contents {
+  --ytd-rich-grid-items-per-row: var(--oneyt-effective-home-columns) !important;
+  --ytd-rich-grid-mini-game-cards-per-row: var(--oneyt-effective-home-columns) !important;
+}
+
+/* Unwrap fixed-size <ytd-rich-grid-row> wrappers so cards reflow evenly across custom column counts. */
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row,
+html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row > #contents {
+  display: contents !important;
+}
+
+/* Collapse empty or hidden section wrappers so custom grids never break mid-row. */
+html.oneyt-enabled.oneyt-home-columns ytd-rich-section-renderer[hidden],
+html.oneyt-enabled.oneyt-home-columns ytd-rich-section-renderer:has(> #content:empty),
+html.oneyt-enabled.oneyt-home-columns ytd-rich-section-renderer:has(> #content > [hidden]:only-child) {
+  display: none;
+}
+
+/* Match skeleton loading placeholders to the chosen column count to avoid layout jump. */
+html.oneyt-enabled.oneyt-home-columns #home-page-skeleton .rich-grid-media-skeleton,
+html.oneyt-enabled.oneyt-home-columns #home-page-skeleton .rich-shelf-videos .rich-grid-media-skeleton.mini-mode,
+html.oneyt-enabled.oneyt-home-columns #home-page-skeleton #home-container-media .rich-grid-media-skeleton.mini-mode {
+  min-width: calc(100% / var(--oneyt-effective-home-columns) - 1.6rem) !important;
+  max-width: calc(100% / var(--oneyt-effective-home-columns) - 1.6rem) !important;
+}
+
+/* Community posts per row (layout.postsPerRow). */
+html.oneyt-enabled.oneyt-posts-per-row ytd-rich-grid-renderer {
+  --ytd-rich-grid-posts-per-row: var(--oneyt-effective-posts-per-row) !important;
+}
+
+html.oneyt-enabled.oneyt-posts-per-row ytd-rich-item-renderer[is-post] {
+  width: calc(
+    100% / var(--oneyt-effective-posts-per-row) - var(--ytd-rich-grid-item-margin, 16px) - 0.01px
+  ) !important;
+}
+
+/* Shorts & shelf items per row on Home / Subscriptions (layout.shelfItemsPerRow). */
+html.oneyt-enabled.oneyt-shelf-items ytd-rich-grid-renderer {
+  --ytd-rich-grid-slim-items-per-row: var(--oneyt-effective-shelf-items) !important;
+  --ytd-rich-grid-game-cards-per-row: var(--oneyt-effective-shelf-items) !important;
+}
+
+html.oneyt-enabled.oneyt-shelf-items :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:is([is-slim-media], :has(ytm-shorts-lockup-view-model)) {
+  width: calc(
+    100% / var(--oneyt-effective-shelf-items) - var(--ytd-rich-grid-item-margin, 16px) - 0.01px
+  ) !important;
+}
+
+/* Reveal slim shelf items up to the selected column count so YouTube does not leave trailing blanks. */
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='1'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 1),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='2'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 2),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='3'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 3),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='4'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 4),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='5'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 5),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='6'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 6),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='7'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 7),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='8'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 8),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='9'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 9),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='10'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 10),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='11'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 11),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='12'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 12),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='13'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 13),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='14'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 14),
+html.oneyt-enabled.oneyt-shelf-items[data-oneyt-shelf-cols='15'] :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 15) {
+  display: block !important;
+}
+
+/* Channel page layout (layout.channelWide, channelColumns, channelShelfItemsPerRow). */
+html.oneyt-enabled.oneyt-channel-wide [page-subtype='channels'] ytd-two-column-browse-results-renderer:has(ytd-rich-grid-renderer:not([is-shorts-grid])) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+html.oneyt-enabled.oneyt-channel-wide [page-subtype='channels'] ytd-two-column-browse-results-renderer:has(ytd-rich-grid-renderer:not([is-shorts-grid])) #primary.ytd-two-column-browse-results-renderer {
+  padding-inline: 20px;
+}
+
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]),
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]) > #contents {
+  --ytd-rich-grid-items-per-row: var(--oneyt-effective-channel-columns) !important;
+}
+
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row,
+html.oneyt-enabled.oneyt-channel-columns [page-subtype='channels'] ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row > #contents {
+  display: contents !important;
+}
+
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-grid-renderer {
+  --ytd-rich-grid-slim-items-per-row: var(--oneyt-effective-channel-shelf-items) !important;
+}
+
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-grid-renderer[is-shorts-grid],
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-grid-renderer[is-shorts-grid] > #contents {
+  --ytd-rich-grid-items-per-row: var(--oneyt-effective-channel-shelf-items) !important;
+}
+
+html.oneyt-enabled.oneyt-channel-shelf-items [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:is([is-slim-media], :has(ytm-shorts-lockup-view-model)) {
+  width: calc(
+    100% / var(--oneyt-effective-channel-shelf-items) - var(--ytd-rich-grid-item-margin, 16px) - 0.01px
+  ) !important;
+}
+
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='1'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 1),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='2'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 2),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='3'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 3),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='4'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 4),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='5'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 5),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='6'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 6),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='7'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 7),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='8'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 8),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='9'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 9),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='10'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 10),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='11'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 11),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='12'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 12),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='13'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 13),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='14'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 14),
+html.oneyt-enabled.oneyt-channel-shelf-items[data-oneyt-channel-shelf-cols='15'] [page-subtype='channels'] ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer[is-slim-media]:nth-child(-n + 15) {
+  display: block !important;
+}
+
+/* Hide channel profile avatars under video cards (layout.hideChannelProfile). */
+html.oneyt-enabled.oneyt-hide-channel-profile .channel-avatar.ytd-ghost-grid-renderer,
+html.oneyt-enabled.oneyt-hide-channel-profile #home-page-skeleton .channel-avatar,
+html.oneyt-enabled.oneyt-hide-channel-profile .ytLockupMetadataViewModelStandard .ytLockupMetadataViewModelAvatar,
+html.oneyt-enabled.oneyt-hide-channel-profile .yt-lockup-metadata-view-model--standard .yt-lockup-metadata-view-model__avatar,
+html.oneyt-enabled.oneyt-hide-channel-profile .yt-lockup-metadata-view-model-wiz--standard .yt-lockup-metadata-view-model-wiz__avatar,
+html.oneyt-enabled.oneyt-hide-channel-profile #avatar-container.ytd-rich-grid-media,
+html.oneyt-enabled.oneyt-hide-channel-profile ytd-rich-grid-media a#avatar-link {
+  display: none !important;
+}
+
+/* Show full video titles without line clamping (layout.fullVideoTitles). */
+html.oneyt-enabled.oneyt-full-video-titles .ytLockupMetadataViewModelStandard.ytLockupMetadataViewModelRichGridLegacyTypography .ytLockupMetadataViewModelTitle,
+html.oneyt-enabled.oneyt-full-video-titles .yt-lockup-metadata-view-model--standard.yt-lockup-metadata-view-model--rich-grid-legacy-typography .yt-lockup-metadata-view-model__title,
+html.oneyt-enabled.oneyt-full-video-titles .yt-lockup-metadata-view-model-wiz--standard.yt-lockup-metadata-view-model-wiz--rich-grid-legacy-typography .yt-lockup-metadata-view-model-wiz__title,
+html.oneyt-enabled.oneyt-full-video-titles ytd-grid-video-renderer #video-title.yt-simple-endpoint.ytd-grid-video-renderer,
+html.oneyt-enabled.oneyt-full-video-titles ytd-rich-grid-media[mini-mode] #video-title.yt-simple-endpoint.ytd-grid-video-renderer,
+html.oneyt-enabled.oneyt-full-video-titles ytd-grid-video-renderer #video-title.ytd-rich-grid-media,
+html.oneyt-enabled.oneyt-full-video-titles ytd-rich-grid-media[mini-mode] #video-title.ytd-rich-grid-media,
+html.oneyt-enabled.oneyt-full-video-titles #video-title.ytd-compact-video-renderer,
+html.oneyt-enabled.oneyt-full-video-titles #video-title.ytd-rich-grid-media,
+html.oneyt-enabled.oneyt-full-video-titles #video-title.ytd-video-renderer,
+html.oneyt-enabled.oneyt-full-video-titles #video-title.ytd-rich-grid-slim-media,
+html.oneyt-enabled.oneyt-full-video-titles #video-title.ytd-grid-playlist-renderer,
+html.oneyt-enabled.oneyt-full-video-titles #video-title.ytd-reel-item-renderer {
+  max-height: unset;
+  -webkit-line-clamp: unset;
 }
 
 html.oneyt-enabled.oneyt-card-spaced ytd-rich-grid-renderer {

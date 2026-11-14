@@ -124,7 +124,7 @@ html.oneyt-enabled.oneyt-player-hide-endscreen #movie_player .ytp-endscreen-cont
  * selector-audit test needs the raw selector value to
  * appear contiguously in the CSS. */
 /* prettier-ignore */
-html.oneyt-enabled.oneyt-player-hide-like-count #segmented-like-button .yt-spec-button-shape-next__button-text-content {
+html.oneyt-enabled.oneyt-player-hide-like-count :is(like-button-view-model, #segmented-like-button) .yt-spec-button-shape-next__button-text-content {
   display: none;
 }
 
@@ -132,7 +132,8 @@ html.oneyt-enabled.oneyt-player-hide-view-count ytd-video-primary-info-renderer 
   display: none;
 }
 
-html.oneyt-enabled.oneyt-player-hide-subscriber-count ytd-video-owner-renderer #subscriber-count {
+/* prettier-ignore */
+html.oneyt-enabled.oneyt-player-hide-subscriber-count ytd-video-owner-renderer :is(#owner-sub-count, #subscriber-count) {
   display: none;
 }
 

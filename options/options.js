@@ -41,6 +41,15 @@
     return obj;
   }
 
+  function countHealthStatuses(features) {
+    var counts = { total: 0, working: 0, broken: 0, 'not-seen': 0, unchecked: 0 };
+    (features || []).forEach(function (item) {
+      counts.total++;
+      if (counts[item.status] !== undefined) counts[item.status]++;
+    });
+    return counts;
+  }
+
   function isPlainObject(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
   }
@@ -69,9 +78,433 @@
   function formatValue(value) {
     if (value === undefined) return '—';
     if (value === null) return 'YouTube default';
-    if (typeof value === 'string' && value === '') return '(empty)';
+    if (typeof value === 'boolean') return value ? 'On' : 'Off';
+    if (typeof value === 'string') return value === '' ? '(empty)' : value;
+    if (Array.isArray(value)) return value.join(', ');
     return JSON.stringify(value);
   }
+
+  function formatDefaultValue(value, control) {
+    var base = formatValue(value);
+    if (typeof value === 'number' && control) {
+      if (control.unit) return base + ' ' + control.unit;
+      if (control.source === 'speedPresets') return base + 'x';
+    }
+    return base;
+  }
+
+  function isControlModified(currentValue, defaultValue) {
+    if (currentValue === undefined && defaultValue === '') return false;
+    if (Array.isArray(currentValue) || Array.isArray(defaultValue)) {
+      return JSON.stringify(currentValue) !== JSON.stringify(defaultValue);
+    }
+    return currentValue !== defaultValue;
+  }
+
+  var MODULE_SECTION_MAP = {
+    'modules.player': { id: 'player', label: 'Player' },
+    'modules.sidebar': { id: 'sidebar', label: 'Sidebar' },
+    'modules.layout': { id: 'layout', label: 'Layout' },
+    'modules.appearance': { id: 'appearance', label: 'Appearance' },
+    'modules.typography': { id: 'appearance', label: 'Appearance' },
+    'modules.playback': { id: 'playback', label: 'Playback' },
+    'modules.recommendations': { id: 'sidebar', label: 'Sidebar' },
+    'modules.focus': { id: 'productivity', label: 'Productivity' },
+    'modules.keyboard': { id: 'keyboard', label: 'Keyboard' },
+    'modules.navigation': { id: 'layout', label: 'Layout' },
+  };
+
+  var SECTION_MODULE_DEPS = {
+    player: [{ key: 'modules.player', label: 'Player' }],
+    sidebar: [
+      { key: 'modules.sidebar', label: 'Sidebar' },
+      { key: 'modules.recommendations', label: 'Recommendations' },
+    ],
+    home: [{ key: 'modules.layout', label: 'Layout' }],
+    layout: [
+      { key: 'modules.layout', label: 'Layout' },
+      { key: 'modules.navigation', label: 'Navigation' },
+    ],
+    appearance: [
+      { key: 'modules.appearance', label: 'Appearance' },
+      { key: 'modules.typography', label: 'Typography' },
+    ],
+    playback: [{ key: 'modules.playback', label: 'Playback' }],
+    productivity: [{ key: 'modules.focus', label: 'Focus' }],
+    keyboard: [{ key: 'modules.keyboard', label: 'Keyboard' }],
+  };
+
+  var CONTROL_DEPENDENCIES = {
+    'sidebar.customWidth': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'sidebar.maxHeight': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'sidebar.scrollbarVisible': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'sidebar.scrollbarWidth': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.scrollbarVisible',
+        equals: true,
+        reason: 'Requires "Show sidebar scrollbar" On',
+      },
+    ],
+    'sidebar.smoothScroll': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.independentScroll',
+        equals: true,
+        reason: 'Requires "Independent sidebar scroll" On',
+      },
+    ],
+    'sidebar.scrollSensitivity': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.independentScroll',
+        equals: true,
+        reason: 'Requires "Independent sidebar scroll" On',
+      },
+    ],
+    'sidebar.playerOffset': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.independentScroll',
+        equals: true,
+        reason: 'Requires "Independent sidebar scroll" On',
+      },
+    ],
+    'recommendations.density': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'recommendations.cardSize': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'recommendations.showMetadata': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'appearance.customCSS': [
+      {
+        key: 'appearance.customCSSEnabled',
+        equals: true,
+        reason: 'Turn on "Use custom CSS" to apply',
+      },
+    ],
+    'productivity.focusHideComments': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'productivity.focusHideChat': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'productivity.focusHideRecommendations': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'productivity.focusHideShorts': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'productivity.focusHideButtons': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'productivity.focusHideMetadata': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'productivity.focusHideNav': [
+      {
+        key: 'productivity.focusMode',
+        equals: true,
+        reason: 'Applies when Focus Mode or tab shortcut is active',
+      },
+    ],
+    'layout.hideShortsHome': [
+      {
+        key: 'layout.blockShorts',
+        equals: false,
+        reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'layout.hideShortsWatch': [
+      {
+        key: 'layout.blockShorts',
+        equals: false,
+        reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'navigation.hideShorts': [
+      {
+        key: 'layout.blockShorts',
+        equals: false,
+        reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'navigation.guideWidth': [
+      {
+        key: 'navigation.compact',
+        equals: false,
+        reason: 'Overridden while "Compact guide" is On',
+      },
+    ],
+    'playback.captionFontSize': [
+      {
+        key: 'playback.captions',
+        notEquals: false,
+        reason: 'Captions are forced Off',
+      },
+    ],
+  };
+
+  function getControlInactiveReason(key, currentState) {
+    var rules = CONTROL_DEPENDENCIES[key];
+    if (!rules || !currentState) return '';
+    for (var i = 0; i < rules.length; i++) {
+      var rule = rules[i];
+      var val = getPath(currentState, rule.key);
+      if (rule.notEquals !== undefined) {
+        if (val === rule.notEquals) return rule.reason;
+      } else if (val !== rule.equals) {
+        return rule.reason;
+      }
+    }
+    return '';
+  }
+
+  var CONTROL_HINTS = {
+    'playback.defaultSpeed': [
+      {
+        key: 'playback.rememberSpeed',
+        equals: true,
+        hint: 'Remember speed is On — takes over once changed on YouTube',
+      },
+    ],
+    'playback.defaultVolume': [
+      {
+        key: 'playback.rememberVolume',
+        equals: true,
+        hint: 'Remember volume is On — takes over once changed on YouTube',
+      },
+    ],
+    'layout.shelfItemsPerRow': [
+      {
+        key: 'layout.blockShorts',
+        equals: true,
+        hint: 'Block Shorts everywhere is On — Shorts shelves stay hidden; applies to other shelf cards',
+      },
+    ],
+  };
+
+  function getControlHint(key, currentState) {
+    var rules = CONTROL_HINTS[key];
+    if (!rules || !currentState) return '';
+    for (var i = 0; i < rules.length; i++) {
+      if (getPath(currentState, rules[i].key) === rules[i].equals) {
+        return rules[i].hint;
+      }
+    }
+    return '';
+  }
+
+  var FOCUS_HIDE_KEYS = [
+    'productivity.focusHideComments',
+    'productivity.focusHideChat',
+    'productivity.focusHideRecommendations',
+    'productivity.focusHideShorts',
+    'productivity.focusHideButtons',
+    'productivity.focusHideMetadata',
+    'productivity.focusHideNav',
+  ];
+
+  var FOCUS_PRESETS = [
+    {
+      id: 'deep',
+      label: 'Deep Focus',
+      description: 'Hide all 7 distraction surfaces — keep video player + search only',
+      values: {
+        'productivity.focusHideComments': true,
+        'productivity.focusHideChat': true,
+        'productivity.focusHideRecommendations': true,
+        'productivity.focusHideShorts': true,
+        'productivity.focusHideButtons': true,
+        'productivity.focusHideMetadata': true,
+        'productivity.focusHideNav': true,
+      },
+    },
+    {
+      id: 'study',
+      label: 'Study Mode',
+      description: 'Hide recommendations, Shorts, live chat & guide; keep comments & description',
+      values: {
+        'productivity.focusHideComments': false,
+        'productivity.focusHideChat': true,
+        'productivity.focusHideRecommendations': true,
+        'productivity.focusHideShorts': true,
+        'productivity.focusHideButtons': false,
+        'productivity.focusHideMetadata': false,
+        'productivity.focusHideNav': true,
+      },
+    },
+    {
+      id: 'cleanFeed',
+      label: 'Clean Feed',
+      description: 'Hide recommendations, Shorts & guide; keep watch engagement visible',
+      values: {
+        'productivity.focusHideComments': false,
+        'productivity.focusHideChat': false,
+        'productivity.focusHideRecommendations': true,
+        'productivity.focusHideShorts': true,
+        'productivity.focusHideButtons': false,
+        'productivity.focusHideMetadata': false,
+        'productivity.focusHideNav': true,
+      },
+    },
+  ];
+
+  function isFocusPresetMatches(currentState, preset) {
+    if (!currentState || !preset || !preset.values) return false;
+    var keys = Object.keys(preset.values);
+    for (var i = 0; i < keys.length; i++) {
+      if (Boolean(getPath(currentState, keys[i])) !== Boolean(preset.values[keys[i]])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  var SECTION_GROUPS = {
+    player: {
+      'player.customWidth': 'Size & positioning',
+      'player.borderRadius': 'Frame & spacing',
+      'player.hideEndscreen': 'Clean watch overlay',
+      'player.miniPlayer.size': 'Mini-player',
+    },
+    sidebar: {
+      'sidebar.independentScroll': 'Sidebar layout & scroll',
+      'sidebar.scrollbarVisible': 'Scrollbar & scroll behaviour',
+      'recommendations.hideSidebar': 'Recommendations feed',
+    },
+    home: {
+      'layout.homeColumns': 'Feed grid & row counts',
+      'layout.cardSpacing': 'Cards, spacing & titles',
+      'layout.hideShortsHome': 'Home feed shelves & clutter',
+    },
+    layout: {
+      'layout.blockShorts': 'Shorts & global blocking',
+      'layout.channelWide': 'Channel page',
+      'layout.hideComments': 'Watch page',
+      'navigation.hideHome': 'Left navigation & guide',
+    },
+    appearance: {
+      'appearance.theme': 'Theme preset',
+      'appearance.colors.accent': 'Custom colours',
+      'appearance.typography.fontFamily': 'Typography',
+      'appearance.borderRadius': 'Radius & spacing',
+      'appearance.customCSSEnabled': 'Custom CSS',
+    },
+    playback: {
+      'playback.defaultSpeed': 'Speed & volume',
+      'playback.autoplay': 'Quality, autoplay & captions',
+    },
+    productivity: {
+      'productivity.focusMode': 'Focus mode',
+      'productivity.focusHideComments': 'Hidden elements in focus mode',
+    },
+    keyboard: {
+      'keyboard.shortcuts.toggleFocus': 'Workspace & player shortcuts',
+      'keyboard.shortcuts.speedUp': 'Playback speed shortcuts',
+    },
+  };
+
+  var TOGGLE_GRID_KEYS = {
+    'layout.hideShortsHome': true,
+    'layout.hideShortsWatch': true,
+    'layout.hideTopicChips': true,
+    'layout.hideLiveShelf': true,
+    'layout.hideMixesShelf': true,
+    'layout.hideNewsShelf': true,
+    'layout.hideChannelProfile': true,
+    'layout.fullVideoTitles': true,
+    'navigation.hideHome': true,
+    'navigation.hideShorts': true,
+    'navigation.hideSubscriptions': true,
+    'navigation.hideLibrary': true,
+    'navigation.hideHistory': true,
+    'navigation.compact': true,
+    'player.hideEndscreen': true,
+    'player.hideLikeCount': true,
+    'player.hideViewCount': true,
+    'player.hideSubscriberCount': true,
+    'productivity.focusHideComments': true,
+    'productivity.focusHideChat': true,
+    'productivity.focusHideRecommendations': true,
+    'productivity.focusHideShorts': true,
+    'productivity.focusHideButtons': true,
+    'productivity.focusHideMetadata': true,
+    'productivity.focusHideNav': true,
+  };
 
   // Select option sources. `settings` supplies dynamic lists
   // (speed presets); `apis` supplies themes/font data.
@@ -327,8 +760,124 @@
     return node;
   }
 
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  // Vector paths (24x24 viewBox) built with createElementNS —
+  // never innerHTML — so section nav stays CSP/security-clean.
+  var SECTION_ICONS = {
+    general: [
+      ['circle', { cx: '12', cy: '12', r: '3' }],
+      [
+        'path',
+        {
+          d: 'M12 2v3m0 14v3M4.93 4.93l2.12 2.12m9.9 9.9l2.12 2.12M2 12h3m14 0h3M4.93 19.07l2.12-2.12m9.9-9.9l2.12-2.12',
+        },
+      ],
+    ],
+    profiles: [['path', { d: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z' }]],
+    health: [['path', { d: 'M22 12h-4l-3 9L9 3l-3 9H2' }]],
+    player: [
+      ['rect', { x: '2', y: '4', width: '20', height: '16', rx: '2' }],
+      ['polygon', { points: '10 9 16 12 10 15 10 9' }],
+    ],
+    sidebar: [
+      ['rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }],
+      ['path', { d: 'M9 3v18' }],
+    ],
+    home: [
+      ['path', { d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' }],
+      ['polyline', { points: '9 22 9 12 15 12 15 22' }],
+    ],
+    layout: [
+      ['rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }],
+      ['rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' }],
+      ['rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' }],
+      ['rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' }],
+    ],
+    appearance: [
+      [
+        'path',
+        {
+          d: 'M12 3a9 9 0 0 0 0 18h1a2 2 0 0 0 2-2v-.5a1.5 1.5 0 0 1 1.5-1.5H18a3 3 0 0 0 3-3A9 9 0 0 0 12 3z',
+        },
+      ],
+      ['circle', { cx: '8', cy: '11', r: '1' }],
+      ['circle', { cx: '11', cy: '7.5', r: '1' }],
+      ['circle', { cx: '15', cy: '8.5', r: '1' }],
+    ],
+    playback: [
+      ['polygon', { points: '13 19 22 12 13 5 13 19' }],
+      ['polygon', { points: '2 19 11 12 2 5 2 19' }],
+    ],
+    productivity: [
+      ['circle', { cx: '12', cy: '12', r: '9' }],
+      ['circle', { cx: '12', cy: '12', r: '5' }],
+      ['circle', { cx: '12', cy: '12', r: '1' }],
+    ],
+    keyboard: [
+      ['rect', { x: '2', y: '5', width: '20', height: '14', rx: '2' }],
+      ['path', { d: 'M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10' }],
+    ],
+    advanced: [
+      ['path', { d: 'M16 18l6-6-6-6' }],
+      ['path', { d: 'M8 6l-6 6 6 6' }],
+    ],
+  };
+
+  function svgIcon(doc, sectionId, className) {
+    if (typeof doc.createElementNS !== 'function') return null;
+    var shapes = SECTION_ICONS[sectionId] || SECTION_ICONS.general;
+    var svg = doc.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '1.75');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    if (className) svg.setAttribute('class', className);
+    shapes.forEach(function (spec) {
+      var child = doc.createElementNS(SVG_NS, spec[0]);
+      var attrs = spec[1];
+      for (var key in attrs) {
+        child.setAttribute(key, attrs[key]);
+      }
+      svg.appendChild(child);
+    });
+    return svg;
+  }
+
   function createOptionsApp(deps) {
     var doc = deps.document;
+
+    function createToolNoticeEl(text) {
+      var msg = text || '';
+      var cls = 'control-warning';
+      if (
+        msg.indexOf('Applied ') === 0 ||
+        msg.indexOf('Saved ') === 0 ||
+        msg.indexOf('Added ') === 0 ||
+        msg.indexOf('Renamed ') === 0 ||
+        msg.indexOf('Deleted ') === 0 ||
+        msg.indexOf('Restored ') === 0
+      ) {
+        cls += ' notice-success';
+      } else if (msg.indexOf('Could not') !== -1 || msg.indexOf('rejected') !== -1) {
+        cls += ' notice-error';
+      }
+      var node = el(doc, 'p', { class: cls, text: msg });
+      if (msg) node.style.display = 'block';
+      return node;
+    }
+
+    function bindEnterSubmit(inputEl, btnEl) {
+      inputEl.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          btnEl.click();
+        }
+      });
+    }
     var storage = deps.storage;
     var defaultsApi = deps.defaultsApi;
     var validators = deps.validators;
@@ -353,7 +902,9 @@
     var templatesNotice = '';
     var savedThemes = [];
     var savedThemesNotice = '';
+    var advancedNotice = '';
     var healthRecord = {};
+    var healthFilter = 'all';
     var saveTimer = null;
     var navEl = doc.getElementById('options-nav');
     var mainEl = doc.getElementById('options-main');
@@ -431,10 +982,534 @@
       return saveNow();
     }
 
+    function isLayoutPresetMatches(preset) {
+      if (!preset || !preset.overrides || !preset.overrides.layout) return false;
+      var lo = preset.overrides.layout;
+      var cur = (state && state.layout) || {};
+      return Object.keys(lo).every(function (k) {
+        return cur[k] === lo[k];
+      });
+    }
+
+    function updateLayoutPreview() {
+      if (!layoutPresetsApi || !mainEl) return;
+      var summaryEl = mainEl.querySelector('.layout-preview-summary');
+      var gridEl = mainEl.querySelector('.layout-preview-grid');
+      if (!summaryEl || !gridEl) return;
+      var summary = layoutPresetsApi.layoutPreviewSummary(state);
+      var thumbSize = (state && state.layout && Number(state.layout.thumbnailSize)) || 0;
+      var responsive = !!(state && state.layout && state.layout.responsiveColumns);
+      summaryEl.textContent =
+        summary.columns +
+        ' columns' +
+        (responsive ? ' (auto-adjust)' : '') +
+        ' · ' +
+        summary.gap +
+        ' px gap · ' +
+        (thumbSize > 0 ? thumbSize + ' px thumb · ' : '') +
+        (summary.maxWidth > 0 ? 'max-width ' + summary.maxWidth + ' px' : 'full width') +
+        '.';
+      var widthCap = summary.maxWidth > 0 ? Math.max(58, Math.min(96, Math.round((summary.maxWidth / 2000) * 100))) : 100;
+      gridEl.setAttribute(
+        'style',
+        'display: flex; gap: ' +
+          Math.min(summary.gap, 24) +
+          'px; margin: 10px auto 0; max-width: ' +
+          widthCap +
+          '%;'
+      );
+      gridEl.textContent = '';
+      for (var i = 0; i < summary.columns; i++) {
+        var cell = el(doc, 'div', { class: 'layout-preview-cell' });
+        cell.appendChild(el(doc, 'div', { class: 'layout-preview-thumb' }));
+        cell.appendChild(el(doc, 'span', { class: 'layout-preview-title' }));
+        cell.appendChild(el(doc, 'span', { class: 'layout-preview-sub' }));
+        gridEl.appendChild(cell);
+      }
+      if (layoutPresetsApi.LAYOUT_PRESETS) {
+        layoutPresetsApi.LAYOUT_PRESETS.forEach(function (preset) {
+          var card = mainEl.querySelector('.preset-card[data-preset-id="' + preset.id + '"]');
+          if (!card) return;
+          var active = isLayoutPresetMatches(preset);
+          card.classList.toggle('is-active', active);
+          var badge = card.querySelector('.preset-active-pill');
+          if (badge) badge.hidden = !active;
+        });
+      }
+    }
+
+    function updateSidebarPreview() {
+      if (!mainEl) return;
+      var summaryEl = mainEl.querySelector('.sidebar-preview-summary');
+      var stageEl = mainEl.querySelector('.sidebar-preview-stage');
+      if (!summaryEl || !stageEl) return;
+      var sb = getPath(state, 'sidebar') || {};
+      var rec = getPath(state, 'recommendations') || {};
+      var hideSidebar = !!rec.hideSidebar;
+      var customWidth = Number(sb.customWidth) || 0;
+      var sbWidthLabel = customWidth > 0 ? customWidth + ' px' : 'YouTube default';
+      var scrollLabel = sb.independentScroll ? 'Independent scroll' : 'Normal scroll';
+      var scrollbarLabel = sb.scrollbarVisible
+        ? 'Scrollbar ' + (Number(sb.scrollbarWidth) || 8) + ' px'
+        : 'Scrollbar hidden';
+      summaryEl.textContent = hideSidebar
+        ? 'Recommendations sidebar is hidden on watch pages.'
+        : sbWidthLabel +
+          ' · ' +
+          scrollLabel +
+          ' · ' +
+          scrollbarLabel +
+          ' · Density: ' +
+          (rec.density || 'default');
+
+      stageEl.textContent = '';
+      var playerBox = el(doc, 'div', { class: 'sidebar-preview-player' });
+      var offset = Math.min(Math.max(Number(sb.playerOffset) || 0, 0), 40);
+      if (sb.independentScroll && offset > 0) {
+        playerBox.style.marginTop = Math.round(offset / 2) + 'px';
+      }
+      playerBox.appendChild(el(doc, 'span', { class: 'sidebar-preview-tag', text: 'Video player' }));
+      stageEl.appendChild(playerBox);
+
+      var colWidthPx = customWidth > 0 ? Math.max(120, Math.min(240, Math.round(customWidth * 0.42))) : 168;
+      var colBox = el(doc, 'div', {
+        class: 'sidebar-preview-col' + (hideSidebar ? ' is-hidden' : ''),
+      });
+      colBox.style.width = colWidthPx + 'px';
+      if (hideSidebar) {
+        colBox.appendChild(el(doc, 'span', { class: 'sidebar-preview-tag', text: 'Sidebar hidden' }));
+        stageEl.appendChild(colBox);
+        return;
+      }
+
+      var list = el(doc, 'div', {
+        class: 'sidebar-preview-list is-density-' + (rec.density || 'default'),
+      });
+      var cardWidth = Number(rec.cardSize) || 0;
+      var thumbPx = cardWidth > 0 ? Math.max(36, Math.min(80, Math.round(cardWidth * 0.3))) : 56;
+      var showMeta = rec.showMetadata !== false;
+      for (var i = 0; i < 4; i++) {
+        var item = el(doc, 'div', { class: 'sidebar-preview-item' });
+        var thumb = el(doc, 'div', { class: 'sidebar-preview-thumb' });
+        thumb.style.width = thumbPx + 'px';
+        item.appendChild(thumb);
+        if (showMeta) {
+          var meta = el(doc, 'div', { class: 'sidebar-preview-meta' });
+          meta.appendChild(el(doc, 'span', { class: 'sidebar-preview-line is-title' }));
+          meta.appendChild(el(doc, 'span', { class: 'sidebar-preview-line is-sub' }));
+          item.appendChild(meta);
+        }
+        list.appendChild(item);
+      }
+      colBox.appendChild(list);
+
+      if (sb.scrollbarVisible) {
+        var barW = Math.max(3, Math.min(12, Number(sb.scrollbarWidth) || 8));
+        var track = el(doc, 'div', { class: 'sidebar-preview-scrollbar' });
+        track.style.width = barW + 'px';
+        var thumbBar = el(doc, 'div', {
+          class:
+            'sidebar-preview-scrollthumb' + (sb.independentScroll ? ' is-active' : ''),
+        });
+        track.appendChild(thumbBar);
+        colBox.appendChild(track);
+      }
+      stageEl.appendChild(colBox);
+    }
+
+    function renderSidebarPreviewTools(sectionEl) {
+      var box = el(doc, 'div', { class: 'tool-box sidebar-preview-box' });
+      box.appendChild(el(doc, 'h3', { text: 'Watch page preview' }));
+      box.appendChild(
+        el(doc, 'p', {
+          class: 'sidebar-preview-summary',
+          text: '',
+        })
+      );
+      box.appendChild(el(doc, 'div', { class: 'sidebar-preview-stage' }));
+      sectionEl.appendChild(box);
+      updateSidebarPreview();
+    }
+
+    function updateThemeContrastPreview() {
+      if (!apis.themes || !mainEl) return;
+      var activeTheme = String(getPath(state, 'appearance.theme') || 'default');
+      mainEl.querySelectorAll('.theme-preset-pill').forEach(function (pill) {
+        pill.classList.toggle('is-active', pill.getAttribute('data-theme-name') === activeTheme);
+      });
+      var card = mainEl.querySelector('.theme-contrast-card');
+      if (!card) return;
+      var customColors = getPath(state, 'appearance.colors') || {};
+      var vars = apis.themes.resolveThemeVars(activeTheme, customColors);
+      var hasTokens = vars && vars.bg && vars.text;
+      var surface = card.querySelector('.theme-preview-surface');
+      var sampleTitle = card.querySelector('.theme-preview-title');
+      var sampleSub = card.querySelector('.theme-preview-sub');
+      var sampleAccent = card.querySelector('.theme-preview-accent');
+      var ratioBadge = card.querySelector('.theme-contrast-ratio');
+      if (!hasTokens) {
+        if (surface) surface.removeAttribute('style');
+        if (sampleTitle) sampleTitle.removeAttribute('style');
+        if (sampleSub) sampleSub.removeAttribute('style');
+        if (sampleAccent) sampleAccent.removeAttribute('style');
+        if (ratioBadge) {
+          ratioBadge.textContent = "YouTube's native theme";
+          ratioBadge.className = 'theme-contrast-ratio';
+        }
+        return;
+      }
+      if (surface) {
+        surface.setAttribute(
+          'style',
+          'background: ' +
+            vars.bg +
+            '; border-color: ' +
+            (vars.border || '#2a2a2a') +
+            ';'
+        );
+      }
+      if (sampleTitle) sampleTitle.setAttribute('style', 'color: ' + vars.text + ';');
+      if (sampleSub && vars.textSecondary) {
+        sampleSub.setAttribute('style', 'color: ' + vars.textSecondary + ';');
+      }
+      if (sampleAccent && vars.accent) {
+        sampleAccent.setAttribute('style', 'background: ' + vars.accent + ';');
+      }
+      if (ratioBadge) {
+        var ratio = apis.themes.contrastRatio(vars.text, vars.bg);
+        var ok = apis.themes.textContrastOk(vars);
+        if (ratio === null) {
+          ratioBadge.textContent = '';
+          ratioBadge.className = 'theme-contrast-ratio';
+        } else if (ok) {
+          ratioBadge.textContent = 'Text contrast ' + ratio.toFixed(1) + ':1 · AA Pass';
+          ratioBadge.className = 'theme-contrast-ratio is-pass';
+        } else {
+          ratioBadge.textContent =
+            'Low contrast ' + ratio.toFixed(1) + ':1 (< 4.5:1) — hard to read';
+          ratioBadge.className = 'theme-contrast-ratio is-warn';
+        }
+      }
+    }
+
+    function renderThemeVisualPanel(sectionEl) {
+      if (!apis.themes) return;
+      var box = el(doc, 'div', { class: 'tool-box theme-visual-box' });
+      var pillsWrap = el(doc, 'div', { class: 'theme-preset-pills' });
+      var names = apis.themes.THEME_NAMES || [];
+      names.forEach(function (name) {
+        var vars = apis.themes.resolveThemeVars(name, name === 'custom' ? getPath(state, 'appearance.colors') : {});
+        var label =
+          name === 'amoled'
+            ? 'AMOLED'
+            : name.charAt(0).toUpperCase() + name.slice(1);
+        var pill = el(doc, 'button', {
+          type: 'button',
+          class: 'theme-preset-pill',
+          'data-theme-name': name,
+        });
+        var dots = el(doc, 'span', { class: 'theme-pill-dots' });
+        var palette =
+          vars && vars.bg
+            ? [vars.bg, vars.surface || vars.bg, vars.accent || '#ff0033']
+            : ['#202020', '#484848', '#ff0033'];
+        palette.forEach(function (hex) {
+          var dot = el(doc, 'span', { class: 'theme-pill-dot' });
+          dot.setAttribute('style', 'background: ' + hex + ';');
+          dots.appendChild(dot);
+        });
+        pill.appendChild(dots);
+        pill.appendChild(el(doc, 'span', { class: 'theme-pill-name', text: label }));
+        pill.addEventListener('click', function () {
+          if (inputsByKey['appearance.theme']) {
+            inputsByKey['appearance.theme'].set(name);
+          }
+          setValue('appearance.theme', name, 0);
+          refreshValues();
+        });
+        pillsWrap.appendChild(pill);
+      });
+      box.appendChild(pillsWrap);
+
+      var card = el(doc, 'div', { class: 'theme-contrast-card' });
+      var surface = el(doc, 'div', { class: 'theme-preview-surface' });
+      surface.appendChild(el(doc, 'span', { class: 'theme-preview-accent' }));
+      var copy = el(doc, 'div', { class: 'theme-preview-copy' });
+      copy.appendChild(
+        el(doc, 'strong', { class: 'theme-preview-title', text: 'Sample video title' })
+      );
+      copy.appendChild(
+        el(doc, 'span', {
+          class: 'theme-preview-sub',
+          text: 'Channel name · 12K views',
+        })
+      );
+      surface.appendChild(copy);
+      card.appendChild(surface);
+      card.appendChild(el(doc, 'span', { class: 'theme-contrast-ratio', text: '' }));
+      box.appendChild(card);
+
+      sectionEl.appendChild(box);
+      updateThemeContrastPreview();
+    }
+
+    function updateColorClearAllBtn() {
+      if (!mainEl) return;
+      var btn = mainEl.querySelector('.colors-clear-all-btn');
+      if (!btn) return;
+      var colors = getPath(state, 'appearance.colors') || {};
+      var count = Object.keys(colors).filter(function (k) {
+        return typeof colors[k] === 'string' && colors[k] !== '';
+      }).length;
+      btn.disabled = count === 0;
+      btn.textContent = count > 0 ? 'Clear all (' + count + ')' : 'Clear all';
+    }
+
+    function updateProductivitySummary() {
+      if (currentSection !== 'productivity' || !mainEl) return;
+      var hiddenCount = FOCUS_HIDE_KEYS.filter(function (k) {
+        return !!getPath(state, k);
+      }).length;
+      var countEl = mainEl.querySelector('.focus-hidden-count');
+      if (countEl) countEl.textContent = hiddenCount + ' of ' + FOCUS_HIDE_KEYS.length + ' hidden';
+      var hideAllBtn = mainEl.querySelector('.focus-hide-all-btn');
+      if (hideAllBtn) hideAllBtn.disabled = hiddenCount === FOCUS_HIDE_KEYS.length;
+      var showAllBtn = mainEl.querySelector('.focus-show-all-btn');
+      if (showAllBtn) showAllBtn.disabled = hiddenCount === 0;
+
+      var isFocusOn = !!getPath(state, 'productivity.focusMode');
+      var shortcut = String(getPath(state, 'keyboard.shortcuts.toggleFocus') || '').trim();
+      var statusPill = mainEl.querySelector('.focus-status-pill');
+      if (statusPill) {
+        statusPill.classList.toggle('is-on', isFocusOn);
+        statusPill.textContent = isFocusOn
+          ? 'Active on all YouTube tabs'
+          : shortcut
+            ? 'Standby — press ' + shortcut + ' for current tab'
+            : 'Standby — per-tab shortcut unbound';
+      }
+      var jumpBtn = mainEl.querySelector('.focus-shortcut-jump');
+      if (jumpBtn) {
+        jumpBtn.textContent = 'Shortcut: ' + (shortcut || 'Unbound') + ' · Change';
+      }
+      mainEl.querySelectorAll('.focus-preset-pill').forEach(function (pill) {
+        var presetId = pill.getAttribute('data-focus-preset');
+        var preset = FOCUS_PRESETS.find(function (p) {
+          return p.id === presetId;
+        });
+        pill.classList.toggle('is-active', !!preset && isFocusPresetMatches(state, preset));
+      });
+      var stage = mainEl.querySelector('.focus-stage');
+      if (stage) {
+        stage.classList.toggle('is-active', isFocusOn);
+        stage.querySelectorAll('[data-focus-key]').forEach(function (tile) {
+          var fk = tile.getAttribute('data-focus-key');
+          var isHidden = !!getPath(state, fk);
+          tile.classList.toggle('is-masked', isHidden);
+          tile.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+          var stateEl = tile.querySelector('.focus-tile-state');
+          if (stateEl) {
+            stateEl.textContent = isHidden ? (isFocusOn ? 'Hidden' : 'Will hide') : 'Visible';
+          }
+        });
+      }
+    }
+
+    function renderFocusVisualPanel(sectionEl) {
+      var box = el(doc, 'div', { class: 'tool-box focus-visual-box' });
+      var head = el(doc, 'div', { class: 'focus-preview-head' });
+      head.appendChild(el(doc, 'span', { class: 'focus-status-pill', text: '' }));
+      var shortcutBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small focus-shortcut-jump',
+        text: '',
+      });
+      shortcutBtn.addEventListener('click', function () {
+        renderSection('keyboard');
+        var row = mainEl && mainEl.querySelector('[data-control-key="keyboard.shortcuts.toggleFocus"]');
+        if (row) {
+          if (typeof row.scrollIntoView === 'function') {
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }
+          row.classList.add('highlight');
+          setTimeout(function () {
+            row.classList.remove('highlight');
+          }, 1500);
+        }
+      });
+      head.appendChild(shortcutBtn);
+      box.appendChild(head);
+
+      var presetsRow = el(doc, 'div', { class: 'focus-presets-row' });
+      presetsRow.appendChild(el(doc, 'span', { class: 'control-preset-label', text: 'Focus presets:' }));
+      FOCUS_PRESETS.forEach(function (preset) {
+        var pill = el(doc, 'button', {
+          type: 'button',
+          class: 'focus-preset-pill',
+          'data-focus-preset': preset.id,
+          title: preset.description,
+          text: preset.label,
+        });
+        pill.addEventListener('click', function () {
+          var next = defaultsApi.deepClone(state);
+          Object.keys(preset.values).forEach(function (k) {
+            setPath(next, k, preset.values[k]);
+          });
+          replaceState(next).then(function () {
+            refreshValues();
+          });
+        });
+        presetsRow.appendChild(pill);
+      });
+      box.appendChild(presetsRow);
+
+      var makeTile = function (focusKey, label, extraClass) {
+        var tile = el(doc, 'button', {
+          type: 'button',
+          class: 'focus-stage-tile' + (extraClass ? ' ' + extraClass : ''),
+          'data-focus-key': focusKey,
+        });
+        tile.appendChild(el(doc, 'span', { class: 'focus-tile-label', text: label }));
+        tile.appendChild(el(doc, 'span', { class: 'focus-tile-state', text: '' }));
+        tile.addEventListener('click', function () {
+          var nextVal = !getPath(state, focusKey);
+          if (inputsByKey[focusKey] && inputsByKey[focusKey].set) {
+            inputsByKey[focusKey].set(nextVal);
+          }
+          setValue(focusKey, nextVal, 0);
+        });
+        return tile;
+      };
+
+      var stage = el(doc, 'div', { class: 'focus-stage' });
+      var topbar = el(doc, 'div', { class: 'focus-stage-topbar' });
+      topbar.appendChild(el(doc, 'span', { text: 'Search & Account' }));
+      topbar.appendChild(el(doc, 'span', { class: 'focus-stage-fixed-tag', text: 'Always visible' }));
+      stage.appendChild(topbar);
+
+      var body = el(doc, 'div', { class: 'focus-stage-body' });
+      body.appendChild(makeTile('productivity.focusHideNav', 'Guide', 'focus-stage-nav'));
+
+      var mainCol = el(doc, 'div', { class: 'focus-stage-main' });
+      var playerBox = el(doc, 'div', { class: 'focus-stage-player' });
+      playerBox.appendChild(el(doc, 'span', { class: 'focus-tile-label', text: 'Video player' }));
+      playerBox.appendChild(el(doc, 'span', { class: 'focus-stage-fixed-tag', text: 'Always focused' }));
+      mainCol.appendChild(playerBox);
+
+      var metaRow = el(doc, 'div', { class: 'focus-stage-row' });
+      metaRow.appendChild(makeTile('productivity.focusHideButtons', 'Buttons'));
+      metaRow.appendChild(makeTile('productivity.focusHideMetadata', 'Description'));
+      mainCol.appendChild(metaRow);
+      mainCol.appendChild(makeTile('productivity.focusHideShorts', 'Shorts'));
+      mainCol.appendChild(makeTile('productivity.focusHideComments', 'Comments'));
+      body.appendChild(mainCol);
+
+      var sideCol = el(doc, 'div', { class: 'focus-stage-side' });
+      sideCol.appendChild(makeTile('productivity.focusHideChat', 'Live chat'));
+      sideCol.appendChild(makeTile('productivity.focusHideRecommendations', 'Recommendations', 'is-tall'));
+      body.appendChild(sideCol);
+
+      stage.appendChild(body);
+      box.appendChild(stage);
+      sectionEl.appendChild(box);
+      updateProductivitySummary();
+    }
+
+    function updateControlModifiedState(key) {
+      if (!mainEl) return;
+      var row = mainEl.querySelector('[data-control-key="' + key + '"]');
+      if (!row) return;
+      var modified = isControlModified(getPath(state, key), getDefault(key));
+      row.classList.toggle('is-modified', modified);
+      var badge = row.querySelector('.control-modified-badge');
+      if (badge) badge.hidden = !modified;
+    }
+
+    function updateModulesSummary() {
+      if (currentSection !== 'general' || !mainEl) return;
+      var general = sectionById('general');
+      if (!general) return;
+      var moduleControls = (general.controls || []).filter(function (c) {
+        return c.key.indexOf('modules.') === 0;
+      });
+      var active = moduleControls.filter(function (c) {
+        return !!getPath(state, c.key);
+      }).length;
+      var countEl = mainEl.querySelector('.modules-active-count');
+      if (countEl) countEl.textContent = active + ' of ' + moduleControls.length + ' active';
+      var pausedEl = mainEl.querySelector('.modules-paused-pill');
+      var gridEl = mainEl.querySelector('.control-grid-modules');
+      var isMasterOn = !!getPath(state, 'enabled');
+      if (pausedEl) pausedEl.hidden = isMasterOn;
+      if (gridEl) gridEl.classList.toggle('is-master-paused', !isMasterOn);
+    }
+
+    function updateControlDependencies() {
+      if (!mainEl) return;
+      mainEl.querySelectorAll('[data-control-key]').forEach(function (row) {
+        var key = row.getAttribute('data-control-key');
+        var reason = getControlInactiveReason(key, state);
+        row.classList.toggle('is-inactive-dep', !!reason);
+        var depBadge = row.querySelector('.control-dep-badge');
+        if (depBadge) {
+          depBadge.textContent = reason;
+          depBadge.hidden = !reason;
+        }
+        var hint = getControlHint(key, state);
+        var hintBadge = row.querySelector('.control-hint-badge');
+        if (hintBadge) {
+          hintBadge.textContent = hint;
+          hintBadge.hidden = !hint;
+        }
+      });
+    }
+
     function setValue(key, value, delay) {
       setPath(state, key, value);
       if (key === 'ui.dashboardTheme') applyDashboardTheme();
+      if (key === 'playback.speedPresets' && inputsByKey['playback.defaultSpeed']) {
+        inputsByKey['playback.defaultSpeed'].set(getPath(state, 'playback.defaultSpeed'));
+      }
+      if (currentSection === 'home' && key.indexOf('layout.') === 0) {
+        updateLayoutPreview();
+      }
+      if (
+        currentSection === 'sidebar' &&
+        (key.indexOf('sidebar.') === 0 || key.indexOf('recommendations.') === 0)
+      ) {
+        updateSidebarPreview();
+      }
+      if (currentSection === 'appearance' && key.indexOf('appearance.') === 0) {
+        updateThemeContrastPreview();
+        updateColorClearAllBtn();
+      }
+      if (key === 'enabled' || key.indexOf('modules.') === 0) {
+        updateModulesSummary();
+      }
+      if (
+        currentSection === 'productivity' &&
+        (key.indexOf('productivity.') === 0 || key === 'keyboard.shortcuts.toggleFocus')
+      ) {
+        updateProductivitySummary();
+      }
+      if (currentSection === 'advanced') {
+        updateAdvancedSummary();
+      }
+      updateControlModifiedState(key);
+      updateControlPresetChips(key);
+      updateControlDependencies();
       saveSoon(delay);
+    }
+
+    function updateControlPresetChips(key) {
+      if (!mainEl) return;
+      var row = mainEl.querySelector('[data-control-key="' + key + '"]');
+      if (!row) return;
+      var raw = getPath(state, key);
+      var cur = raw === undefined || raw === null ? '' : String(raw).trim();
+      row.querySelectorAll('.control-preset-chip').forEach(function (chip) {
+        chip.classList.toggle('is-active', chip.getAttribute('data-preset-value') === cur);
+      });
     }
 
     function systemPrefersDark() {
@@ -457,8 +1532,18 @@
           var input = inputsByKey[control.key];
           if (!input || !input.set) return;
           input.set(getPath(state, control.key));
+          updateControlModifiedState(control.key);
+          updateControlPresetChips(control.key);
         });
       });
+      updateModulesSummary();
+      updateProductivitySummary();
+      updateAdvancedSummary();
+      updateSidebarPreview();
+      updateThemeContrastPreview();
+      updateColorClearAllBtn();
+      updateControlDependencies();
+      checkShortcutWarnings();
     }
 
     function showWarning(row, message) {
@@ -468,8 +1553,34 @@
       warn.style.display = message ? 'block' : 'none';
     }
 
+    function updateKeyboardSummary(conflictCount) {
+      if (currentSection !== 'keyboard' || !mainEl) return;
+      var keyboardSection = sectionById('keyboard');
+      var controls = (keyboardSection && keyboardSection.controls) || [];
+      var boundCount = controls.filter(function (c) {
+        var v = getPath(state, c.key);
+        return typeof v === 'string' && v.trim() !== '';
+      }).length;
+      var countEl = mainEl.querySelector('.keyboard-bound-count');
+      if (countEl) countEl.textContent = boundCount + ' of ' + controls.length + ' bound';
+      var unbindAllBtn = mainEl.querySelector('.keyboard-unbind-all-btn');
+      if (unbindAllBtn) unbindAllBtn.disabled = boundCount === 0;
+      var pill = mainEl.querySelector('.keyboard-health-pill');
+      if (pill && typeof conflictCount === 'number') {
+        pill.classList.toggle('is-warn', conflictCount > 0);
+        pill.classList.toggle('is-ok', conflictCount === 0);
+        pill.textContent =
+          conflictCount > 0
+            ? conflictCount + ' conflict' + (conflictCount === 1 ? '' : 's') + ' found'
+            : 'No conflicts';
+      }
+    }
+
     function checkShortcutWarnings() {
-      if (!keyboardApi) return;
+      if (!keyboardApi) {
+        updateKeyboardSummary(0);
+        return;
+      }
       var shortcuts = getPath(state, 'keyboard.shortcuts') || {};
       var dups = keyboardApi.findDuplicateShortcuts(shortcuts);
       var conflicts = keyboardApi.findNativeConflicts(shortcuts);
@@ -490,14 +1601,25 @@
           if (row) showWarning(row, dupKeys[control.key] || '');
         });
       });
+      updateKeyboardSummary(Object.keys(dupKeys).length);
     }
 
     // ----- control inputs -----
 
     function makeToggle(control) {
-      var input = el(doc, 'input', { type: 'checkbox', class: 'control-input' });
+      var wrap = el(doc, 'label', { class: 'toggle-switch' });
+      var input = el(doc, 'input', {
+        type: 'checkbox',
+        class: 'control-input toggle-input',
+        'aria-label': control.label,
+      });
+      var track = el(doc, 'span', { class: 'toggle-track', 'aria-hidden': 'true' }, [
+        el(doc, 'span', { class: 'toggle-thumb' }),
+      ]);
+      wrap.appendChild(input);
+      wrap.appendChild(track);
       return {
-        node: input,
+        node: wrap,
         set: function (value) {
           input.checked = !!value;
         },
@@ -549,6 +1671,9 @@
             }
             setValue(control.key, selectToSetting(control.source, value), 0);
             if (control.key === 'appearance.theme') refreshValues();
+            if (control.key === 'playback.defaultSpeed' && inputsByKey['playback.speedPresets']) {
+              inputsByKey['playback.speedPresets'].set(getPath(state, 'playback.speedPresets'));
+            }
           });
         },
       };
@@ -563,12 +1688,17 @@
         max: control.max !== undefined ? String(control.max) : '',
         step: control.step !== undefined ? String(control.step) : '',
       });
-      var out = el(doc, 'output', { class: 'control-value' });
-      wrap.appendChild(input);
-      wrap.appendChild(out);
+      var out = null;
       var updateOut = function () {
-        out.textContent = input.value + (control.unit ? ' ' + control.unit : '');
+        if (out) out.textContent = input.value + (control.unit ? ' ' + control.unit : '');
       };
+      wrap.appendChild(input);
+      if (isRange) {
+        out = el(doc, 'output', { class: 'control-value' });
+        wrap.appendChild(out);
+      } else if (control.unit) {
+        wrap.appendChild(el(doc, 'span', { class: 'control-number-unit', text: control.unit }));
+      }
       return {
         node: wrap,
         set: function (value) {
@@ -649,6 +1779,26 @@
       wrap.appendChild(picker);
       wrap.appendChild(text);
       wrap.appendChild(clear);
+      var fallbackHex = function () {
+        if (control.key.indexOf('appearance.colors.') === 0 && apis.themes) {
+          var cname = control.key.slice('appearance.colors.'.length);
+          var tok = apis.themes.CUSTOM_COLOR_KEYS && apis.themes.CUSTOM_COLOR_KEYS[cname];
+          if (tok) {
+            var themeName = getPath(state, 'appearance.theme');
+            var resolved = apis.themes.resolveThemeVars(themeName, {});
+            if (resolved[tok]) return resolved[tok];
+            if (apis.themes.THEMES && apis.themes.THEMES.dark && apis.themes.THEMES.dark[tok]) {
+              return apis.themes.THEMES.dark[tok];
+            }
+          }
+        }
+        return '#000000';
+      };
+      var syncEmptyUi = function (hex) {
+        var fb = fallbackHex();
+        picker.value = hex || fb;
+        text.placeholder = fb !== '#000000' ? 'Preset (' + fb + ')' : '#rrggbb or empty';
+      };
       var apply = function (hex) {
         setValue(control.key, hex, 0);
       };
@@ -657,10 +1807,11 @@
         set: function (value) {
           var hex = typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value) ? value : '';
           text.value = hex;
-          picker.value = hex || '#000000';
+          syncEmptyUi(hex);
         },
         bind: function (row) {
           picker.addEventListener('input', function () {
+            showWarning(row, '');
             text.value = picker.value;
             apply(picker.value);
           });
@@ -672,13 +1823,14 @@
               return;
             }
             showWarning(row, '');
-            picker.value = v || '#000000';
+            syncEmptyUi(v);
             apply(v);
           });
           clear.addEventListener('click', function () {
+            showWarning(row, '');
             apply('');
             text.value = '';
-            picker.value = '#000000';
+            syncEmptyUi('');
           });
         },
       };
@@ -724,21 +1876,56 @@
         placeholder: 'e.g. 1.75',
       });
       var addBtn = el(doc, 'button', { type: 'button', class: 'btn btn-small', text: 'Add speed' });
+      var addRow = el(doc, 'div', { class: 'tool-inline-form' });
+      addRow.appendChild(addInput);
+      addRow.appendChild(addBtn);
       wrap.appendChild(listEl);
-      wrap.appendChild(addInput);
-      wrap.appendChild(addBtn);
+      wrap.appendChild(addRow);
+      var rowRef = null;
       var render = function (values) {
         listEl.textContent = '';
-        (values || []).forEach(function (v) {
-          var chip = el(doc, 'span', { class: 'speed-chip', text: v + 'x ' });
-          var x = el(doc, 'button', { type: 'button', class: 'speed-remove', text: '×' });
+        var list = values || [];
+        var defSpeed = Number(getPath(state, 'playback.defaultSpeed'));
+        list.forEach(function (v) {
+          var isDefault = v === defSpeed;
+          var chip = el(doc, 'span', {
+            class: 'speed-chip' + (isDefault ? ' is-default' : ''),
+          });
+          var selectBtn = el(doc, 'button', {
+            type: 'button',
+            class: 'speed-chip-select',
+            text: v + 'x',
+            title: isDefault ? 'Current default speed' : 'Set ' + v + 'x as default speed',
+          });
+          selectBtn.addEventListener('click', function () {
+            if (rowRef) showWarning(rowRef, '');
+            setValue('playback.defaultSpeed', v, 0);
+            if (inputsByKey['playback.defaultSpeed']) {
+              inputsByKey['playback.defaultSpeed'].set(v);
+            }
+            render(getPath(state, control.key) || list);
+          });
+          var x = el(doc, 'button', {
+            type: 'button',
+            class: 'speed-remove',
+            text: '×',
+            'aria-label': 'Remove ' + v + 'x speed',
+          });
+          x.disabled = list.length <= 1;
           x.addEventListener('click', function () {
-            var next = (getPath(state, control.key) || []).filter(function (n) {
+            var currentList = getPath(state, control.key) || [];
+            if (currentList.length <= 1) {
+              if (rowRef) showWarning(rowRef, 'Keep at least one speed preset.');
+              return;
+            }
+            if (rowRef) showWarning(rowRef, '');
+            var next = currentList.filter(function (n) {
               return n !== v;
             });
             setValue(control.key, next, 0);
             render(next);
           });
+          chip.appendChild(selectBtn);
           chip.appendChild(x);
           listEl.appendChild(chip);
         });
@@ -749,7 +1936,8 @@
           render(Array.isArray(value) ? value : []);
         },
         bind: function (row) {
-          addBtn.addEventListener('click', function () {
+          rowRef = row;
+          var addSpeed = function () {
             var num = Number(addInput.value);
             if (!validators) return;
             var check = validators.validateSpeedPresets([num]);
@@ -767,28 +1955,52 @@
             setValue(control.key, next, 0);
             render(next);
             addInput.value = '';
+          };
+          addBtn.addEventListener('click', addSpeed);
+          addInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              addSpeed();
+            }
           });
         },
       };
     }
 
     function makeShortcut(control) {
+      var wrap = el(doc, 'div', { class: 'control-shortcut-wrap' });
       var input = el(doc, 'input', {
         type: 'text',
         class: 'control-input control-shortcut',
         readonly: 'readonly',
-        placeholder: 'Click, then press keys',
+        placeholder: 'Unbound (click to record)',
+        'aria-label': control.label,
       });
+      var clearBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small control-shortcut-clear',
+        text: 'Unbind',
+        'aria-label': 'Unbind ' + control.label,
+      });
+      wrap.appendChild(input);
+      wrap.appendChild(clearBtn);
+
       var capturing = false;
+      var syncDisplay = function (val) {
+        var str = val ? String(val).trim() : '';
+        input.value = str;
+        input.classList.toggle('is-unbound', !str);
+        clearBtn.disabled = !str;
+      };
       var onKey = function (event) {
         // Escape cancels; Tab cancels too and must keep moving
         // focus — binding 'Tab' as a shortcut would trap keyboard
         // users in the field (Phase 6 accessibility pass).
         if (event.key === 'Escape' || event.key === 'Tab') {
           capturing = false;
-          input.value = getPath(state, control.key) || '';
           input.classList.remove('capturing');
           doc.removeEventListener('keydown', onKey, true);
+          syncDisplay(getPath(state, control.key));
           return;
         }
         event.preventDefault();
@@ -808,43 +2020,59 @@
         if (keyboardApi) {
           var parsed = keyboardApi.normalizeShortcut(combo);
           if (!parsed) {
-            input.value = getPath(state, control.key) || '';
+            syncDisplay(getPath(state, control.key));
             return;
           }
         }
-        input.value = combo;
+        syncDisplay(combo);
         setValue(control.key, combo, 0);
         checkShortcutWarnings();
       };
+      var startCapture = function () {
+        if (capturing) return;
+        capturing = true;
+        input.classList.add('capturing');
+        input.classList.remove('is-unbound');
+        input.value = 'Press keys… (Esc to cancel)';
+        doc.addEventListener('keydown', onKey, true);
+      };
       return {
-        node: input,
+        node: wrap,
         set: function (value) {
-          if (!capturing) input.value = value || '';
+          if (!capturing) syncDisplay(value);
         },
         bind: function () {
-          input.addEventListener('focus', function () {
-            input.value = '';
-          });
           input.addEventListener('blur', function () {
             // Focus without capturing (keyboard tab-through)
             // blanked the field with no restore: put the
             // stored shortcut back.
             if (!capturing) input.value = getPath(state, control.key) || '';
+            if (!capturing) syncDisplay(getPath(state, control.key));
           });
-          input.addEventListener('click', function () {
-            if (capturing) return;
-            capturing = true;
-            input.classList.add('capturing');
-            input.value = 'Press keys… (Esc to cancel)';
-            doc.addEventListener('keydown', onKey, true);
-          });
+          input.addEventListener('click', startCapture);
           input.addEventListener('keydown', function (event) {
-            if ((event.key === 'Backspace' || event.key === 'Delete') && !capturing) {
+            if (capturing) return;
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              startCapture();
+              return;
+            }
+            if (event.key === 'Backspace' || event.key === 'Delete') {
               event.preventDefault();
               setValue(control.key, '', 0);
-              input.value = '';
+              syncDisplay('');
               checkShortcutWarnings();
             }
+          });
+          clearBtn.addEventListener('click', function () {
+            if (capturing) {
+              capturing = false;
+              input.classList.remove('capturing');
+              doc.removeEventListener('keydown', onKey, true);
+            }
+            setValue(control.key, '', 0);
+            syncDisplay('');
+            checkShortcutWarnings();
           });
         },
       };
@@ -878,14 +2106,22 @@
     // ----- sections -----
 
     function renderControlRow(control) {
-      var row = el(doc, 'div', { class: 'control-row', 'data-control-key': control.key });
-      var head = el(doc, 'div', { class: 'control-head' });
-      head.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+      var isToggle = control.type === 'toggle';
+      var isStacked = control.type === 'textarea' || control.type === 'speedList';
+      var isInline = !isToggle && !isStacked;
+      var classes = ['control-row'];
+      if (isToggle) classes.push('control-row-toggle');
+      if (isInline) classes.push('control-row-inline');
+      if (control.key === 'enabled') classes.push('control-row-master');
+      var row = el(doc, 'div', {
+        class: classes.join(' '),
+        'data-control-key': control.key,
+      });
       var resetBtn = el(doc, 'button', {
         type: 'button',
         class: 'btn btn-small control-reset',
         text: 'Reset',
-        title: 'Restore default: ' + formatValue(getDefault(control.key)),
+        title: 'Restore default: ' + formatDefaultValue(getDefault(control.key), control),
       });
       resetBtn.addEventListener('click', function () {
         var def = defaultsApi.deepClone(getDefault(control.key));
@@ -894,33 +2130,151 @@
         if (input) input.set(def);
         if (control.key.indexOf('keyboard.shortcuts.') === 0) checkShortcutWarnings();
       });
-      head.appendChild(resetBtn);
-      row.appendChild(head);
-      if (control.description) {
-        row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
-      }
       var input = makeInput(control);
       inputsByKey[control.key] = input;
-      row.appendChild(input.node);
-      row.appendChild(
-        el(doc, 'p', {
+      if (isToggle) {
+        var head = el(doc, 'div', { class: 'control-head' });
+        head.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+        var toggleActions = el(doc, 'div', { class: 'control-actions' });
+        toggleActions.appendChild(resetBtn);
+        toggleActions.appendChild(input.node);
+        head.appendChild(toggleActions);
+        row.appendChild(head);
+        if (control.description) {
+          row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
+        }
+      } else if (isInline) {
+        var grid = el(doc, 'div', { class: 'control-row-grid' });
+        var copy = el(doc, 'div', { class: 'control-copy' });
+        copy.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+        if (control.description) {
+          copy.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
+        }
+        var inlineActions = el(doc, 'div', { class: 'control-actions' });
+        inlineActions.appendChild(input.node);
+        inlineActions.appendChild(resetBtn);
+        grid.appendChild(copy);
+        grid.appendChild(inlineActions);
+        row.appendChild(grid);
+      } else {
+        var stackHead = el(doc, 'div', { class: 'control-head' });
+        stackHead.appendChild(el(doc, 'span', { class: 'control-label', text: control.label }));
+        stackHead.appendChild(resetBtn);
+        row.appendChild(stackHead);
+        if (control.description) {
+          row.appendChild(el(doc, 'p', { class: 'control-desc', text: control.description }));
+        }
+        row.appendChild(input.node);
+      }
+      if (Array.isArray(control.presets) && control.presets.length > 0) {
+        var presetBar = el(doc, 'div', { class: 'control-preset-bar' });
+        presetBar.appendChild(el(doc, 'span', { class: 'control-preset-label', text: 'Quick pick:' }));
+        var rawPresetVal = getPath(state, control.key);
+        var curPresetVal =
+          rawPresetVal === undefined || rawPresetVal === null ? '' : String(rawPresetVal).trim();
+        control.presets.forEach(function (preset) {
+          var presetStr = String(preset.value);
+          var chip = el(doc, 'button', {
+            type: 'button',
+            class:
+              'control-preset-chip' + (presetStr === curPresetVal ? ' is-active' : ''),
+            text: preset.label,
+            'data-preset-value': presetStr,
+          });
+          chip.addEventListener('click', function () {
+            showWarning(row, '');
+            if (input.set) input.set(preset.value);
+            setValue(control.key, preset.value, 0);
+          });
+          presetBar.appendChild(chip);
+        });
+        row.appendChild(presetBar);
+      }
+      var foot = el(doc, 'div', { class: 'control-foot' });
+      foot.appendChild(
+        el(doc, 'span', {
           class: 'control-default',
-          text: 'Default: ' + formatValue(getDefault(control.key)),
+          text: 'Default: ' + formatDefaultValue(getDefault(control.key), control),
         })
       );
+      var modBadge = el(doc, 'span', {
+        class: 'control-modified-badge',
+        text: 'Modified',
+      });
+      modBadge.hidden = !isControlModified(getPath(state, control.key), getDefault(control.key));
+      foot.appendChild(modBadge);
+      var depBadge = el(doc, 'span', {
+        class: 'control-dep-badge',
+        text: '',
+      });
+      depBadge.hidden = true;
+      foot.appendChild(depBadge);
+      var hintBadge = el(doc, 'span', {
+        class: 'control-hint-badge',
+        text: '',
+      });
+      hintBadge.hidden = true;
+      foot.appendChild(hintBadge);
+      var targetSection = MODULE_SECTION_MAP[control.key];
+      if (targetSection) {
+        var jumpBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'control-jump-btn',
+          text: 'Configure ' + targetSection.label + ' →',
+        });
+        jumpBtn.addEventListener('click', function () {
+          renderSection(targetSection.id);
+        });
+        foot.appendChild(jumpBtn);
+      }
+      row.appendChild(foot);
       row.appendChild(el(doc, 'p', { class: 'control-warning', text: '' }));
       input.bind(row);
       input.set(getPath(state, control.key));
+      row.classList.toggle(
+        'is-modified',
+        isControlModified(getPath(state, control.key), getDefault(control.key))
+      );
       return row;
     }
 
+    function updateAdvancedSummary() {
+      if (currentSection !== 'advanced' || !mainEl) return;
+      var customized = diffSettings(defaultsApi.cloneDefaults(), state).length;
+      var diffEl = mainEl.querySelector('.advanced-diff-count');
+      if (diffEl) {
+        diffEl.textContent = customized > 0 ? customized + ' customized' : 'All defaults';
+      }
+      var resetCountEl = mainEl.querySelector('.reset-danger-count');
+      if (resetCountEl) {
+        resetCountEl.textContent =
+          customized > 0
+            ? customized + ' setting' + (customized === 1 ? '' : 's') + ' customized'
+            : 'Already at defaults';
+      }
+      var storagePill = mainEl.querySelector('.about-storage-pill');
+      if (storagePill) {
+        var syncOn = !!getPath(state, 'sync.enabled');
+        storagePill.classList.toggle('is-synced', syncOn);
+        storagePill.textContent = syncOn
+          ? 'Storage: Local + Chrome Sync (CSS stays local)'
+          : 'Storage: Local device only';
+      }
+    }
+
     function renderAdvancedTools(sectionEl) {
+      var advMsgEl = createToolNoticeEl(advancedNotice);
+      if (advancedNotice) advancedNotice = '';
+      sectionEl.appendChild(advMsgEl);
       // Import / export.
       var importBox = el(doc, 'div', { class: 'tool-box' });
-      importBox.appendChild(el(doc, 'h3', { text: 'Import / Export' }));
+      var importHead = el(doc, 'div', { class: 'advanced-card-head' });
+      importHead.appendChild(el(doc, 'h3', { text: 'Import / Export' }));
+      importHead.appendChild(el(doc, 'span', { class: 'advanced-diff-count', text: '' }));
+      importBox.appendChild(importHead);
       importBox.appendChild(
         el(doc, 'p', {
-          text: 'Export downloads your settings as JSON. Import validates the file first, shows what would change, and only applies it when you confirm.',
+          text: 'Back up settings as JSON, or validate an import file to preview every change before applying.',
         })
       );
       var exportBtn = el(doc, 'button', {
@@ -928,11 +2282,32 @@
         class: 'btn',
         text: 'Export settings (JSON)',
       });
-      var importFile = el(doc, 'input', { type: 'file', accept: '.json,application/json' });
+      var copyBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn advanced-copy-btn',
+        text: 'Copy JSON',
+      });
+      var backupRow = el(doc, 'div', { class: 'advanced-action-row' }, [exportBtn, copyBtn]);
+
+      var fileRow = el(doc, 'div', { class: 'file-picker-row' });
+      var fileLabel = el(doc, 'label', { class: 'btn file-picker-btn' });
+      fileLabel.appendChild(el(doc, 'span', { text: 'Choose JSON file' }));
+      var importFile = el(doc, 'input', {
+        type: 'file',
+        class: 'file-picker-input',
+        accept: '.json,application/json',
+        'aria-label': 'Choose settings JSON file',
+      });
+      fileLabel.appendChild(importFile);
+      var fileNameEl = el(doc, 'span', { class: 'file-picked-name', text: 'No file selected' });
+      fileRow.appendChild(fileLabel);
+      fileRow.appendChild(fileNameEl);
+
       var importText = el(doc, 'textarea', {
         class: 'control-input control-textarea',
-        rows: '6',
+        rows: '5',
         placeholder: '…or paste exported JSON here',
+        'aria-label': 'Paste exported settings JSON',
       });
       var importMsg = el(doc, 'p', { class: 'control-warning', text: '' });
       var previewEl = el(doc, 'div', { class: 'import-preview' });
@@ -952,8 +2327,29 @@
         a.click();
         URL.revokeObjectURL(url);
       });
+      copyBtn.addEventListener('click', function () {
+        var nav = typeof navigator !== 'undefined' ? navigator : null;
+        if (!nav || !nav.clipboard || typeof nav.clipboard.writeText !== 'function') {
+          importMsg.textContent = 'Clipboard copy unavailable — use Export settings (JSON) instead.';
+          importMsg.style.display = 'block';
+          return;
+        }
+        nav.clipboard.writeText(JSON.stringify(state, null, 2)).then(
+          function () {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function () {
+              copyBtn.textContent = 'Copy JSON';
+            }, 1600);
+          },
+          function () {
+            importMsg.textContent = 'Could not copy JSON to clipboard.';
+            importMsg.style.display = 'block';
+          }
+        );
+      });
       var handleImportText = function (text) {
         importMsg.textContent = '';
+        importMsg.style.display = 'none';
         previewEl.textContent = '';
         applyBtn.style.display = 'none';
         pendingImport = null;
@@ -1007,6 +2403,7 @@
         }
         if (diff.length === 0) {
           previewEl.textContent = 'No changes — the file matches your current settings.';
+          applyBtn.style.display = 'none';
         } else {
           var list = el(doc, 'ul', {});
           diff.forEach(function (change) {
@@ -1023,12 +2420,17 @@
           });
           previewEl.appendChild(el(doc, 'p', { text: diff.length + ' setting(s) would change:' }));
           previewEl.appendChild(list);
+          applyBtn.style.display = 'inline-block';
         }
-        applyBtn.style.display = 'inline-block';
       };
       importFile.addEventListener('change', function () {
         var file = importFile.files && importFile.files[0];
-        if (!file) return;
+        if (!file) {
+          fileNameEl.textContent = 'No file selected';
+          return;
+        }
+        var kb = Math.max(1, Math.round(file.size / 1024));
+        fileNameEl.textContent = file.name + ' (' + kb + ' KB)';
         var reader = new FileReader();
         reader.onload = function () {
           handleImportText(String(reader.result || ''));
@@ -1040,33 +2442,52 @@
         class: 'btn',
         text: 'Validate & preview',
       });
+      var clearImportBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small advanced-clear-import-btn',
+        text: 'Clear',
+      });
       importBtn.addEventListener('click', function () {
         handleImportText(importText.value);
+      });
+      clearImportBtn.addEventListener('click', function () {
+        importText.value = '';
+        importFile.value = '';
+        fileNameEl.textContent = 'No file selected';
+        importMsg.textContent = '';
+        importMsg.style.display = 'none';
+        previewEl.textContent = '';
+        pendingImport = null;
+        applyBtn.style.display = 'none';
       });
       applyBtn.addEventListener('click', function () {
         if (!pendingImport) return;
         replaceState(defaultsApi.deepClone(pendingImport)).then(function (saved) {
+          if (saved) advancedNotice = 'Applied imported settings.';
           renderSection(currentSection);
-          if (saved) {
-            importMsg.textContent = 'Import applied.';
-            importMsg.style.display = 'block';
-          }
         });
       });
-      importBox.appendChild(exportBtn);
-      importBox.appendChild(el(doc, 'p', { text: 'Import from a file:' }));
-      importBox.appendChild(importFile);
-      importBox.appendChild(el(doc, 'p', { text: 'Import from pasted JSON:' }));
+      var importActions = el(doc, 'div', { class: 'advanced-action-row' }, [
+        importBtn,
+        clearImportBtn,
+        applyBtn,
+      ]);
+      importBox.appendChild(backupRow);
+      importBox.appendChild(el(doc, 'p', { class: 'advanced-sub-label', text: 'Import from a file' }));
+      importBox.appendChild(fileRow);
+      importBox.appendChild(el(doc, 'p', { class: 'advanced-sub-label', text: 'Or paste exported JSON' }));
       importBox.appendChild(importText);
-      importBox.appendChild(importBtn);
+      importBox.appendChild(importActions);
       importBox.appendChild(importMsg);
       importBox.appendChild(previewEl);
-      importBox.appendChild(applyBtn);
       sectionEl.appendChild(importBox);
 
       // Reset all.
-      var resetBox = el(doc, 'div', { class: 'tool-box' });
-      resetBox.appendChild(el(doc, 'h3', { text: 'Reset everything' }));
+      var resetBox = el(doc, 'div', { class: 'tool-box reset-danger-box' });
+      var resetHead = el(doc, 'div', { class: 'advanced-card-head' });
+      resetHead.appendChild(el(doc, 'h3', { text: 'Reset everything' }));
+      resetHead.appendChild(el(doc, 'span', { class: 'reset-danger-count', text: '' }));
+      resetBox.appendChild(resetHead);
       resetBox.appendChild(
         el(doc, 'p', { text: 'Restore every setting to its default. This cannot be undone.' })
       );
@@ -1077,7 +2498,8 @@
       });
       resetAllBtn.addEventListener('click', function () {
         if (!window.confirm('Reset ALL OneYT settings to defaults?')) return;
-        replaceState(defaultsApi.cloneDefaults()).then(function () {
+        replaceState(defaultsApi.cloneDefaults()).then(function (saved) {
+          if (saved) advancedNotice = 'Restored all settings to defaults.';
           renderSection(currentSection);
         });
       });
@@ -1095,17 +2517,20 @@
       } catch {
         // Non-Chrome context (tests): keep the fallback.
       }
+      var metaRow = el(doc, 'div', { class: 'about-meta-row' }, [
+        el(doc, 'span', { class: 'about-pill', text: 'OneYT v' + version }),
+        el(doc, 'span', { class: 'about-pill', text: 'Schema v' + state.schemaVersion }),
+        el(doc, 'span', { class: 'about-pill about-storage-pill', text: '' }),
+      ]);
+      infoBox.appendChild(metaRow);
       infoBox.appendChild(
         el(doc, 'p', {
-          text:
-            'OneYT version ' +
-            version +
-            ' · Settings schema v' +
-            state.schemaVersion +
-            ' · All settings are stored locally on this device.',
+          class: 'about-note',
+          text: 'Custom CSS templates, saved themes, profiles, and remembered playback state always stay on this device.',
         })
       );
       sectionEl.appendChild(infoBox);
+      updateAdvancedSummary();
     }
 
     // Profiles (Phase 16, PL-16). Mirrors renderAdvancedTools:
@@ -1113,12 +2538,8 @@
     // A preset changes only the settings it names; a profile
     // restores its snapshot exactly (see shared/profiles.js).
     function renderProfilesTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (profilesNotice) {
-        msgEl.textContent = profilesNotice;
-        msgEl.style.display = 'block';
-        profilesNotice = '';
-      }
+      var msgEl = createToolNoticeEl(profilesNotice);
+      if (profilesNotice) profilesNotice = '';
       sectionEl.appendChild(msgEl);
       if (!profilesApi) {
         sectionEl.appendChild(
@@ -1135,10 +2556,11 @@
           text: 'One click applies a whole setup. A preset changes only the settings it names — everything else you set stays as it is.',
         })
       );
+      var presetGrid = el(doc, 'div', { class: 'preset-grid' });
       profilesApi.BUILTIN_PRESETS.forEach(function (preset) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: preset.name }));
-        row.appendChild(el(doc, 'p', { text: preset.description }));
+        var card = el(doc, 'div', { class: 'preset-card' });
+        card.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: preset.name }));
+        card.appendChild(el(doc, 'p', { class: 'preset-card-desc', text: preset.description }));
         var applyBtn = el(doc, 'button', {
           type: 'button',
           class: 'btn',
@@ -1153,9 +2575,12 @@
             }
           );
         });
-        row.appendChild(applyBtn);
-        presetBox.appendChild(row);
+        var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
+        cardFoot.appendChild(applyBtn);
+        card.appendChild(cardFoot);
+        presetGrid.appendChild(card);
       });
+      presetBox.appendChild(presetGrid);
       sectionEl.appendChild(presetBox);
 
       // Save the current settings as a profile.
@@ -1181,118 +2606,126 @@
         class: 'btn btn-primary',
         text: 'Save profile',
       });
-      saveBtn.addEventListener('click', function () {
-        var result = profilesApi.createProfile(nameInput.value, state, profiles, defaultsApi);
-        if (result.error) {
-          msgEl.textContent = result.error;
-          msgEl.style.display = 'block';
-          return;
-        }
-        profiles = result.profiles;
-        saveProfiles().then(function () {
-          profilesNotice = 'Saved profile "' + nameInput.value.trim() + '".';
-          renderSection(currentSection);
-        });
-      });
-      saveBox.appendChild(nameInput);
-      saveBox.appendChild(saveBtn);
-      sectionEl.appendChild(saveBox);
-
-      // Saved profiles.
-      var listBox = el(doc, 'div', { class: 'tool-box' });
-      listBox.appendChild(
-        el(doc, 'h3', {
-          text: 'Your profiles (' + profiles.length + '/' + profilesApi.MAX_PROFILES + ')',
-        })
-      );
-      if (profiles.length === 0) {
-        listBox.appendChild(
-          el(doc, 'p', { text: 'No saved profiles yet — save one above to restore it later.' })
-        );
-      }
-      profiles.forEach(function (profile) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: profile.name }));
-        var saved = profile.createdAt
-          ? new Date(profile.createdAt).toLocaleDateString()
-          : 'date unknown';
-        row.appendChild(el(doc, 'p', { text: 'Saved ' + saved + '.' }));
-        var applyBtn = el(doc, 'button', {
-          type: 'button',
-          class: 'btn btn-primary',
-          text: 'Apply',
-        });
-        applyBtn.addEventListener('click', function () {
-          replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(
-            function (saved) {
-              refreshValues();
-              if (saved) {
-                profilesNotice =
-                  'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
-              }
-              renderSection(currentSection);
-            }
-          );
-        });
-        var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
-        renameBtn.addEventListener('click', function () {
-          row.textContent = '';
-          var editInput = el(doc, 'input', {
-            type: 'text',
-            class: 'control-input',
-            maxlength: String(profilesApi.MAX_PROFILE_NAME_LENGTH),
+        saveBtn.addEventListener('click', function () {
+          var result = profilesApi.createProfile(nameInput.value, state, profiles, defaultsApi);
+          if (result.error) {
+            msgEl.textContent = result.error;
+            msgEl.style.display = 'block';
+            return;
+          }
+          profiles = result.profiles;
+          saveProfiles().then(function (saved) {
+            if (saved) profilesNotice = 'Saved profile "' + nameInput.value.trim() + '".';
+            renderSection(currentSection);
           });
-          editInput.value = profile.name;
-          editInput.setAttribute('aria-label', 'New profile name');
-          var confirmBtn = el(doc, 'button', {
+        });
+        var saveForm = el(doc, 'div', { class: 'tool-inline-form' });
+        saveForm.appendChild(nameInput);
+        saveForm.appendChild(saveBtn);
+        bindEnterSubmit(nameInput, saveBtn);
+        saveBox.appendChild(saveForm);
+        sectionEl.appendChild(saveBox);
+
+        // Saved profiles.
+        var listBox = el(doc, 'div', { class: 'tool-box' });
+        listBox.appendChild(
+          el(doc, 'h3', {
+            text: 'Your profiles (' + profiles.length + '/' + profilesApi.MAX_PROFILES + ')',
+          })
+        );
+        if (profiles.length === 0) {
+          listBox.appendChild(
+            el(doc, 'p', { text: 'No saved profiles yet — save one above to restore it later.' })
+          );
+        }
+        profiles.forEach(function (profile) {
+          var row = el(doc, 'div', { class: 'profile-row' });
+          row.appendChild(el(doc, 'strong', { text: profile.name }));
+          var saved = profile.createdAt
+            ? new Date(profile.createdAt).toLocaleDateString()
+            : 'date unknown';
+          row.appendChild(el(doc, 'p', { text: 'Saved ' + saved + '.' }));
+          var applyBtn = el(doc, 'button', {
             type: 'button',
             class: 'btn btn-primary',
-            text: 'Save name',
+            text: 'Apply',
           });
-          confirmBtn.addEventListener('click', function () {
-            var result = profilesApi.renameProfile(
-              profiles,
-              profile.name,
-              editInput.value,
-              defaultsApi
+          applyBtn.addEventListener('click', function () {
+            replaceState(profilesApi.applyProfile(state, profile, defaultsApi)).then(
+              function (applied) {
+                refreshValues();
+                if (applied) {
+                  profilesNotice =
+                    'Applied profile "' + profile.name + '" — your settings now match the snapshot.';
+                }
+                renderSection(currentSection);
+              }
             );
-            if (result.error) {
-              profilesNotice = result.error;
+          });
+          var renameBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Rename' });
+          renameBtn.addEventListener('click', function () {
+            row.textContent = '';
+            var editInput = el(doc, 'input', {
+              type: 'text',
+              class: 'control-input',
+              maxlength: String(profilesApi.MAX_PROFILE_NAME_LENGTH),
+            });
+            editInput.value = profile.name;
+            editInput.setAttribute('aria-label', 'New profile name');
+            var confirmBtn = el(doc, 'button', {
+              type: 'button',
+              class: 'btn btn-primary',
+              text: 'Save name',
+            });
+            confirmBtn.addEventListener('click', function () {
+              var result = profilesApi.renameProfile(
+                profiles,
+                profile.name,
+                editInput.value,
+                defaultsApi
+              );
+              if (result.error) {
+                profilesNotice = result.error;
+                renderSection(currentSection);
+                return;
+              }
+              profiles = result.profiles;
+              saveProfiles().then(function (ok) {
+                if (ok) profilesNotice = 'Renamed profile to "' + editInput.value.trim() + '".';
+                renderSection(currentSection);
+              });
+            });
+            var cancelBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Cancel' });
+            cancelBtn.addEventListener('click', function () {
               renderSection(currentSection);
-              return;
-            }
-            profiles = result.profiles;
-            saveProfiles().then(function () {
-              profilesNotice = 'Renamed profile to "' + editInput.value.trim() + '".';
+            });
+            var renameForm = el(doc, 'div', { class: 'tool-inline-form' });
+            renameForm.appendChild(editInput);
+            renameForm.appendChild(confirmBtn);
+            renameForm.appendChild(cancelBtn);
+            bindEnterSubmit(editInput, confirmBtn);
+            row.appendChild(renameForm);
+          });
+          var deleteBtn = el(doc, 'button', {
+            type: 'button',
+            class: 'btn btn-danger',
+            text: 'Delete',
+          });
+          deleteBtn.addEventListener('click', function () {
+            if (!window.confirm('Delete profile "' + profile.name + '"?')) return;
+            profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
+            saveProfiles().then(function (ok) {
+              if (ok) profilesNotice = 'Deleted profile "' + profile.name + '".';
               renderSection(currentSection);
             });
           });
-          var cancelBtn = el(doc, 'button', { type: 'button', class: 'btn', text: 'Cancel' });
-          cancelBtn.addEventListener('click', function () {
-            renderSection(currentSection);
-          });
-          row.appendChild(editInput);
-          row.appendChild(confirmBtn);
-          row.appendChild(cancelBtn);
+          var actions = el(doc, 'div', { class: 'tool-actions' });
+          actions.appendChild(applyBtn);
+          actions.appendChild(renameBtn);
+          actions.appendChild(deleteBtn);
+          row.appendChild(actions);
+          listBox.appendChild(row);
         });
-        var deleteBtn = el(doc, 'button', {
-          type: 'button',
-          class: 'btn btn-danger',
-          text: 'Delete',
-        });
-        deleteBtn.addEventListener('click', function () {
-          if (!window.confirm('Delete profile "' + profile.name + '"?')) return;
-          profiles = profilesApi.deleteProfile(profiles, profile.name, defaultsApi);
-          saveProfiles().then(function () {
-            profilesNotice = 'Deleted profile "' + profile.name + '".';
-            renderSection(currentSection);
-          });
-        });
-        row.appendChild(applyBtn);
-        row.appendChild(renameBtn);
-        row.appendChild(deleteBtn);
-        listBox.appendChild(row);
-      });
       sectionEl.appendChild(listBox);
     }
 
@@ -1305,12 +2738,8 @@
     // Removal is manual: delete the template's block
     // from the Custom CSS box.
     function renderCssTemplateTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (templatesNotice) {
-        msgEl.textContent = templatesNotice;
-        msgEl.style.display = 'block';
-        templatesNotice = '';
-      }
+      var msgEl = createToolNoticeEl(templatesNotice);
+      if (templatesNotice) templatesNotice = '';
       sectionEl.appendChild(msgEl);
       if (!cssTemplatesApi) {
         sectionEl.appendChild(
@@ -1328,10 +2757,11 @@
         })
       );
       var currentCss = getPath(state, 'appearance.customCSS') || '';
+      var templateGrid = el(doc, 'div', { class: 'preset-grid' });
       cssTemplatesApi.listCssTemplates().forEach(function (template) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: template.name }));
-        row.appendChild(el(doc, 'p', { text: template.description }));
+        var card = el(doc, 'div', { class: 'preset-card' });
+        card.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: template.name }));
+        card.appendChild(el(doc, 'p', { class: 'preset-card-desc', text: template.description }));
         var applied = cssTemplatesApi.isCssTemplateApplied(currentCss, template.id);
         var applyBtn = el(doc, 'button', {
           type: 'button',
@@ -1351,15 +2781,20 @@
           }
           setValue('appearance.customCSS', result.css);
           setValue('appearance.customCSSEnabled', true);
-          saveNow().then(function () {
+          saveNow().then(function (saved) {
             refreshValues();
-            templatesNotice = 'Applied template "' + template.name + '" — custom CSS is now on.';
+            if (saved) {
+              templatesNotice = 'Applied template "' + template.name + '" — custom CSS is now on.';
+            }
             renderSection(currentSection);
           });
         });
-        row.appendChild(applyBtn);
-        box.appendChild(row);
+        var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
+        cardFoot.appendChild(applyBtn);
+        card.appendChild(cardFoot);
+        templateGrid.appendChild(card);
       });
+      box.appendChild(templateGrid);
       sectionEl.appendChild(box);
     }
 
@@ -1373,12 +2808,8 @@
     // adds it when you confirm (mirroring the Advanced
     // import flow).
     function renderSavedThemeTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (savedThemesNotice) {
-        msgEl.textContent = savedThemesNotice;
-        msgEl.style.display = 'block';
-        savedThemesNotice = '';
-      }
+      var msgEl = createToolNoticeEl(savedThemesNotice);
+      if (savedThemesNotice) savedThemesNotice = '';
       sectionEl.appendChild(msgEl);
       if (!savedThemesApi) {
         sectionEl.appendChild(
@@ -1427,13 +2858,16 @@
           return;
         }
         savedThemes = result.themes;
-        saveSavedThemes().then(function () {
-          savedThemesNotice = 'Saved theme "' + nameInput.value.trim() + '".';
+        saveSavedThemes().then(function (saved) {
+          if (saved) savedThemesNotice = 'Saved theme "' + nameInput.value.trim() + '".';
           renderSection(currentSection);
         });
       });
-      saveBox.appendChild(nameInput);
-      saveBox.appendChild(saveBtn);
+      var saveForm = el(doc, 'div', { class: 'tool-inline-form' });
+      saveForm.appendChild(nameInput);
+      saveForm.appendChild(saveBtn);
+      bindEnterSubmit(nameInput, saveBtn);
+      saveBox.appendChild(saveForm);
       sectionEl.appendChild(saveBox);
 
       // Saved themes.
@@ -1455,7 +2889,19 @@
       }
       savedThemes.forEach(function (savedTheme) {
         var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: savedTheme.name }));
+        var titleRow = el(doc, 'div', { class: 'theme-title-row' });
+        titleRow.appendChild(el(doc, 'strong', { text: savedTheme.name }));
+        var swatchHexes = Object.values(savedTheme.colors || {}).slice(0, 4);
+        if (swatchHexes.length > 0) {
+          var swatches = el(doc, 'span', { class: 'theme-swatches', 'aria-hidden': 'true' });
+          swatchHexes.forEach(function (hex) {
+            var dot = el(doc, 'span', { class: 'theme-swatch-dot' });
+            dot.style.backgroundColor = hex;
+            swatches.appendChild(dot);
+          });
+          titleRow.appendChild(swatches);
+        }
+        row.appendChild(titleRow);
         var colourCount = Object.keys(savedTheme.colors || {}).length;
         row.appendChild(
           el(doc, 'p', {
@@ -1476,9 +2922,9 @@
         });
         applyBtn.addEventListener('click', function () {
           state = savedThemesApi.applySavedTheme(state, savedTheme, defaultsApi, themesApi);
-          saveNow().then(function () {
+          saveNow().then(function (saved) {
             refreshValues();
-            savedThemesNotice = 'Applied theme "' + savedTheme.name + '".';
+            if (saved) savedThemesNotice = 'Applied theme "' + savedTheme.name + '".';
             renderSection(currentSection);
           });
         });
@@ -1521,8 +2967,8 @@
               return;
             }
             savedThemes = result.themes;
-            saveSavedThemes().then(function () {
-              savedThemesNotice = 'Renamed theme to "' + editInput.value.trim() + '".';
+            saveSavedThemes().then(function (ok) {
+              if (ok) savedThemesNotice = 'Renamed theme to "' + editInput.value.trim() + '".';
               renderSection(currentSection);
             });
           });
@@ -1530,9 +2976,12 @@
           cancelBtn.addEventListener('click', function () {
             renderSection(currentSection);
           });
-          row.appendChild(editInput);
-          row.appendChild(confirmBtn);
-          row.appendChild(cancelBtn);
+          var renameForm = el(doc, 'div', { class: 'tool-inline-form' });
+          renameForm.appendChild(editInput);
+          renameForm.appendChild(confirmBtn);
+          renameForm.appendChild(cancelBtn);
+          bindEnterSubmit(editInput, confirmBtn);
+          row.appendChild(renameForm);
         });
         var deleteBtn = el(doc, 'button', {
           type: 'button',
@@ -1542,15 +2991,17 @@
         deleteBtn.addEventListener('click', function () {
           if (!window.confirm('Delete theme "' + savedTheme.name + '"?')) return;
           savedThemes = savedThemesApi.deleteSavedTheme(savedThemes, savedTheme.name, themesApi);
-          saveSavedThemes().then(function () {
-            savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
+          saveSavedThemes().then(function (ok) {
+            if (ok) savedThemesNotice = 'Deleted theme "' + savedTheme.name + '".';
             renderSection(currentSection);
           });
         });
-        row.appendChild(applyBtn);
-        row.appendChild(exportBtn);
-        row.appendChild(renameBtn);
-        row.appendChild(deleteBtn);
+        var actions = el(doc, 'div', { class: 'tool-actions' });
+        actions.appendChild(applyBtn);
+        actions.appendChild(exportBtn);
+        actions.appendChild(renameBtn);
+        actions.appendChild(deleteBtn);
+        row.appendChild(actions);
         listBox.appendChild(row);
       });
       sectionEl.appendChild(listBox);
@@ -1645,8 +3096,8 @@
           return;
         }
         savedThemes = savedThemes.concat([pendingTheme]);
-        saveSavedThemes().then(function () {
-          savedThemesNotice = 'Added theme "' + pendingTheme.name + '".';
+        saveSavedThemes().then(function (saved) {
+          if (saved) savedThemesNotice = 'Added theme "' + pendingTheme.name + '".';
           renderSection(currentSection);
         });
       });
@@ -1659,6 +3110,55 @@
       importBox.appendChild(previewEl);
       importBox.appendChild(addBtn);
       sectionEl.appendChild(importBox);
+    }
+
+    function renderModuleStatusBanner(sectionEl, sectionId) {
+      var deps = SECTION_MODULE_DEPS[sectionId];
+      if (!deps || deps.length === 0) return;
+      var masterOff = !getPath(state, 'enabled');
+      var disabledDeps = deps.filter(function (dep) {
+        return !getPath(state, dep.key);
+      });
+      if (!masterOff && disabledDeps.length === 0) return;
+      var banner = el(doc, 'div', { class: 'module-status-banner', role: 'status' });
+      var msg;
+      var btnText;
+      if (masterOff) {
+        msg =
+          'OneYT is turned off in General — these settings are saved but will not run on YouTube until enabled.';
+        btnText = 'Turn on OneYT';
+      } else {
+        var names = disabledDeps
+          .map(function (dep) {
+            return dep.label;
+          })
+          .join(' & ');
+        msg =
+          names +
+          (disabledDeps.length === 1 ? ' module is' : ' modules are') +
+          ' disabled in General — turn ' +
+          (disabledDeps.length === 1 ? 'it' : 'them') +
+          ' on for changes here to apply.';
+        btnText = 'Enable ' + names;
+      }
+      banner.appendChild(el(doc, 'span', { class: 'module-status-text', text: msg }));
+      var enableBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small',
+        text: btnText,
+      });
+      enableBtn.addEventListener('click', function () {
+        var next = defaultsApi.deepClone(state);
+        if (masterOff) setPath(next, 'enabled', true);
+        disabledDeps.forEach(function (dep) {
+          setPath(next, dep.key, true);
+        });
+        replaceState(next).then(function () {
+          renderSection(sectionId);
+        });
+      });
+      banner.appendChild(enableBtn);
+      sectionEl.appendChild(banner);
     }
 
     function renderSection(sectionId) {
@@ -1674,15 +3174,17 @@
       });
       mainEl.textContent = '';
       var header = el(doc, 'div', { class: 'section-header' });
-      header.appendChild(el(doc, 'h2', { text: section.title }));
+      var headerCopy = el(doc, 'div', { class: 'section-header-copy' });
+      headerCopy.appendChild(el(doc, 'h2', { text: section.title }));
       if (section.description) {
-        header.appendChild(el(doc, 'p', { class: 'section-desc', text: section.description }));
+        headerCopy.appendChild(el(doc, 'p', { class: 'section-desc', text: section.description }));
       }
+      header.appendChild(headerCopy);
       if ((section.controls || []).length > 0) {
         var resetSectionBtn = el(doc, 'button', {
           type: 'button',
-          class: 'btn btn-small',
-          text: 'Reset this section',
+          class: 'btn btn-small section-reset-btn',
+          text: 'Reset section',
         });
         resetSectionBtn.addEventListener('click', function () {
           var next = defaultsApi.deepClone(state);
@@ -1696,15 +3198,158 @@
         header.appendChild(resetSectionBtn);
       }
       mainEl.appendChild(header);
-      (section.controls || []).forEach(function (control) {
-        mainEl.appendChild(renderControlRow(control));
-      });
+      if (section.id !== 'general') renderModuleStatusBanner(mainEl, section.id);
+      if (section.id === 'general') {
+        var coreControls = (section.controls || []).filter(function (c) {
+          return c.key.indexOf('modules.') !== 0;
+        });
+        var moduleControls = (section.controls || []).filter(function (c) {
+          return c.key.indexOf('modules.') === 0;
+        });
+        coreControls.forEach(function (control) {
+          mainEl.appendChild(renderControlRow(control));
+        });
+        if (moduleControls.length > 0) {
+          var groupHead = el(doc, 'div', { class: 'section-group-head' });
+          var groupTitle = el(doc, 'div', { class: 'section-group-title' });
+          groupTitle.appendChild(el(doc, 'h3', { text: 'Feature modules' }));
+          groupTitle.appendChild(el(doc, 'span', { class: 'modules-active-count', text: '' }));
+          groupHead.appendChild(groupTitle);
+          var pausedPill = el(doc, 'span', {
+            class: 'modules-paused-pill',
+            text: 'Master switch is off — modules paused on YouTube',
+          });
+          pausedPill.hidden = !!getPath(state, 'enabled');
+          groupHead.appendChild(pausedPill);
+          mainEl.appendChild(groupHead);
+          var modulesGrid = el(doc, 'div', { class: 'control-grid-modules' });
+          moduleControls.forEach(function (control) {
+            modulesGrid.appendChild(renderControlRow(control));
+          });
+          mainEl.appendChild(modulesGrid);
+          updateModulesSummary();
+        }
+      } else {
+        var groups = SECTION_GROUPS[section.id] || {};
+        var gridRun = null;
+        var gridRunKind = '';
+        var flushGridRun = function () {
+          if (gridRun) {
+            mainEl.appendChild(gridRun);
+            gridRun = null;
+            gridRunKind = '';
+          }
+        };
+        (section.controls || []).forEach(function (control) {
+          var groupTitleText = groups[control.key];
+          if (groupTitleText) {
+            flushGridRun();
+            var subHead = el(doc, 'div', { class: 'section-group-head' });
+            var subTitle = el(doc, 'div', { class: 'section-group-title' });
+            subTitle.appendChild(el(doc, 'h3', { text: groupTitleText }));
+            subHead.appendChild(subTitle);
+            if (control.key === 'appearance.colors.accent') {
+              var clearAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small colors-clear-all-btn',
+                text: 'Clear all',
+              });
+              clearAllBtn.addEventListener('click', function () {
+                var next = defaultsApi.deepClone(state);
+                setPath(next, 'appearance.colors', {});
+                replaceState(next).then(function () {
+                  refreshValues();
+                });
+              });
+              subHead.appendChild(clearAllBtn);
+            } else if (control.key === 'productivity.focusHideComments') {
+              subTitle.appendChild(el(doc, 'span', { class: 'focus-hidden-count', text: '' }));
+              var quickWrap = el(doc, 'div', { class: 'focus-quick-actions' });
+              var setAllFocusHidden = function (val) {
+                var next = defaultsApi.deepClone(state);
+                FOCUS_HIDE_KEYS.forEach(function (k) {
+                  setPath(next, k, val);
+                });
+                replaceState(next).then(function () {
+                  refreshValues();
+                });
+              };
+              var hideAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small focus-hide-all-btn',
+                text: 'Hide all',
+              });
+              hideAllBtn.addEventListener('click', function () {
+                setAllFocusHidden(true);
+              });
+              var showAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small focus-show-all-btn',
+                text: 'Show all',
+              });
+              showAllBtn.addEventListener('click', function () {
+                setAllFocusHidden(false);
+              });
+              quickWrap.appendChild(hideAllBtn);
+              quickWrap.appendChild(showAllBtn);
+              subHead.appendChild(quickWrap);
+            } else if (control.key === 'keyboard.shortcuts.toggleFocus') {
+              subTitle.appendChild(el(doc, 'span', { class: 'keyboard-bound-count', text: '' }));
+              subTitle.appendChild(el(doc, 'span', { class: 'keyboard-health-pill', text: '' }));
+              var unbindAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small keyboard-unbind-all-btn',
+                text: 'Unbind all',
+              });
+              unbindAllBtn.addEventListener('click', function () {
+                var next = defaultsApi.deepClone(state);
+                var kSection = sectionById('keyboard');
+                ((kSection && kSection.controls) || []).forEach(function (c) {
+                  setPath(next, c.key, '');
+                });
+                replaceState(next).then(function () {
+                  refreshValues();
+                });
+              });
+              subHead.appendChild(unbindAllBtn);
+            }
+            mainEl.appendChild(subHead);
+          }
+          var desiredGrid = '';
+          if (control.type === 'toggle' && TOGGLE_GRID_KEYS[control.key]) {
+            desiredGrid = 'control-grid-toggles';
+          } else if (control.type === 'color' && control.key.indexOf('appearance.colors.') === 0) {
+            desiredGrid = 'control-grid-colors';
+          }
+          if (desiredGrid) {
+            if (!gridRun || gridRunKind !== desiredGrid) {
+              flushGridRun();
+              gridRun = el(doc, 'div', { class: desiredGrid });
+              gridRunKind = desiredGrid;
+            }
+            gridRun.appendChild(renderControlRow(control));
+          } else {
+            flushGridRun();
+            mainEl.appendChild(renderControlRow(control));
+            if (section.id === 'appearance' && control.key === 'appearance.theme') {
+              renderThemeVisualPanel(mainEl);
+            } else if (section.id === 'productivity' && control.key === 'productivity.focusMode') {
+              renderFocusVisualPanel(mainEl);
+            }
+          }
+        });
+        flushGridRun();
+        updateColorClearAllBtn();
+        updateProductivitySummary();
+      }
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);
       if (section.id === 'health') renderHealthTools(mainEl);
       if (section.id === 'appearance') renderCssTemplateTools(mainEl);
       if (section.id === 'appearance') renderSavedThemeTools(mainEl);
-      if (section.id === 'layout') renderLayoutEditorTools(mainEl);
+      if (section.id === 'home') renderLayoutEditorTools(mainEl);
+      if (section.id === 'sidebar') renderSidebarPreviewTools(mainEl);
+      updateControlDependencies();
       checkShortcutWarnings();
     }
 
@@ -1717,12 +3362,8 @@
     // The preview is a diagram of the numbers, not a
     // screenshot of YouTube.
     function renderLayoutEditorTools(sectionEl) {
-      var msgEl = el(doc, 'p', { class: 'control-warning', text: '' });
-      if (layoutEditorNotice) {
-        msgEl.textContent = layoutEditorNotice;
-        msgEl.style.display = 'block';
-        layoutEditorNotice = '';
-      }
+      var msgEl = createToolNoticeEl(layoutEditorNotice);
+      if (layoutEditorNotice) layoutEditorNotice = '';
       sectionEl.appendChild(msgEl);
       if (!layoutPresetsApi) {
         sectionEl.appendChild(
@@ -1732,35 +3373,17 @@
         );
         return;
       }
-      var summary = layoutPresetsApi.layoutPreviewSummary(state);
       var previewBox = el(doc, 'div', { class: 'tool-box' });
       previewBox.appendChild(el(doc, 'h3', { text: 'Preview' }));
       previewBox.appendChild(
         el(doc, 'p', {
-          text:
-            summary.columns +
-            ' columns · ' +
-            summary.gap +
-            ' px gap · ' +
-            (summary.maxWidth > 0 ? 'max-width ' + summary.maxWidth + ' px' : 'full width') +
-            '.',
+          class: 'layout-preview-summary',
+          text: '',
         })
       );
-      var grid = el(doc, 'div', { class: 'layout-preview-grid' });
-      grid.setAttribute(
-        'style',
-        'display: flex; gap: ' + Math.min(summary.gap, 24) + 'px; margin-top: 8px;'
-      );
-      for (var i = 0; i < summary.columns; i++) {
-        var cell = el(doc, 'div', { class: 'layout-preview-cell' });
-        cell.setAttribute(
-          'style',
-          'flex: 1; height: 48px; background: var(--ui-accent-soft, rgba(255, 0, 51, 0.12)); border: 1px solid var(--ui-border, #2a2a2a); border-radius: 6px;'
-        );
-        grid.appendChild(cell);
-      }
-      previewBox.appendChild(grid);
+      previewBox.appendChild(el(doc, 'div', { class: 'layout-preview-grid' }));
       sectionEl.appendChild(previewBox);
+      updateLayoutPreview();
 
       var presetBox = el(doc, 'div', { class: 'tool-box' });
       presetBox.appendChild(el(doc, 'h3', { text: 'Layout presets' }));
@@ -1769,10 +3392,26 @@
           text: 'One click sets the home grid numbers together. A preset changes only the layout numbers — hiding toggles, theme and everything else stay as they are. Fine-tune the numbers above afterwards.',
         })
       );
+      var layoutGrid = el(doc, 'div', { class: 'preset-grid' });
       layoutPresetsApi.LAYOUT_PRESETS.forEach(function (preset) {
-        var row = el(doc, 'div', { class: 'profile-row' });
-        row.appendChild(el(doc, 'strong', { text: preset.name }));
-        row.appendChild(el(doc, 'p', { text: preset.description }));
+        var active = isLayoutPresetMatches(preset);
+        var card = el(doc, 'div', {
+          class: 'preset-card' + (active ? ' is-active' : ''),
+          'data-preset-id': preset.id,
+        });
+        var head = el(doc, 'div', { class: 'preset-card-head' });
+        head.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: preset.name }));
+        if (preset.overrides && preset.overrides.layout) {
+          var lo = preset.overrides.layout;
+          head.appendChild(
+            el(doc, 'span', {
+              class: 'preset-card-meta',
+              text: lo.homeColumns + ' cols · ' + lo.cardSpacing + ' px',
+            })
+          );
+        }
+        card.appendChild(head);
+        card.appendChild(el(doc, 'p', { class: 'preset-card-desc', text: preset.description }));
         var applyBtn = el(doc, 'button', {
           type: 'button',
           class: 'btn',
@@ -1780,15 +3419,21 @@
         });
         applyBtn.addEventListener('click', function () {
           state = layoutPresetsApi.applyLayoutPreset(state, preset.id, defaultsApi);
-          saveNow().then(function () {
+          saveNow().then(function (saved) {
             refreshValues();
-            layoutEditorNotice = 'Applied layout preset "' + preset.name + '".';
+            if (saved) layoutEditorNotice = 'Applied layout preset "' + preset.name + '".';
             renderSection(currentSection);
           });
         });
-        row.appendChild(applyBtn);
-        presetBox.appendChild(row);
+        var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
+        cardFoot.appendChild(applyBtn);
+        var activePill = el(doc, 'span', { class: 'preset-active-pill', text: 'Active' });
+        activePill.hidden = !active;
+        cardFoot.appendChild(activePill);
+        card.appendChild(cardFoot);
+        layoutGrid.appendChild(card);
       });
+      presetBox.appendChild(layoutGrid);
       sectionEl.appendChild(presetBox);
     }
 
@@ -1808,56 +3453,173 @@
         return;
       }
       var summary = healthApi.summarizeHealth(healthRecord);
+      var counts = countHealthStatuses(summary.features);
 
-      var statusBox = el(doc, 'div', { class: 'tool-box' });
-      var statusText =
-        summary.status === 'ok'
-          ? 'All checked features are working.'
-          : summary.status === 'broken'
-            ? 'Some features are not working — YouTube may have changed its layout. Nothing is disabled; the features below simply cannot find what they look for.'
-            : 'No health data yet — open YouTube, wait a few seconds, then come back here.';
-      statusBox.appendChild(el(doc, 'h3', { text: 'Status' }));
-      statusBox.appendChild(el(doc, 'p', { text: statusText }));
-      var checkedPages = Object.keys(summary.checked);
-      if (checkedPages.length > 0) {
-        checkedPages.forEach(function (pageType) {
-          statusBox.appendChild(
-            el(doc, 'p', {
-              text:
-                pageType +
-                ' page checked ' +
-                new Date(summary.checked[pageType]).toLocaleString() +
-                '.',
-            })
-          );
-        });
-      }
+      var statusMeta = {
+        ok: {
+          badge: 'Healthy',
+          message: 'All checked features are working.',
+        },
+        broken: {
+          badge: 'Attention needed',
+          message:
+            'Some features are not working — YouTube may have changed its layout. Nothing is disabled; the features below simply cannot find what they look for.',
+        },
+        unknown: {
+          badge: 'Waiting for data',
+          message: 'No health data yet — open YouTube, wait a few seconds, then come back here.',
+        },
+      };
+      var bannerMeta = statusMeta[summary.status] || statusMeta.unknown;
+
+      var statusBox = el(doc, 'div', {
+        class: 'tool-box health-banner health-status-' + summary.status,
+      });
+      var bannerHead = el(doc, 'div', { class: 'health-banner-head' });
+      var bannerTitleGroup = el(doc, 'div', { class: 'health-banner-title' });
+      bannerTitleGroup.appendChild(
+        el(doc, 'span', {
+          class: 'health-badge health-badge--' + (summary.status === 'ok' ? 'working' : summary.status === 'broken' ? 'broken' : 'unchecked'),
+          text: bannerMeta.badge,
+        })
+      );
+      bannerTitleGroup.appendChild(el(doc, 'h3', { text: 'Overview' }));
+      bannerHead.appendChild(bannerTitleGroup);
+
       var refreshBtn = el(doc, 'button', {
         type: 'button',
-        class: 'btn',
+        class: 'btn btn-small',
         text: 'Check again',
       });
       refreshBtn.addEventListener('click', function () {
         refreshHealth();
       });
-      statusBox.appendChild(refreshBtn);
+      bannerHead.appendChild(refreshBtn);
+      statusBox.appendChild(bannerHead);
+      statusBox.appendChild(el(doc, 'p', { class: 'health-banner-desc', text: bannerMeta.message }));
+
+      var checkedPages = Object.keys(summary.checked);
+      if (checkedPages.length > 0) {
+        var checkedWrap = el(doc, 'div', { class: 'health-checked-list' });
+        checkedPages.forEach(function (pageType) {
+          checkedWrap.appendChild(
+            el(doc, 'span', {
+              class: 'health-checked-pill',
+              text:
+                pageType +
+                ' checked ' +
+                new Date(summary.checked[pageType]).toLocaleString(),
+            })
+          );
+        });
+        statusBox.appendChild(checkedWrap);
+      }
       sectionEl.appendChild(statusBox);
 
-      var listBox = el(doc, 'div', { class: 'tool-box' });
-      listBox.appendChild(el(doc, 'h3', { text: 'Features' }));
+      // Summary stat & filter chips.
+      var statsBar = el(doc, 'div', {
+        class: 'health-stats',
+        role: 'group',
+        'aria-label': 'Filter features by status',
+      });
+      var filterSpecs = [
+        { id: 'all', label: 'All', count: counts.total },
+        { id: 'working', label: 'Working', count: counts.working },
+        { id: 'broken', label: 'Not working', count: counts.broken },
+        { id: 'not-seen', label: 'Not seen', count: counts['not-seen'] },
+        { id: 'unchecked', label: 'Not checked', count: counts.unchecked },
+      ];
+      var filterButtons = [];
+
+      var listBox = el(doc, 'div', { class: 'tool-box health-list-box' });
+      var listHead = el(doc, 'div', { class: 'health-list-head' });
+      listHead.appendChild(el(doc, 'h3', { text: 'Features' }));
+      var showingEl = el(doc, 'span', { class: 'health-showing' });
+      listHead.appendChild(showingEl);
+      listBox.appendChild(listHead);
+
+      var grid = el(doc, 'div', { class: 'health-grid' });
+      listBox.appendChild(grid);
+
       var statusLabels = {
         working: 'Working',
         broken: 'Not working',
-        'not-seen': 'Not seen on this visit',
-        unchecked: 'Not checked yet',
+        'not-seen': 'Not seen',
+        unchecked: 'Not checked',
       };
-      summary.features.forEach(function (row) {
-        var item = el(doc, 'div', { class: 'profile-row' });
-        item.appendChild(el(doc, 'strong', { text: row.feature }));
-        item.appendChild(el(doc, 'p', { text: statusLabels[row.status] || row.status }));
-        listBox.appendChild(item);
+
+      function renderFeatureCards() {
+        var filtered = summary.features.filter(function (row) {
+          return healthFilter === 'all' || row.status === healthFilter;
+        });
+        showingEl.textContent =
+          'Showing ' + filtered.length + ' of ' + summary.features.length;
+        grid.textContent = '';
+        if (filtered.length === 0) {
+          grid.appendChild(
+            el(doc, 'p', {
+              class: 'health-empty',
+              text: 'No features match this status filter.',
+            })
+          );
+          return;
+        }
+        filtered.forEach(function (row) {
+          var card = el(doc, 'div', {
+            class: 'health-card health-card--' + row.status,
+          });
+          card.appendChild(el(doc, 'span', { class: 'health-card-name', text: row.feature }));
+          var badge = el(doc, 'span', { class: 'health-badge health-badge--' + row.status }, [
+            el(doc, 'span', { class: 'health-dot', 'aria-hidden': 'true' }),
+            statusLabels[row.status] || row.status,
+          ]);
+          card.appendChild(badge);
+          grid.appendChild(card);
+        });
+      }
+
+      filterSpecs.forEach(function (spec) {
+        var btn = el(doc, 'button', {
+          type: 'button',
+          class:
+            'health-stat-card health-stat-' +
+            spec.id +
+            (healthFilter === spec.id ? ' active' : ''),
+          'aria-pressed': healthFilter === spec.id ? 'true' : 'false',
+        });
+        btn.appendChild(el(doc, 'span', { class: 'health-stat-count', text: String(spec.count) }));
+        btn.appendChild(el(doc, 'span', { class: 'health-stat-label', text: spec.label }));
+        btn.addEventListener('click', function () {
+          healthFilter = spec.id;
+          filterButtons.forEach(function (entry) {
+            var isActive = entry.id === healthFilter;
+            entry.btn.classList.toggle('active', isActive);
+            entry.btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          });
+          renderFeatureCards();
+        });
+        filterButtons.push({ id: spec.id, btn: btn });
+        statsBar.appendChild(btn);
       });
+
+      sectionEl.appendChild(statsBar);
+      renderFeatureCards();
       sectionEl.appendChild(listBox);
+    }
+
+    function updateHealthNavBadge() {
+      if (!navEl) return;
+      var healthBtn = navEl.querySelector('.nav-item[data-section="health"]');
+      if (!healthBtn) return;
+      var dot = healthBtn.querySelector('.nav-status-dot');
+      if (!dot) return;
+      var broken =
+        healthApi &&
+        healthApi.summarizeHealth &&
+        healthApi.summarizeHealth(healthRecord).status === 'broken';
+      dot.style.display = broken ? 'inline-block' : 'none';
+      if (broken) dot.setAttribute('title', 'Some features need attention');
+      else dot.removeAttribute('title');
     }
 
     function renderNav() {
@@ -1867,13 +3629,21 @@
           type: 'button',
           class: 'nav-item',
           'data-section': section.id,
-          text: section.title,
         });
+        var icon = svgIcon(doc, section.id, 'nav-icon');
+        if (icon) btn.appendChild(icon);
+        btn.appendChild(el(doc, 'span', { class: 'nav-label', text: section.title }));
+        if (section.id === 'health') {
+          var dot = el(doc, 'span', { class: 'nav-status-dot', 'aria-hidden': 'true' });
+          dot.style.display = 'none';
+          btn.appendChild(dot);
+        }
         btn.addEventListener('click', function () {
           renderSection(section.id);
         });
         navEl.appendChild(btn);
       });
+      updateHealthNavBadge();
     }
 
     function appendHighlighted(parent, text, words) {
@@ -1962,7 +3732,7 @@
         if (clearEl) clearEl.hidden = true;
         var row = mainEl.querySelector('[data-control-key="' + entry.key + '"]');
         if (row) {
-          row.scrollIntoView({ block: 'center' });
+          row.scrollIntoView({ block: 'center', behavior: 'smooth' });
           row.classList.add('highlight');
           setTimeout(function () {
             row.classList.remove('highlight');
@@ -2001,8 +3771,19 @@
           var item = el(doc, 'button', { type: 'button', class: 'search-result' });
           item.setAttribute('role', 'option');
           item.setAttribute('id', 'search-result-' + i);
-          item.appendChild(doc.createTextNode(entry.sectionTitle + ' — '));
-          appendHighlighted(item, entry.label, words);
+          var head = el(doc, 'div', { class: 'search-result-head' });
+          var labelEl = el(doc, 'span', { class: 'search-result-label' });
+          appendHighlighted(labelEl, entry.label, words);
+          head.appendChild(labelEl);
+          head.appendChild(
+            el(doc, 'span', { class: 'search-result-section', text: entry.sectionTitle })
+          );
+          item.appendChild(head);
+          if (entry.description) {
+            var descEl = el(doc, 'span', { class: 'search-result-desc' });
+            appendHighlighted(descEl, entry.description, words);
+            item.appendChild(descEl);
+          }
           item.addEventListener('click', function () {
             activate(entry);
           });
@@ -2059,6 +3840,23 @@
           closeResults();
         }
       });
+      doc.addEventListener('keydown', function (event) {
+        if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+        var target = event.target;
+        var tag = target && target.tagName;
+        if (
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT' ||
+          (target && target.isContentEditable) ||
+          doc.querySelector('.control-shortcut.capturing')
+        ) {
+          return;
+        }
+        event.preventDefault();
+        searchEl.focus();
+        if (typeof searchEl.select === 'function') searchEl.select();
+      });
     }
 
     function load() {
@@ -2106,6 +3904,7 @@
         .get(HEALTH_KEY)
         .then(function (stored) {
           healthRecord = healthApi ? healthApi.validateHealthRecord(stored) : {};
+          updateHealthNavBadge();
           if (currentSection === 'health') renderSection('health');
         })
         .catch(function () {});
@@ -2115,17 +3914,29 @@
     // A failure never touches the settings; the notice is
     // shown the next time the Profiles section renders.
     function saveProfiles() {
-      return storage.set({ [PROFILES_KEY]: profiles }).catch(function () {
-        profilesNotice = 'Could not save profiles — please try again.';
-      });
+      return storage
+        .set({ [PROFILES_KEY]: profiles })
+        .then(function () {
+          return true;
+        })
+        .catch(function () {
+          profilesNotice = 'Could not save profiles — please try again.';
+          return false;
+        });
     }
 
     // Persist the saved-themes list (local only — never
     // synced). Same failure shape as saveProfiles.
     function saveSavedThemes() {
-      return storage.set({ [SAVED_THEMES_KEY]: savedThemes }).catch(function () {
-        savedThemesNotice = 'Could not save themes — please try again.';
-      });
+      return storage
+        .set({ [SAVED_THEMES_KEY]: savedThemes })
+        .then(function () {
+          return true;
+        })
+        .catch(function () {
+          savedThemesNotice = 'Could not save themes — please try again.';
+          return false;
+        });
     }
 
     function init() {
@@ -2133,6 +3944,7 @@
       bindSearch();
       return load().then(function () {
         applyDashboardTheme();
+        updateHealthNavBadge();
         if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
           window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
             if (getPath(state, 'ui.dashboardTheme') === 'system') applyDashboardTheme();
@@ -2180,10 +3992,10 @@
             applyDashboardTheme();
             refreshValues();
             // The layout preview is drawn in renderSection,
-            // not in refreshValues: re-render the Layout
-            // section so an external change visibly updates
-            // the preview instead of leaving stale numbers.
-            if (currentSection === 'layout') renderSection('layout');
+            // not in refreshValues: re-render the Home section
+            // so an external change visibly updates the preview
+            // instead of leaving stale numbers.
+            if (currentSection === 'home') renderSection('home');
           });
         }
       });
@@ -2248,6 +4060,12 @@
     clampSettingsToControls: clampSettingsToControls,
     diffSettings: diffSettings,
     formatValue: formatValue,
+    formatDefaultValue: formatDefaultValue,
+    isControlModified: isControlModified,
+    getControlInactiveReason: getControlInactiveReason,
+    CONTROL_DEPENDENCIES: CONTROL_DEPENDENCIES,
+    getControlHint: getControlHint,
+    CONTROL_HINTS: CONTROL_HINTS,
     resolveSelectOptions: resolveSelectOptions,
     selectToSetting: selectToSetting,
     settingToSelect: settingToSelect,
@@ -2256,6 +4074,14 @@
     splitHighlight: splitHighlight,
     searchKeyAction: searchKeyAction,
     resolveDashboardTheme: resolveDashboardTheme,
+    countHealthStatuses: countHealthStatuses,
+    MODULE_SECTION_MAP: MODULE_SECTION_MAP,
+    SECTION_GROUPS: SECTION_GROUPS,
+    TOGGLE_GRID_KEYS: TOGGLE_GRID_KEYS,
+    SECTION_MODULE_DEPS: SECTION_MODULE_DEPS,
+    FOCUS_HIDE_KEYS: FOCUS_HIDE_KEYS,
+    FOCUS_PRESETS: FOCUS_PRESETS,
+    isFocusPresetMatches: isFocusPresetMatches,
     createOptionsApp: createOptionsApp,
   };
 
@@ -2278,6 +4104,7 @@
       'health',
       'player',
       'sidebar',
+      'home',
       'layout',
       'appearance',
       'playback',

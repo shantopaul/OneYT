@@ -93,10 +93,18 @@
       hideLiveShelf: false, // hide the "Live now" shelf on the home feed
       hideMixesShelf: false, // hide Mixes on the home feed (shelf + individual mix cards)
       hideNewsShelf: false, // hide the "Breaking news" shelf on the home feed
-      homeColumns: 0, // 0 = default
+      homeColumns: 0, // 0 = default (1-15)
+      responsiveColumns: false, // auto-adjust columns on narrow viewports
+      postsPerRow: 0, // 0 = default (1-6)
+      shelfItemsPerRow: 0, // 0 = default (1-15, Shorts & shelf cards)
       cardSpacing: 0, // px, 0 = default
       thumbnailSize: 0, // px width, 0 = default
       homeMaxWidth: 0, // px, 0 = YouTube default (Phase 22: cap + centre the home grid)
+      hideChannelProfile: false, // hide channel avatars under video cards
+      fullVideoTitles: false, // show full video titles without line clamping
+      channelWide: false, // full-width channel grid layout
+      channelColumns: 0, // 0 = default (1-15 videos per row on channel pages)
+      channelShelfItemsPerRow: 0, // 0 = default (1-15 Shorts/shelf items per row on channel pages)
       hideComments: false,
       watchSpacing: 0, // px gap between player and #below, 0 = default (Phase 2)
     },

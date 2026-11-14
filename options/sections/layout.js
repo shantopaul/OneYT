@@ -1,12 +1,12 @@
 // OneYT — dashboard section: Layout.
-// Watch/homepage layout + guide navigation controls.
+// Global Shorts blocking, Channel page grid, Watch page and guide navigation.
 (function () {
   'use strict';
 
   var section = {
     id: 'layout',
     title: 'Layout',
-    description: 'Watch page, homepage grid and guide navigation.',
+    description: 'Global Shorts blocking, Channel page grid, Watch page and guide navigation.',
     controls: [
       {
         key: 'layout.blockShorts',
@@ -17,13 +17,6 @@
         keywords: ['shorts', 'block', 'hide', 'remove'],
       },
       {
-        key: 'layout.hideShortsHome',
-        type: 'toggle',
-        label: 'Hide Shorts on Home',
-        description: 'Hide the Shorts shelf on the homepage.',
-        keywords: ['shorts', 'hide', 'home'],
-      },
-      {
         key: 'layout.hideShortsWatch',
         type: 'toggle',
         label: 'Hide Shorts on Watch',
@@ -31,77 +24,44 @@
         keywords: ['shorts', 'hide', 'watch'],
       },
       {
-        key: 'layout.hideTopicChips',
+        key: 'layout.channelWide',
         type: 'toggle',
-        label: 'Hide topic chips bar on Home',
-        description:
-          'Hide the topic filter chips row ("All", "Music", "Gaming", …) at the top of the home feed. Home page only.',
-        keywords: ['topic', 'chips', 'filter', 'home', 'hide'],
+        label: 'Wide channel layout',
+        description: 'Expand channel video grids to full available width instead of YouTube’s narrow column.',
+        keywords: ['channel', 'wide', 'full width', 'layout'],
       },
       {
-        key: 'layout.hideLiveShelf',
-        type: 'toggle',
-        label: 'Hide Live shelf on Home',
-        description: 'Hide the "Live now" shelf on the homepage.',
-        keywords: ['live', 'shelf', 'hide', 'home'],
-      },
-      {
-        key: 'layout.hideMixesShelf',
-        type: 'toggle',
-        label: 'Hide Mixes on Home',
-        description: 'Hide Mixes on the homepage — the Mixes shelf and the individual mix cards.',
-        keywords: ['mixes', 'mix', 'hide', 'home'],
-      },
-      {
-        key: 'layout.hideNewsShelf',
-        type: 'toggle',
-        label: 'Hide News shelf on Home',
-        description: 'Hide the "Breaking news" shelf on the homepage.',
-        keywords: ['news', 'shelf', 'hide', 'home'],
-      },
-      {
-        key: 'layout.homeColumns',
+        key: 'layout.channelColumns',
         type: 'number',
-        label: 'Homepage columns',
-        description: 'Videos per row on the homepage. 0 = YouTube default.',
+        label: 'Channel videos per row',
+        description: 'Videos per row on channel pages (1–15). 0 = YouTube default.',
         min: 0,
-        max: 12,
+        max: 15,
         step: 1,
-        keywords: ['home', 'columns', 'grid'],
+        presets: [
+          { label: 'YouTube auto (0)', value: 0 },
+          { label: '4 columns', value: 4 },
+          { label: '5 columns', value: 5 },
+          { label: '6 columns', value: 6 },
+          { label: '8 columns', value: 8 },
+        ],
+        keywords: ['channel', 'columns', 'row', 'videos'],
       },
       {
-        key: 'layout.cardSpacing',
+        key: 'layout.channelShelfItemsPerRow',
         type: 'number',
-        label: 'Homepage card spacing',
-        description: 'Gap between homepage cards in pixels. 0 = YouTube default.',
+        label: 'Channel Shorts & shelf per row',
+        description: 'Shorts and shelf cards per row on channel pages (1–15). 0 = YouTube default.',
         min: 0,
-        max: 60,
+        max: 15,
         step: 1,
-        unit: 'px',
-        keywords: ['home', 'card', 'spacing', 'gap'],
-      },
-      {
-        key: 'layout.thumbnailSize',
-        type: 'number',
-        label: 'Homepage thumbnail width',
-        description: 'Thumbnail width in pixels. 0 = YouTube default.',
-        min: 0,
-        max: 800,
-        step: 1,
-        unit: 'px',
-        keywords: ['home', 'thumbnail', 'size'],
-      },
-      {
-        key: 'layout.homeMaxWidth',
-        type: 'number',
-        label: 'Homepage max width',
-        description:
-          'Cap the homepage feed width in pixels and centre it — the ultrawide fix. 0 = YouTube default (full width).',
-        min: 0,
-        max: 2560,
-        step: 1,
-        unit: 'px',
-        keywords: ['home', 'max', 'width', 'ultrawide', 'centre', 'center'],
+        presets: [
+          { label: 'YouTube auto (0)', value: 0 },
+          { label: '6 items', value: 6 },
+          { label: '8 items', value: 8 },
+          { label: '10 items', value: 10 },
+        ],
+        keywords: ['channel', 'shorts', 'shelf', 'row', 'items'],
       },
       {
         key: 'layout.hideComments',

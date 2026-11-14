@@ -6,14 +6,17 @@ html.oneyt-enabled.oneyt-rec-hide-sidebar #secondary {
   display: none;
 }
 
-html.oneyt-enabled.oneyt-rec-compact #secondary ytd-compact-video-renderer {
+/* prettier-ignore */
+html.oneyt-enabled.oneyt-rec-compact #secondary :is(ytd-compact-video-renderer, yt-lockup-view-model) {
   margin-bottom: 2px;
 }
 
-html.oneyt-enabled.oneyt-rec-card-sized #secondary ytd-compact-video-renderer ytd-thumbnail {
+/* prettier-ignore */
+html.oneyt-enabled.oneyt-rec-card-sized #secondary :is(ytd-compact-video-renderer, yt-lockup-view-model) :is(ytd-thumbnail, yt-thumbnail-view-model) {
   width: var(--oneyt-rec-card-size);
 }
 
-html.oneyt-enabled.oneyt-rec-hide-meta #secondary ytd-compact-video-renderer #metadata {
+/* prettier-ignore */
+html.oneyt-enabled.oneyt-rec-hide-meta #secondary :is(ytd-compact-video-renderer, yt-lockup-view-model) :is(#metadata, yt-lockup-metadata-view-model) {
   display: none;
 }

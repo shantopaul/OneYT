@@ -19,7 +19,9 @@ html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-recommendations ytd-rich-grid-re
   display: none;
 }
 
-html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts ytd-rich-shelf-renderer[is-shorts] {
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts :is([page-subtype='home'], [page-subtype='subscriptions']) ytd-rich-section-renderer:has(a[href^='/shorts/']) {
   display: none;
 }
 

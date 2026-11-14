@@ -69,6 +69,13 @@
           max: 200,
           step: 5,
           unit: '%',
+          presets: [
+            { label: 'Default (0)', value: 0 },
+            { label: '90%', value: 90 },
+            { label: '100%', value: 100 },
+            { label: '115%', value: 115 },
+            { label: '125%', value: 125 },
+          ],
           keywords: ['font', 'size', 'typography'],
         },
         {
@@ -98,6 +105,12 @@
           max: 32,
           step: 1,
           unit: 'px',
+          presets: [
+            { label: 'Sharp (0 px)', value: 0 },
+            { label: '8 px', value: 8 },
+            { label: '12 px', value: 12 },
+            { label: '16 px', value: 16 },
+          ],
           keywords: ['radius', 'corners', 'rounded', 'thumbnail'],
         },
         {
@@ -109,6 +122,12 @@
           max: 64,
           step: 1,
           unit: 'px',
+          presets: [
+            { label: 'Tight (0 px)', value: 0 },
+            { label: '8 px', value: 8 },
+            { label: '12 px', value: 12 },
+            { label: '20 px', value: 20 },
+          ],
           keywords: ['spacing', 'gap'],
         },
         {
