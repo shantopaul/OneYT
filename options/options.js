@@ -370,6 +370,62 @@
     'productivity.focusHideNav',
   ];
 
+  var FOCUS_PRESETS = [
+    {
+      id: 'deep',
+      label: 'Deep Focus',
+      description: 'Hide all 7 distraction surfaces — keep video player + search only',
+      values: {
+        'productivity.focusHideComments': true,
+        'productivity.focusHideChat': true,
+        'productivity.focusHideRecommendations': true,
+        'productivity.focusHideShorts': true,
+        'productivity.focusHideButtons': true,
+        'productivity.focusHideMetadata': true,
+        'productivity.focusHideNav': true,
+      },
+    },
+    {
+      id: 'study',
+      label: 'Study Mode',
+      description: 'Hide recommendations, Shorts, live chat & guide; keep comments & description',
+      values: {
+        'productivity.focusHideComments': false,
+        'productivity.focusHideChat': true,
+        'productivity.focusHideRecommendations': true,
+        'productivity.focusHideShorts': true,
+        'productivity.focusHideButtons': false,
+        'productivity.focusHideMetadata': false,
+        'productivity.focusHideNav': true,
+      },
+    },
+    {
+      id: 'cleanFeed',
+      label: 'Clean Feed',
+      description: 'Hide recommendations, Shorts & guide; keep watch engagement visible',
+      values: {
+        'productivity.focusHideComments': false,
+        'productivity.focusHideChat': false,
+        'productivity.focusHideRecommendations': true,
+        'productivity.focusHideShorts': true,
+        'productivity.focusHideButtons': false,
+        'productivity.focusHideMetadata': false,
+        'productivity.focusHideNav': true,
+      },
+    },
+  ];
+
+  function isFocusPresetMatches(currentState, preset) {
+    if (!currentState || !preset || !preset.values) return false;
+    var keys = Object.keys(preset.values);
+    for (var i = 0; i < keys.length; i++) {
+      if (Boolean(getPath(currentState, keys[i])) !== Boolean(preset.values[keys[i]])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   var SECTION_GROUPS = {
     player: {
       'player.customWidth': 'Size & positioning',
@@ -1192,6 +1248,143 @@
       if (hideAllBtn) hideAllBtn.disabled = hiddenCount === FOCUS_HIDE_KEYS.length;
       var showAllBtn = mainEl.querySelector('.focus-show-all-btn');
       if (showAllBtn) showAllBtn.disabled = hiddenCount === 0;
+
+      var isFocusOn = !!getPath(state, 'productivity.focusMode');
+      var shortcut = String(getPath(state, 'keyboard.shortcuts.toggleFocus') || '').trim();
+      var statusPill = mainEl.querySelector('.focus-status-pill');
+      if (statusPill) {
+        statusPill.classList.toggle('is-on', isFocusOn);
+        statusPill.textContent = isFocusOn
+          ? 'Active on all YouTube tabs'
+          : shortcut
+            ? 'Standby — press ' + shortcut + ' for current tab'
+            : 'Standby — per-tab shortcut unbound';
+      }
+      var jumpBtn = mainEl.querySelector('.focus-shortcut-jump');
+      if (jumpBtn) {
+        jumpBtn.textContent = 'Shortcut: ' + (shortcut || 'Unbound') + ' · Change';
+      }
+      mainEl.querySelectorAll('.focus-preset-pill').forEach(function (pill) {
+        var presetId = pill.getAttribute('data-focus-preset');
+        var preset = FOCUS_PRESETS.find(function (p) {
+          return p.id === presetId;
+        });
+        pill.classList.toggle('is-active', !!preset && isFocusPresetMatches(state, preset));
+      });
+      var stage = mainEl.querySelector('.focus-stage');
+      if (stage) {
+        stage.classList.toggle('is-active', isFocusOn);
+        stage.querySelectorAll('[data-focus-key]').forEach(function (tile) {
+          var fk = tile.getAttribute('data-focus-key');
+          var isHidden = !!getPath(state, fk);
+          tile.classList.toggle('is-masked', isHidden);
+          tile.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+          var stateEl = tile.querySelector('.focus-tile-state');
+          if (stateEl) {
+            stateEl.textContent = isHidden ? (isFocusOn ? 'Hidden' : 'Will hide') : 'Visible';
+          }
+        });
+      }
+    }
+
+    function renderFocusVisualPanel(sectionEl) {
+      var box = el(doc, 'div', { class: 'tool-box focus-visual-box' });
+      var head = el(doc, 'div', { class: 'focus-preview-head' });
+      head.appendChild(el(doc, 'span', { class: 'focus-status-pill', text: '' }));
+      var shortcutBtn = el(doc, 'button', {
+        type: 'button',
+        class: 'btn btn-small focus-shortcut-jump',
+        text: '',
+      });
+      shortcutBtn.addEventListener('click', function () {
+        renderSection('keyboard');
+        var row = mainEl && mainEl.querySelector('[data-control-key="keyboard.shortcuts.toggleFocus"]');
+        if (row) {
+          if (typeof row.scrollIntoView === 'function') {
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }
+          row.classList.add('highlight');
+          setTimeout(function () {
+            row.classList.remove('highlight');
+          }, 1500);
+        }
+      });
+      head.appendChild(shortcutBtn);
+      box.appendChild(head);
+
+      var presetsRow = el(doc, 'div', { class: 'focus-presets-row' });
+      presetsRow.appendChild(el(doc, 'span', { class: 'control-preset-label', text: 'Focus presets:' }));
+      FOCUS_PRESETS.forEach(function (preset) {
+        var pill = el(doc, 'button', {
+          type: 'button',
+          class: 'focus-preset-pill',
+          'data-focus-preset': preset.id,
+          title: preset.description,
+          text: preset.label,
+        });
+        pill.addEventListener('click', function () {
+          var next = defaultsApi.deepClone(state);
+          Object.keys(preset.values).forEach(function (k) {
+            setPath(next, k, preset.values[k]);
+          });
+          replaceState(next).then(function () {
+            refreshValues();
+          });
+        });
+        presetsRow.appendChild(pill);
+      });
+      box.appendChild(presetsRow);
+
+      var makeTile = function (focusKey, label, extraClass) {
+        var tile = el(doc, 'button', {
+          type: 'button',
+          class: 'focus-stage-tile' + (extraClass ? ' ' + extraClass : ''),
+          'data-focus-key': focusKey,
+        });
+        tile.appendChild(el(doc, 'span', { class: 'focus-tile-label', text: label }));
+        tile.appendChild(el(doc, 'span', { class: 'focus-tile-state', text: '' }));
+        tile.addEventListener('click', function () {
+          var nextVal = !getPath(state, focusKey);
+          if (inputsByKey[focusKey] && inputsByKey[focusKey].set) {
+            inputsByKey[focusKey].set(nextVal);
+          }
+          setValue(focusKey, nextVal, 0);
+        });
+        return tile;
+      };
+
+      var stage = el(doc, 'div', { class: 'focus-stage' });
+      var topbar = el(doc, 'div', { class: 'focus-stage-topbar' });
+      topbar.appendChild(el(doc, 'span', { text: 'Search & Account' }));
+      topbar.appendChild(el(doc, 'span', { class: 'focus-stage-fixed-tag', text: 'Always visible' }));
+      stage.appendChild(topbar);
+
+      var body = el(doc, 'div', { class: 'focus-stage-body' });
+      body.appendChild(makeTile('productivity.focusHideNav', 'Guide', 'focus-stage-nav'));
+
+      var mainCol = el(doc, 'div', { class: 'focus-stage-main' });
+      var playerBox = el(doc, 'div', { class: 'focus-stage-player' });
+      playerBox.appendChild(el(doc, 'span', { class: 'focus-tile-label', text: 'Video player' }));
+      playerBox.appendChild(el(doc, 'span', { class: 'focus-stage-fixed-tag', text: 'Always focused' }));
+      mainCol.appendChild(playerBox);
+
+      var metaRow = el(doc, 'div', { class: 'focus-stage-row' });
+      metaRow.appendChild(makeTile('productivity.focusHideButtons', 'Buttons'));
+      metaRow.appendChild(makeTile('productivity.focusHideMetadata', 'Description'));
+      mainCol.appendChild(metaRow);
+      mainCol.appendChild(makeTile('productivity.focusHideShorts', 'Shorts'));
+      mainCol.appendChild(makeTile('productivity.focusHideComments', 'Comments'));
+      body.appendChild(mainCol);
+
+      var sideCol = el(doc, 'div', { class: 'focus-stage-side' });
+      sideCol.appendChild(makeTile('productivity.focusHideChat', 'Live chat'));
+      sideCol.appendChild(makeTile('productivity.focusHideRecommendations', 'Recommendations', 'is-tall'));
+      body.appendChild(sideCol);
+
+      stage.appendChild(body);
+      box.appendChild(stage);
+      sectionEl.appendChild(box);
+      updateProductivitySummary();
     }
 
     function updateControlModifiedState(key) {
@@ -2927,6 +3120,8 @@
             mainEl.appendChild(renderControlRow(control));
             if (section.id === 'appearance' && control.key === 'appearance.theme') {
               renderThemeVisualPanel(mainEl);
+            } else if (section.id === 'productivity' && control.key === 'productivity.focusMode') {
+              renderFocusVisualPanel(mainEl);
             }
           }
         });
@@ -3672,6 +3867,8 @@
     TOGGLE_GRID_KEYS: TOGGLE_GRID_KEYS,
     SECTION_MODULE_DEPS: SECTION_MODULE_DEPS,
     FOCUS_HIDE_KEYS: FOCUS_HIDE_KEYS,
+    FOCUS_PRESETS: FOCUS_PRESETS,
+    isFocusPresetMatches: isFocusPresetMatches,
     createOptionsApp: createOptionsApp,
   };
 
