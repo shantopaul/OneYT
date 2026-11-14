@@ -1091,6 +1091,18 @@
       updateThemeContrastPreview();
     }
 
+    function updateColorClearAllBtn() {
+      if (!mainEl) return;
+      var btn = mainEl.querySelector('.colors-clear-all-btn');
+      if (!btn) return;
+      var colors = getPath(state, 'appearance.colors') || {};
+      var count = Object.keys(colors).filter(function (k) {
+        return typeof colors[k] === 'string' && colors[k] !== '';
+      }).length;
+      btn.disabled = count === 0;
+      btn.textContent = count > 0 ? 'Clear all (' + count + ')' : 'Clear all';
+    }
+
     function updateControlModifiedState(key) {
       if (!mainEl) return;
       var row = mainEl.querySelector('[data-control-key="' + key + '"]');
@@ -1151,6 +1163,7 @@
       }
       if (currentSection === 'appearance' && key.indexOf('appearance.') === 0) {
         updateThemeContrastPreview();
+        updateColorClearAllBtn();
       }
       if (key === 'enabled' || key.indexOf('modules.') === 0) {
         updateModulesSummary();
@@ -1199,6 +1212,7 @@
       updateModulesSummary();
       updateSidebarPreview();
       updateThemeContrastPreview();
+      updateColorClearAllBtn();
       updateControlDependencies();
     }
 
@@ -2688,35 +2702,63 @@
         }
       } else {
         var groups = SECTION_GROUPS[section.id] || {};
-        var toggleRun = null;
-        var flushToggleRun = function () {
-          if (toggleRun) {
-            mainEl.appendChild(toggleRun);
-            toggleRun = null;
+        var gridRun = null;
+        var gridRunKind = '';
+        var flushGridRun = function () {
+          if (gridRun) {
+            mainEl.appendChild(gridRun);
+            gridRun = null;
+            gridRunKind = '';
           }
         };
         (section.controls || []).forEach(function (control) {
           var groupTitleText = groups[control.key];
           if (groupTitleText) {
-            flushToggleRun();
+            flushGridRun();
             var subHead = el(doc, 'div', { class: 'section-group-head' });
             var subTitle = el(doc, 'div', { class: 'section-group-title' });
             subTitle.appendChild(el(doc, 'h3', { text: groupTitleText }));
             subHead.appendChild(subTitle);
+            if (control.key === 'appearance.colors.accent') {
+              var clearAllBtn = el(doc, 'button', {
+                type: 'button',
+                class: 'btn btn-small colors-clear-all-btn',
+                text: 'Clear all',
+              });
+              clearAllBtn.addEventListener('click', function () {
+                var next = defaultsApi.deepClone(state);
+                setPath(next, 'appearance.colors', {});
+                replaceState(next).then(function () {
+                  refreshValues();
+                });
+              });
+              subHead.appendChild(clearAllBtn);
+            }
             mainEl.appendChild(subHead);
           }
+          var desiredGrid = '';
           if (control.type === 'toggle' && TOGGLE_GRID_KEYS[control.key]) {
-            if (!toggleRun) toggleRun = el(doc, 'div', { class: 'control-grid-toggles' });
-            toggleRun.appendChild(renderControlRow(control));
+            desiredGrid = 'control-grid-toggles';
+          } else if (control.type === 'color' && control.key.indexOf('appearance.colors.') === 0) {
+            desiredGrid = 'control-grid-colors';
+          }
+          if (desiredGrid) {
+            if (!gridRun || gridRunKind !== desiredGrid) {
+              flushGridRun();
+              gridRun = el(doc, 'div', { class: desiredGrid });
+              gridRunKind = desiredGrid;
+            }
+            gridRun.appendChild(renderControlRow(control));
           } else {
-            flushToggleRun();
+            flushGridRun();
             mainEl.appendChild(renderControlRow(control));
             if (section.id === 'appearance' && control.key === 'appearance.theme') {
               renderThemeVisualPanel(mainEl);
             }
           }
         });
-        flushToggleRun();
+        flushGridRun();
+        updateColorClearAllBtn();
       }
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);

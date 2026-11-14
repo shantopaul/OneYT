@@ -1575,35 +1575,60 @@ body {
 }
 
 .control-grid-modules,
-.control-grid-toggles {
+.control-grid-toggles,
+.control-grid-colors {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   transition: opacity 150ms ease;
 }
 
-.control-grid-toggles {
+.control-grid-toggles,
+.control-grid-colors {
   margin-bottom: 12px;
 }
 
 @media (max-width: 640px) {
   .control-grid-modules,
-  .control-grid-toggles {
+  .control-grid-toggles,
+  .control-grid-colors {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
 .control-grid-modules .control-row,
-.control-grid-toggles .control-row {
+.control-grid-toggles .control-row,
+.control-grid-colors .control-row {
   margin-bottom: 0;
   display: flex;
   flex-direction: column;
 }
 
 .control-grid-modules .control-foot,
-.control-grid-toggles .control-foot {
+.control-grid-toggles .control-foot,
+.control-grid-colors .control-foot {
   margin-top: auto;
   padding-top: 8px;
+}
+
+.control-grid-colors .control-row-grid {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.control-grid-colors .control-copy {
+  flex: none;
+}
+
+.control-grid-colors .control-actions {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.colors-clear-all-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .control-grid-modules.is-master-paused {
