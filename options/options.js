@@ -92,6 +92,19 @@
     return currentValue !== defaultValue;
   }
 
+  var MODULE_SECTION_MAP = {
+    'modules.player': { id: 'player', label: 'Player' },
+    'modules.sidebar': { id: 'sidebar', label: 'Sidebar' },
+    'modules.layout': { id: 'layout', label: 'Layout' },
+    'modules.appearance': { id: 'appearance', label: 'Appearance' },
+    'modules.typography': { id: 'appearance', label: 'Appearance' },
+    'modules.playback': { id: 'playback', label: 'Playback' },
+    'modules.recommendations': { id: 'sidebar', label: 'Sidebar' },
+    'modules.focus': { id: 'productivity', label: 'Productivity' },
+    'modules.keyboard': { id: 'keyboard', label: 'Keyboard' },
+    'modules.navigation': { id: 'productivity', label: 'Productivity' },
+  };
+
   // Select option sources. `settings` supplies dynamic lists
   // (speed presets); `apis` supplies themes/font data.
   function resolveSelectOptions(source, settings, apis) {
@@ -572,6 +585,25 @@
       if (badge) badge.hidden = !modified;
     }
 
+    function updateModulesSummary() {
+      if (currentSection !== 'general' || !mainEl) return;
+      var general = sectionById('general');
+      if (!general) return;
+      var moduleControls = (general.controls || []).filter(function (c) {
+        return c.key.indexOf('modules.') === 0;
+      });
+      var active = moduleControls.filter(function (c) {
+        return !!getPath(state, c.key);
+      }).length;
+      var countEl = mainEl.querySelector('.modules-active-count');
+      if (countEl) countEl.textContent = active + ' of ' + moduleControls.length + ' active';
+      var pausedEl = mainEl.querySelector('.modules-paused-pill');
+      var gridEl = mainEl.querySelector('.control-grid-modules');
+      var isMasterOn = !!getPath(state, 'enabled');
+      if (pausedEl) pausedEl.hidden = isMasterOn;
+      if (gridEl) gridEl.classList.toggle('is-master-paused', !isMasterOn);
+    }
+
     function setValue(key, value, delay) {
       setPath(state, key, value);
       if (key === 'ui.dashboardTheme') applyDashboardTheme();
@@ -580,6 +612,9 @@
       }
       if (currentSection === 'layout' && key.indexOf('layout.') === 0) {
         updateLayoutPreview();
+      }
+      if (key === 'enabled' || key.indexOf('modules.') === 0) {
+        updateModulesSummary();
       }
       updateControlModifiedState(key);
       saveSoon(delay);
@@ -608,6 +643,7 @@
           updateControlModifiedState(control.key);
         });
       });
+      updateModulesSummary();
     }
 
     function showWarning(row, message) {
@@ -1054,8 +1090,11 @@
 
     function renderControlRow(control) {
       var isToggle = control.type === 'toggle';
+      var classes = ['control-row'];
+      if (isToggle) classes.push('control-row-toggle');
+      if (control.key === 'enabled') classes.push('control-row-master');
       var row = el(doc, 'div', {
-        class: isToggle ? 'control-row control-row-toggle' : 'control-row',
+        class: classes.join(' '),
         'data-control-key': control.key,
       });
       var head = el(doc, 'div', { class: 'control-head' });
@@ -1105,6 +1144,18 @@
       });
       modBadge.hidden = !isControlModified(getPath(state, control.key), getDefault(control.key));
       foot.appendChild(modBadge);
+      var targetSection = MODULE_SECTION_MAP[control.key];
+      if (targetSection) {
+        var jumpBtn = el(doc, 'button', {
+          type: 'button',
+          class: 'control-jump-btn',
+          text: 'Configure ' + targetSection.label + ' →',
+        });
+        jumpBtn.addEventListener('click', function () {
+          renderSection(targetSection.id);
+        });
+        foot.appendChild(jumpBtn);
+      }
       row.appendChild(foot);
       row.appendChild(el(doc, 'p', { class: 'control-warning', text: '' }));
       input.bind(row);
@@ -1914,9 +1965,41 @@
         header.appendChild(resetSectionBtn);
       }
       mainEl.appendChild(header);
-      (section.controls || []).forEach(function (control) {
-        mainEl.appendChild(renderControlRow(control));
-      });
+      if (section.id === 'general') {
+        var coreControls = (section.controls || []).filter(function (c) {
+          return c.key.indexOf('modules.') !== 0;
+        });
+        var moduleControls = (section.controls || []).filter(function (c) {
+          return c.key.indexOf('modules.') === 0;
+        });
+        coreControls.forEach(function (control) {
+          mainEl.appendChild(renderControlRow(control));
+        });
+        if (moduleControls.length > 0) {
+          var groupHead = el(doc, 'div', { class: 'section-group-head' });
+          var groupTitle = el(doc, 'div', { class: 'section-group-title' });
+          groupTitle.appendChild(el(doc, 'h3', { text: 'Feature modules' }));
+          groupTitle.appendChild(el(doc, 'span', { class: 'modules-active-count', text: '' }));
+          groupHead.appendChild(groupTitle);
+          var pausedPill = el(doc, 'span', {
+            class: 'modules-paused-pill',
+            text: 'Master switch is off — modules paused on YouTube',
+          });
+          pausedPill.hidden = !!getPath(state, 'enabled');
+          groupHead.appendChild(pausedPill);
+          mainEl.appendChild(groupHead);
+          var modulesGrid = el(doc, 'div', { class: 'control-grid-modules' });
+          moduleControls.forEach(function (control) {
+            modulesGrid.appendChild(renderControlRow(control));
+          });
+          mainEl.appendChild(modulesGrid);
+          updateModulesSummary();
+        }
+      } else {
+        (section.controls || []).forEach(function (control) {
+          mainEl.appendChild(renderControlRow(control));
+        });
+      }
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);
       if (section.id === 'health') renderHealthTools(mainEl);
@@ -2625,6 +2708,7 @@
     searchKeyAction: searchKeyAction,
     resolveDashboardTheme: resolveDashboardTheme,
     countHealthStatuses: countHealthStatuses,
+    MODULE_SECTION_MAP: MODULE_SECTION_MAP,
     createOptionsApp: createOptionsApp,
   };
 

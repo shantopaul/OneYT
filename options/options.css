@@ -1208,3 +1208,105 @@ body {
   margin: 8px 0;
   color: var(--ui-text-muted);
 }
+
+/* --- General dashboard & module grid --- */
+
+.control-row-master {
+  border-color: var(--ui-border-strong);
+}
+
+.section-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 22px 0 12px;
+}
+
+.section-group-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-group-title h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.modules-active-count {
+  padding: 2px 9px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.modules-paused-pill {
+  padding: 3px 10px;
+  background: var(--ui-warning-soft);
+  border: 1px solid var(--ui-warning);
+  border-radius: 999px;
+  color: var(--ui-warning);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.modules-paused-pill[hidden],
+.control-modified-badge[hidden] {
+  display: none;
+}
+
+.control-grid-modules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  transition: opacity 150ms ease;
+}
+
+@media (max-width: 640px) {
+  .control-grid-modules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.control-grid-modules .control-row {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.control-grid-modules .control-foot {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.control-grid-modules.is-master-paused {
+  opacity: 0.65;
+}
+
+.control-jump-btn {
+  margin-left: auto;
+  padding: 2px 8px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--ui-text-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.control-jump-btn:hover {
+  color: var(--ui-text);
+  background: var(--ui-surface-hover);
+  border-color: var(--ui-border);
+}
+
+.control-jump-btn:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
