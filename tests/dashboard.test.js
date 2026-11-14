@@ -801,4 +801,25 @@ test('dashboard: row-fixer parity — Home section, feed rows, responsive column
   assert.ok(layoutCss.includes('oneyt-channel-wide'));
   assert.ok(layoutCss.includes('ytd-rich-grid-row'));
   assert.ok(layoutCss.includes('ytd-rich-grid-renderer[is-shorts-grid]'));
+
+  const focusCss = fs.readFileSync(
+    path.join(__dirname, '..', 'content', 'modules', 'focus', 'focus.css'),
+    'utf8'
+  );
+  assert.ok(
+    layoutCss.includes('html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-section-renderer:has('),
+    'hideShortsHome should collapse enclosing ytd-rich-section-renderer'
+  );
+  assert.ok(
+    layoutCss.includes('html.oneyt-enabled.oneyt-block-shorts ytd-rich-section-renderer:has('),
+    'blockShorts should collapse enclosing ytd-rich-section-renderer'
+  );
+  assert.ok(
+    layoutCss.includes('html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-section-renderer:has('),
+    'hideNewsShelf should collapse enclosing ytd-rich-section-renderer'
+  );
+  assert.ok(
+    focusCss.includes('html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts ytd-rich-section-renderer:has('),
+    'focusHideShorts should collapse enclosing ytd-rich-section-renderer'
+  );
 });
