@@ -59,27 +59,81 @@
       return store;
     }
 
+    function isContextInvalidated(err, checkGlobalRuntime) {
+      if (err && typeof err.message === 'string' && /context invalidated/i.test(err.message)) {
+        return true;
+      }
+      return (
+        (!area || checkGlobalRuntime) &&
+        typeof chrome !== 'undefined' &&
+        !!chrome.runtime &&
+        !chrome.runtime.id
+      );
+    }
+
+    // Invokes a storage API call safely: resolves to undefined when the
+    // extension context has been invalidated (extension reload/update while
+    // a YouTube tab remains open), while propagating genuine storage errors.
+    function safeCall(fn, onResult) {
+      var result;
+      try {
+        result = fn();
+      } catch (err) {
+        if (isContextInvalidated(err)) return Promise.resolve(undefined);
+        return Promise.reject(err);
+      }
+      return Promise.resolve(result).then(onResult, function (err) {
+        if (isContextInvalidated(err)) return undefined;
+        throw err;
+      });
+    }
+
+    function mirrorToSync(key, value) {
+      if (!value || typeof value !== 'object' || !value.sync || typeof value.sync !== 'object') {
+        return null;
+      }
+      if (value.sync.enabled === true) {
+        return safeCall(function () {
+          return syncStore.set({ [key]: syncableSettings(value) });
+        }).catch(function () {});
+      }
+      if (typeof syncStore.remove === 'function') {
+        return safeCall(function () {
+          return syncStore.remove(key);
+        }).catch(function () {});
+      }
+      return null;
+    }
+
     return {
       // Reads one key (or an object of defaults). Resolves to the
       // stored value, or undefined when the key is absent.
       get: function (key) {
         var s = requireStore();
-        return Promise.resolve(s.get(key)).then(function (result) {
-          return result ? result[key] : undefined;
-        });
+        return safeCall(
+          function () {
+            return s.get(key);
+          },
+          function (result) {
+            return result ? result[key] : undefined;
+          }
+        );
       },
 
       // Reads one key from the sync area. Resolves to undefined
       // when sync is unavailable or the key is absent.
       getFromSync: function (key) {
         if (!syncStore) return Promise.resolve(undefined);
-        return Promise.resolve(syncStore.get(key))
-          .then(function (result) {
+        return safeCall(
+          function () {
+            return syncStore.get(key);
+          },
+          function (result) {
             return result ? result[key] : undefined;
-          })
-          .catch(function () {
-            return undefined;
-          });
+          }
+        ).catch(function () {
+          return undefined;
+        });
       },
 
       // Writes an object of key -> value pairs to local storage.
@@ -89,44 +143,55 @@
       // never reject this promise — local is the source of truth.
       set: function (items) {
         var s = requireStore();
-        return Promise.resolve(s.set(items)).then(function () {
-          if (!syncStore) return undefined;
-          var jobs = [];
-          for (var key in items) {
-            var value = items[key];
-            if (
-              !value ||
-              typeof value !== 'object' ||
-              !value.sync ||
-              typeof value.sync !== 'object'
-            ) {
-              continue;
+        return safeCall(
+          function () {
+            return s.set(items);
+          },
+          function () {
+            if (!syncStore) return undefined;
+            var jobs = [];
+            for (var key in items) {
+              var job = mirrorToSync(key, items[key]);
+              if (job) jobs.push(job);
             }
-            if (value.sync.enabled === true) {
-              jobs.push(
-                Promise.resolve(syncStore.set({ [key]: syncableSettings(value) })).catch(
-                  function () {}
-                )
-              );
-            } else if (typeof syncStore.remove === 'function') {
-              jobs.push(Promise.resolve(syncStore.remove(key)).catch(function () {}));
-            }
+            return Promise.all(jobs).then(function () {
+              return undefined;
+            });
           }
-          return Promise.all(jobs).then(function () {
-            return undefined;
-          });
-        });
+        );
       },
 
       // Subscribes to chrome.storage.onChanged. The listener gets
       // (changes, areaName). Returns an unsubscribe function.
       onChanged: function (listener) {
-        if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.onChanged) {
+        if (
+          typeof chrome === 'undefined' ||
+          !chrome.storage ||
+          !chrome.storage.onChanged ||
+          isContextInvalidated(null, true)
+        ) {
           return function () {};
         }
-        chrome.storage.onChanged.addListener(listener);
+        try {
+          chrome.storage.onChanged.addListener(listener);
+        } catch (err) {
+          if (isContextInvalidated(err, true)) return function () {};
+          throw err;
+        }
         return function () {
-          chrome.storage.onChanged.removeListener(listener);
+          if (
+            typeof chrome === 'undefined' ||
+            !chrome.storage ||
+            !chrome.storage.onChanged ||
+            isContextInvalidated(null, true)
+          ) {
+            return;
+          }
+          try {
+            chrome.storage.onChanged.removeListener(listener);
+          } catch (err) {
+            if (!isContextInvalidated(err, true)) throw err;
+          }
         };
       },
     };
