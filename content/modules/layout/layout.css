@@ -16,7 +16,9 @@ html.oneyt-enabled.oneyt-watch-spaced #below {
 }
 
 html.oneyt-enabled.oneyt-hide-shorts-watch ytd-rich-shelf-renderer[is-shorts],
-html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts] {
+html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-hide-shorts-home ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.oneyt-enabled.oneyt-hide-shorts-home [page-subtype='home'] ytd-rich-section-renderer:has(a[href^='/shorts/']) {
   display: none;
 }
 
@@ -37,29 +39,35 @@ html.oneyt-enabled.oneyt-hide-topic-chips ytd-feed-filter-chip-bar-renderer {
  * on other pages stay. Mixes are matched two ways: a Mixes
  * shelf by title, and the individual mix cards by their
  * radio link (mixes on home are grid items, not a shelf).
- * Verify live — the title attributes are English UI text,
- * and a hidden shelf may leave an empty gap where its
- * section wrapper stays. */
-html.oneyt-enabled.oneyt-hide-live-shelf ytd-rich-shelf-renderer[title*='Live now' i] {
+ * Also hide the enclosing ytd-rich-section-renderer so custom
+ * column grids do not break onto a new row where a hidden
+ * shelf sat. */
+html.oneyt-enabled.oneyt-hide-live-shelf ytd-rich-shelf-renderer[title*='Live now' i],
+html.oneyt-enabled.oneyt-hide-live-shelf ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[title*='Live now' i]) {
   display: none;
 }
 
 html.oneyt-enabled.oneyt-hide-mixes-shelf ytd-rich-shelf-renderer[title*='Mixes' i],
+html.oneyt-enabled.oneyt-hide-mixes-shelf ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[title*='Mixes' i]),
 html.oneyt-enabled.oneyt-hide-mixes-shelf ytd-rich-item-renderer:has(a[href*='start_radio=1']) {
   display: none;
 }
 
-html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-shelf-renderer[title*='News' i] {
+html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-shelf-renderer[title*='News' i],
+html.oneyt-enabled.oneyt-hide-news-shelf ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[title*='News' i]) {
   display: none;
 }
 
 /* Block Shorts everywhere (layout.blockShorts, v1.1): one class,
- * every page. Shelves on home/watch (rich shelf) and on search /
- * subscriptions (reel shelf), the Shorts entries in the guide and
- * the mini-guide, and Shorts video cards in grids and search
- * results. Verify live — YouTube renames these elements
- * sometimes, and the Phase 6 selector audit covers them. */
+ * every page. Shelves on home/watch (rich shelf and its section
+ * wrapper) and on search / subscriptions (reel shelf), the Shorts
+ * entries in the guide and the mini-guide, and Shorts video cards
+ * in grids and search results. Verify live — YouTube renames these
+ * elements sometimes, and the Phase 6 selector audit covers them. */
 html.oneyt-enabled.oneyt-block-shorts ytd-rich-shelf-renderer[is-shorts],
+html.oneyt-enabled.oneyt-block-shorts ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='home'] ytd-rich-section-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-rich-section-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts ytd-reel-shelf-renderer,
 html.oneyt-enabled.oneyt-block-shorts ytd-guide-entry-renderer:has(a[href='/shorts']),
 html.oneyt-enabled.oneyt-block-shorts ytd-mini-guide-entry-renderer:has(a[href='/shorts']),
@@ -170,6 +178,13 @@ html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer > #contents {
 html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row,
 html.oneyt-enabled.oneyt-home-columns ytd-rich-grid-renderer:not([is-shorts-grid]) ytd-rich-grid-row > #contents {
   display: contents !important;
+}
+
+/* Collapse empty or hidden section wrappers so custom grids never break mid-row. */
+html.oneyt-enabled.oneyt-home-columns ytd-rich-section-renderer[hidden],
+html.oneyt-enabled.oneyt-home-columns ytd-rich-section-renderer:has(> #content:empty),
+html.oneyt-enabled.oneyt-home-columns ytd-rich-section-renderer:has(> #content > [hidden]:only-child) {
+  display: none;
 }
 
 /* Match skeleton loading placeholders to the chosen column count to avoid layout jump. */
