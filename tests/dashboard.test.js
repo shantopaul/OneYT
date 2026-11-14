@@ -15,6 +15,7 @@ const SECTION_FILES = [
   'health',
   'player',
   'sidebar',
+  'home',
   'layout',
   'appearance',
   'playback',
@@ -285,8 +286,9 @@ test('dashboard: manifest declares the options page and every script exists', ()
   // + shared/health.js + sections/health.js (Phase 18)
   // + shared/cssTemplates.js (Phase 20)
   // + shared/savedThemes.js (Phase 21)
-  // + shared/layoutPresets.js (Phase 22).
-  assert.equal(scripts.length, 23);
+  // + shared/layoutPresets.js (Phase 22)
+  // + sections/home.js (dedicated Home section).
+  assert.equal(scripts.length, 24);
   scripts.forEach(function (src) {
     const resolved = path.normalize(path.join(__dirname, '..', 'options', src));
     assert.ok(fs.existsSync(resolved), 'missing script: ' + src);
@@ -380,8 +382,8 @@ test('dashboard: onChanged refreshes profiles, themes and the layout preview', (
     'open Appearance section re-renders'
   );
   assert.ok(
-    src.includes("if (currentSection === 'layout') renderSection('layout');"),
-    'open Layout section re-renders so the preview updates'
+    src.includes("if (currentSection === 'home') renderSection('home');"),
+    'open Home section re-renders so the preview updates'
   );
 });
 
@@ -564,7 +566,7 @@ test('dashboard: formatDefaultValue, CONTROL_DEPENDENCIES, quick presets & Sideb
 test('dashboard: 2-col toggle grids, Layout Shorts deps, quick-picks & active preset preview', () => {
   const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
   const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
-  const layout = require('../options/sections/layout');
+  const home = require('../options/sections/home');
 
   const allDefaults = new Set(leafPaths(defaults.DEFAULT_SETTINGS));
   Object.keys(options.TOGGLE_GRID_KEYS).forEach((key) => {
@@ -589,8 +591,8 @@ test('dashboard: 2-col toggle grids, Layout Shorts deps, quick-picks & active pr
     'guideWidth notes compact mode override when compact is On'
   );
 
-  const homeColsControl = layout.controls.find((c) => c.key === 'layout.homeColumns');
-  const homeMaxWidthControl = layout.controls.find((c) => c.key === 'layout.homeMaxWidth');
+  const homeColsControl = home.controls.find((c) => c.key === 'layout.homeColumns');
+  const homeMaxWidthControl = home.controls.find((c) => c.key === 'layout.homeMaxWidth');
   assert.ok(Array.isArray(homeColsControl.presets) && homeColsControl.presets.length >= 4);
   assert.ok(Array.isArray(homeMaxWidthControl.presets) && homeMaxWidthControl.presets.length >= 3);
 
@@ -742,24 +744,37 @@ test('dashboard: Advanced notice, file picker, Copy JSON, danger zone & live sto
   assert.ok(css.includes('.about-storage-pill.is-synced'), 'synced storage pill state styled');
 });
 
-test('dashboard: row-fixer parity — feed rows, responsive columns, avatars, titles and channel layout', () => {
+test('dashboard: row-fixer parity — Home section, feed rows, responsive columns, avatars, titles and channel layout', () => {
+  const homeSection = require('../options/sections/home');
   const layoutSection = require('../options/sections/layout');
   const layoutCss = fs.readFileSync(
     path.join(__dirname, '..', 'content', 'modules', 'layout', 'layout.css'),
     'utf8'
   );
 
-  const expectedKeys = [
+  const homeExpected = [
+    'homeColumns',
     'responsiveColumns',
     'postsPerRow',
     'shelfItemsPerRow',
     'hideChannelProfile',
     'fullVideoTitles',
-    'channelWide',
-    'channelColumns',
-    'channelShelfItemsPerRow',
+    'hideShortsHome',
+    'hideTopicChips',
+    'hideLiveShelf',
+    'hideMixesShelf',
+    'hideNewsShelf',
   ];
-  expectedKeys.forEach((k) => {
+  homeExpected.forEach((k) => {
+    assert.ok(Object.prototype.hasOwnProperty.call(defaults.DEFAULT_SETTINGS.layout, k), k);
+    assert.ok(
+      homeSection.controls.some((c) => c.key === 'layout.' + k),
+      'home section has control for layout.' + k
+    );
+  });
+
+  const channelExpected = ['channelWide', 'channelColumns', 'channelShelfItemsPerRow'];
+  channelExpected.forEach((k) => {
     assert.ok(Object.prototype.hasOwnProperty.call(defaults.DEFAULT_SETTINGS.layout, k), k);
     assert.ok(
       layoutSection.controls.some((c) => c.key === 'layout.' + k),
@@ -767,8 +782,10 @@ test('dashboard: row-fixer parity — feed rows, responsive columns, avatars, ti
     );
   });
 
-  const homeCols = layoutSection.controls.find((c) => c.key === 'layout.homeColumns');
+  const homeCols = homeSection.controls.find((c) => c.key === 'layout.homeColumns');
   assert.equal(homeCols.max, 15);
+  assert.ok(homeCols.description.toLowerCase().includes('skeleton'));
+  assert.equal(options.SECTION_GROUPS.home['layout.homeColumns'], 'Feed grid & row counts');
   assert.equal(options.SECTION_GROUPS.layout['layout.channelWide'], 'Channel page');
   assert.equal(options.TOGGLE_GRID_KEYS['layout.hideChannelProfile'], true);
   assert.equal(options.TOGGLE_GRID_KEYS['layout.fullVideoTitles'], true);
