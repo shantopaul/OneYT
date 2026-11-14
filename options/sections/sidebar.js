@@ -39,7 +39,7 @@
         key: 'sidebar.scrollbarVisible',
         type: 'toggle',
         label: 'Show sidebar scrollbar',
-        description: 'Untick to hide the sidebar scrollbar.',
+        description: 'Turn off to hide the sidebar scrollbar.',
         keywords: ['sidebar', 'scrollbar', 'show', 'hide'],
       },
       {

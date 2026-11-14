@@ -84,6 +84,14 @@
     return JSON.stringify(value);
   }
 
+  function formatDefaultValue(value, control) {
+    var base = formatValue(value);
+    if (typeof value === 'number' && control && control.unit) {
+      return base + ' ' + control.unit;
+    }
+    return base;
+  }
+
   function isControlModified(currentValue, defaultValue) {
     if (currentValue === undefined && defaultValue === '') return false;
     if (Array.isArray(currentValue) || Array.isArray(defaultValue)) {
@@ -132,7 +140,8 @@
       'player.miniPlayer.size': 'Mini-player',
     },
     sidebar: {
-      'sidebar.independentScroll': 'Sidebar scrolling',
+      'sidebar.independentScroll': 'Sidebar layout & scroll',
+      'sidebar.scrollbarVisible': 'Scrollbar & scroll behaviour',
       'recommendations.hideSidebar': 'Recommendations feed',
     },
     layout: {
@@ -1190,7 +1199,7 @@
         type: 'button',
         class: 'btn btn-small control-reset',
         text: 'Reset',
-        title: 'Restore default: ' + formatValue(getDefault(control.key)),
+        title: 'Restore default: ' + formatDefaultValue(getDefault(control.key), control),
       });
       resetBtn.addEventListener('click', function () {
         var def = defaultsApi.deepClone(getDefault(control.key));
@@ -1239,7 +1248,7 @@
       foot.appendChild(
         el(doc, 'span', {
           class: 'control-default',
-          text: 'Default: ' + formatValue(getDefault(control.key)),
+          text: 'Default: ' + formatDefaultValue(getDefault(control.key), control),
         })
       );
       var modBadge = el(doc, 'span', {
@@ -2884,6 +2893,7 @@
     clampSettingsToControls: clampSettingsToControls,
     diffSettings: diffSettings,
     formatValue: formatValue,
+    formatDefaultValue: formatDefaultValue,
     isControlModified: isControlModified,
     resolveSelectOptions: resolveSelectOptions,
     selectToSetting: selectToSetting,
