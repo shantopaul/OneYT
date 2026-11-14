@@ -403,3 +403,48 @@ test('dashboard: free-text CSS controls carry a cssProperty for probe validation
     'invalid CSS warns and reverts'
   );
 });
+
+test('dashboard: countHealthStatuses tallies all status buckets accurately', () => {
+  assert.deepEqual(options.countHealthStatuses([]), {
+    total: 0,
+    working: 0,
+    broken: 0,
+    'not-seen': 0,
+    unchecked: 0,
+  });
+  assert.deepEqual(
+    options.countHealthStatuses([
+      { feature: 'Video player', status: 'working' },
+      { feature: 'Watch page layout', status: 'working' },
+      { feature: 'Recommendations sidebar', status: 'broken' },
+      { feature: 'Live shelf', status: 'not-seen' },
+      { feature: 'Home feed grid', status: 'unchecked' },
+    ]),
+    {
+      total: 5,
+      working: 2,
+      broken: 1,
+      'not-seen': 1,
+      unchecked: 1,
+    }
+  );
+});
+
+test('dashboard: UI/UX enhancements — responsive nav icons, Health grid, reactive preview & speed sync', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.html'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(html.includes('class="options-topbar-inner"'), 'topbar inner wrapper centers header');
+  assert.ok(html.includes('aria-live="polite"'), 'saved indicator announces politely');
+  assert.ok(css.includes('.toggle-switch'), 'accessible pill switch styling present');
+  assert.ok(css.includes('.toggle-input:focus-visible + .toggle-track'), 'switch focus ring');
+  assert.ok(css.includes('.health-stat-card:focus-visible'), 'health filter cards focus ring');
+  assert.ok(css.includes('.health-grid'), 'health features use responsive grid');
+  assert.ok(src.includes('doc.createElementNS(SVG_NS'), 'nav icons use SVG createElementNS');
+  assert.ok(src.includes('updateLayoutPreview()'), 'layout numbers update live preview');
+  assert.ok(
+    src.includes("inputsByKey['playback.defaultSpeed']"),
+    'speedPresets updates defaultSpeed select'
+  );
+  assert.ok(src.includes('health-stat-card'), 'health filter chips rendered');
+});
