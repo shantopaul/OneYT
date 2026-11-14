@@ -132,6 +132,138 @@
     keyboard: [{ key: 'modules.keyboard', label: 'Keyboard' }],
   };
 
+  var CONTROL_DEPENDENCIES = {
+    'sidebar.customWidth': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'sidebar.maxHeight': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'sidebar.scrollbarVisible': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'sidebar.scrollbarWidth': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.scrollbarVisible',
+        equals: true,
+        reason: 'Requires "Show sidebar scrollbar" On',
+      },
+    ],
+    'sidebar.smoothScroll': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.independentScroll',
+        equals: true,
+        reason: 'Requires "Independent sidebar scroll" On',
+      },
+    ],
+    'sidebar.scrollSensitivity': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.independentScroll',
+        equals: true,
+        reason: 'Requires "Independent sidebar scroll" On',
+      },
+    ],
+    'sidebar.playerOffset': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+      {
+        key: 'sidebar.independentScroll',
+        equals: true,
+        reason: 'Requires "Independent sidebar scroll" On',
+      },
+    ],
+    'recommendations.density': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'recommendations.cardSize': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'recommendations.showMetadata': [
+      {
+        key: 'recommendations.hideSidebar',
+        equals: false,
+        reason: 'Hidden while recommendations sidebar is hidden',
+      },
+    ],
+    'appearance.customCSS': [
+      {
+        key: 'appearance.customCSSEnabled',
+        equals: true,
+        reason: 'Turn on "Use custom CSS" to apply',
+      },
+    ],
+    'productivity.focusHideComments': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+    'productivity.focusHideChat': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+    'productivity.focusHideRecommendations': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+    'productivity.focusHideShorts': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+    'productivity.focusHideButtons': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+    'productivity.focusHideMetadata': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+    'productivity.focusHideNav': [
+      { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
+    ],
+  };
+
+  function getControlInactiveReason(key, currentState) {
+    var rules = CONTROL_DEPENDENCIES[key];
+    if (!rules || !currentState) return '';
+    for (var i = 0; i < rules.length; i++) {
+      if (getPath(currentState, rules[i].key) !== rules[i].equals) {
+        return rules[i].reason;
+      }
+    }
+    return '';
+  }
+
   var SECTION_GROUPS = {
     player: {
       'player.customWidth': 'Size & positioning',
@@ -694,6 +826,20 @@
       if (gridEl) gridEl.classList.toggle('is-master-paused', !isMasterOn);
     }
 
+    function updateControlDependencies() {
+      if (!mainEl) return;
+      mainEl.querySelectorAll('[data-control-key]').forEach(function (row) {
+        var key = row.getAttribute('data-control-key');
+        var reason = getControlInactiveReason(key, state);
+        row.classList.toggle('is-inactive-dep', !!reason);
+        var depBadge = row.querySelector('.control-dep-badge');
+        if (depBadge) {
+          depBadge.textContent = reason;
+          depBadge.hidden = !reason;
+        }
+      });
+    }
+
     function setValue(key, value, delay) {
       setPath(state, key, value);
       if (key === 'ui.dashboardTheme') applyDashboardTheme();
@@ -707,6 +853,7 @@
         updateModulesSummary();
       }
       updateControlModifiedState(key);
+      updateControlDependencies();
       saveSoon(delay);
     }
 
@@ -734,6 +881,7 @@
         });
       });
       updateModulesSummary();
+      updateControlDependencies();
     }
 
     function showWarning(row, message) {
@@ -1257,6 +1405,12 @@
       });
       modBadge.hidden = !isControlModified(getPath(state, control.key), getDefault(control.key));
       foot.appendChild(modBadge);
+      var depBadge = el(doc, 'span', {
+        class: 'control-dep-badge',
+        text: '',
+      });
+      depBadge.hidden = true;
+      foot.appendChild(depBadge);
       var targetSection = MODULE_SECTION_MAP[control.key];
       if (targetSection) {
         var jumpBtn = el(doc, 'button', {
@@ -2190,6 +2344,7 @@
       if (section.id === 'appearance') renderCssTemplateTools(mainEl);
       if (section.id === 'appearance') renderSavedThemeTools(mainEl);
       if (section.id === 'layout') renderLayoutEditorTools(mainEl);
+      updateControlDependencies();
       checkShortcutWarnings();
     }
 
@@ -2895,6 +3050,8 @@
     formatValue: formatValue,
     formatDefaultValue: formatDefaultValue,
     isControlModified: isControlModified,
+    getControlInactiveReason: getControlInactiveReason,
+    CONTROL_DEPENDENCIES: CONTROL_DEPENDENCIES,
     resolveSelectOptions: resolveSelectOptions,
     selectToSetting: selectToSetting,
     settingToSelect: settingToSelect,
