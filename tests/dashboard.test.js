@@ -560,3 +560,42 @@ test('dashboard: formatDefaultValue, CONTROL_DEPENDENCIES, quick presets & Sideb
   assert.ok(css.includes('.sidebar-preview-stage'), 'sidebar preview schematic styled');
   assert.ok(src.includes('renderSidebarPreviewTools('), 'sidebar preview rendered');
 });
+
+test('dashboard: 2-col toggle grids, Layout Shorts deps, quick-picks & active preset preview', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const layout = require('../options/sections/layout');
+
+  const allDefaults = new Set(leafPaths(defaults.DEFAULT_SETTINGS));
+  Object.keys(options.TOGGLE_GRID_KEYS).forEach((key) => {
+    assert.ok(allDefaults.has(key), 'TOGGLE_GRID_KEYS key exists in DEFAULT_SETTINGS: ' + key);
+  });
+
+  const blockState = defaults.cloneDefaults();
+  blockState.layout.blockShorts = true;
+  assert.ok(
+    options.getControlInactiveReason('layout.hideShortsHome', blockState).length > 0,
+    'hideShortsHome notes redundancy when blockShorts is On'
+  );
+  assert.ok(
+    options.getControlInactiveReason('navigation.hideShorts', blockState).length > 0,
+    'navigation.hideShorts notes redundancy when blockShorts is On'
+  );
+
+  const compactNav = defaults.cloneDefaults();
+  compactNav.navigation.compact = true;
+  assert.ok(
+    options.getControlInactiveReason('navigation.guideWidth', compactNav).length > 0,
+    'guideWidth notes compact mode override when compact is On'
+  );
+
+  const homeColsControl = layout.controls.find((c) => c.key === 'layout.homeColumns');
+  const homeMaxWidthControl = layout.controls.find((c) => c.key === 'layout.homeMaxWidth');
+  assert.ok(Array.isArray(homeColsControl.presets) && homeColsControl.presets.length >= 4);
+  assert.ok(Array.isArray(homeMaxWidthControl.presets) && homeMaxWidthControl.presets.length >= 3);
+
+  assert.ok(css.includes('.control-grid-toggles'), '2-column toggle grid styled');
+  assert.ok(css.includes('.preset-card.is-active'), 'active preset highlight styled');
+  assert.ok(css.includes('.layout-preview-thumb'), 'layout preview card thumbs styled');
+  assert.ok(src.includes('isLayoutPresetMatches('), 'layout preset matching helper exists');
+});
