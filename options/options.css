@@ -1404,6 +1404,140 @@ body {
   flex: 1 1 260px;
 }
 
+/* --- Watch sidebar live preview --- */
+
+.sidebar-preview-stage {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 12px;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  min-height: 156px;
+}
+
+.sidebar-preview-player {
+  flex: 1;
+  min-width: 0;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius-sm);
+}
+
+.sidebar-preview-tag {
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sidebar-preview-col {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px;
+  max-height: 152px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius-sm);
+  flex-shrink: 0;
+}
+
+.sidebar-preview-col.is-hidden {
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  opacity: 0.65;
+}
+
+.sidebar-preview-list {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.sidebar-preview-list.is-density-compact {
+  gap: 4px;
+}
+
+.sidebar-preview-list.is-density-comfortable {
+  gap: 10px;
+}
+
+.sidebar-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-preview-thumb {
+  height: 24px;
+  background: var(--ui-accent-soft);
+  border: 1px solid var(--ui-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.sidebar-preview-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-preview-line {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ui-border-strong);
+}
+
+.sidebar-preview-line.is-title {
+  width: 92%;
+}
+
+.sidebar-preview-line.is-sub {
+  width: 60%;
+  opacity: 0.7;
+}
+
+.sidebar-preview-scrollbar {
+  background: var(--ui-bg);
+  border-radius: 999px;
+  padding: 1px;
+  flex-shrink: 0;
+}
+
+.sidebar-preview-scrollthumb {
+  width: 100%;
+  height: 44%;
+  border-radius: 999px;
+  background: var(--ui-border-strong);
+}
+
+.sidebar-preview-scrollthumb.is-active {
+  background: var(--ui-accent);
+}
+
+@media (max-width: 560px) {
+  .sidebar-preview-stage {
+    flex-direction: column;
+  }
+
+  .sidebar-preview-col {
+    width: 100% !important;
+  }
+}
+
 .section-group-title {
   display: inline-flex;
   align-items: center;

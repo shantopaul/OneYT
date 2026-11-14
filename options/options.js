@@ -797,6 +797,99 @@
       }
     }
 
+    function updateSidebarPreview() {
+      if (!mainEl) return;
+      var summaryEl = mainEl.querySelector('.sidebar-preview-summary');
+      var stageEl = mainEl.querySelector('.sidebar-preview-stage');
+      if (!summaryEl || !stageEl) return;
+      var sb = getPath(state, 'sidebar') || {};
+      var rec = getPath(state, 'recommendations') || {};
+      var hideSidebar = !!rec.hideSidebar;
+      var customWidth = Number(sb.customWidth) || 0;
+      var sbWidthLabel = customWidth > 0 ? customWidth + ' px' : 'YouTube default';
+      var scrollLabel = sb.independentScroll ? 'Independent scroll' : 'Normal scroll';
+      var scrollbarLabel = sb.scrollbarVisible
+        ? 'Scrollbar ' + (Number(sb.scrollbarWidth) || 8) + ' px'
+        : 'Scrollbar hidden';
+      summaryEl.textContent = hideSidebar
+        ? 'Recommendations sidebar is hidden on watch pages.'
+        : sbWidthLabel +
+          ' · ' +
+          scrollLabel +
+          ' · ' +
+          scrollbarLabel +
+          ' · Density: ' +
+          (rec.density || 'default');
+
+      stageEl.textContent = '';
+      var playerBox = el(doc, 'div', { class: 'sidebar-preview-player' });
+      var offset = Math.min(Math.max(Number(sb.playerOffset) || 0, 0), 40);
+      if (sb.independentScroll && offset > 0) {
+        playerBox.style.marginTop = Math.round(offset / 2) + 'px';
+      }
+      playerBox.appendChild(el(doc, 'span', { class: 'sidebar-preview-tag', text: 'Video player' }));
+      stageEl.appendChild(playerBox);
+
+      var colWidthPx = customWidth > 0 ? Math.max(120, Math.min(240, Math.round(customWidth * 0.42))) : 168;
+      var colBox = el(doc, 'div', {
+        class: 'sidebar-preview-col' + (hideSidebar ? ' is-hidden' : ''),
+      });
+      colBox.style.width = colWidthPx + 'px';
+      if (hideSidebar) {
+        colBox.appendChild(el(doc, 'span', { class: 'sidebar-preview-tag', text: 'Sidebar hidden' }));
+        stageEl.appendChild(colBox);
+        return;
+      }
+
+      var list = el(doc, 'div', {
+        class: 'sidebar-preview-list is-density-' + (rec.density || 'default'),
+      });
+      var cardWidth = Number(rec.cardSize) || 0;
+      var thumbPx = cardWidth > 0 ? Math.max(36, Math.min(80, Math.round(cardWidth * 0.3))) : 56;
+      var showMeta = rec.showMetadata !== false;
+      for (var i = 0; i < 4; i++) {
+        var item = el(doc, 'div', { class: 'sidebar-preview-item' });
+        var thumb = el(doc, 'div', { class: 'sidebar-preview-thumb' });
+        thumb.style.width = thumbPx + 'px';
+        item.appendChild(thumb);
+        if (showMeta) {
+          var meta = el(doc, 'div', { class: 'sidebar-preview-meta' });
+          meta.appendChild(el(doc, 'span', { class: 'sidebar-preview-line is-title' }));
+          meta.appendChild(el(doc, 'span', { class: 'sidebar-preview-line is-sub' }));
+          item.appendChild(meta);
+        }
+        list.appendChild(item);
+      }
+      colBox.appendChild(list);
+
+      if (sb.scrollbarVisible) {
+        var barW = Math.max(3, Math.min(12, Number(sb.scrollbarWidth) || 8));
+        var track = el(doc, 'div', { class: 'sidebar-preview-scrollbar' });
+        track.style.width = barW + 'px';
+        var thumbBar = el(doc, 'div', {
+          class:
+            'sidebar-preview-scrollthumb' + (sb.independentScroll ? ' is-active' : ''),
+        });
+        track.appendChild(thumbBar);
+        colBox.appendChild(track);
+      }
+      stageEl.appendChild(colBox);
+    }
+
+    function renderSidebarPreviewTools(sectionEl) {
+      var box = el(doc, 'div', { class: 'tool-box sidebar-preview-box' });
+      box.appendChild(el(doc, 'h3', { text: 'Watch page preview' }));
+      box.appendChild(
+        el(doc, 'p', {
+          class: 'sidebar-preview-summary',
+          text: '',
+        })
+      );
+      box.appendChild(el(doc, 'div', { class: 'sidebar-preview-stage' }));
+      sectionEl.appendChild(box);
+      updateSidebarPreview();
+    }
+
     function updateControlModifiedState(key) {
       if (!mainEl) return;
       var row = mainEl.querySelector('[data-control-key="' + key + '"]');
@@ -849,6 +942,12 @@
       if (currentSection === 'layout' && key.indexOf('layout.') === 0) {
         updateLayoutPreview();
       }
+      if (
+        currentSection === 'sidebar' &&
+        (key.indexOf('sidebar.') === 0 || key.indexOf('recommendations.') === 0)
+      ) {
+        updateSidebarPreview();
+      }
       if (key === 'enabled' || key.indexOf('modules.') === 0) {
         updateModulesSummary();
       }
@@ -893,6 +992,7 @@
         });
       });
       updateModulesSummary();
+      updateSidebarPreview();
       updateControlDependencies();
     }
 
@@ -2377,6 +2477,7 @@
       if (section.id === 'appearance') renderCssTemplateTools(mainEl);
       if (section.id === 'appearance') renderSavedThemeTools(mainEl);
       if (section.id === 'layout') renderLayoutEditorTools(mainEl);
+      if (section.id === 'sidebar') renderSidebarPreviewTools(mainEl);
       updateControlDependencies();
       checkShortcutWarnings();
     }
