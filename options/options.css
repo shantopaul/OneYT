@@ -1574,26 +1574,34 @@ body {
   display: none;
 }
 
-.control-grid-modules {
+.control-grid-modules,
+.control-grid-toggles {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   transition: opacity 150ms ease;
 }
 
+.control-grid-toggles {
+  margin-bottom: 12px;
+}
+
 @media (max-width: 640px) {
-  .control-grid-modules {
+  .control-grid-modules,
+  .control-grid-toggles {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.control-grid-modules .control-row {
+.control-grid-modules .control-row,
+.control-grid-toggles .control-row {
   margin-bottom: 0;
   display: flex;
   flex-direction: column;
 }
 
-.control-grid-modules .control-foot {
+.control-grid-modules .control-foot,
+.control-grid-toggles .control-foot {
   margin-top: auto;
   padding-top: 8px;
 }

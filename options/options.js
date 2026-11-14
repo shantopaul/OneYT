@@ -327,6 +327,32 @@
     },
   };
 
+  var TOGGLE_GRID_KEYS = {
+    'layout.hideShortsHome': true,
+    'layout.hideShortsWatch': true,
+    'layout.hideTopicChips': true,
+    'layout.hideLiveShelf': true,
+    'layout.hideMixesShelf': true,
+    'layout.hideNewsShelf': true,
+    'navigation.hideHome': true,
+    'navigation.hideShorts': true,
+    'navigation.hideSubscriptions': true,
+    'navigation.hideLibrary': true,
+    'navigation.hideHistory': true,
+    'navigation.compact': true,
+    'player.hideEndscreen': true,
+    'player.hideLikeCount': true,
+    'player.hideViewCount': true,
+    'player.hideSubscriberCount': true,
+    'productivity.focusHideComments': true,
+    'productivity.focusHideChat': true,
+    'productivity.focusHideRecommendations': true,
+    'productivity.focusHideShorts': true,
+    'productivity.focusHideButtons': true,
+    'productivity.focusHideMetadata': true,
+    'productivity.focusHideNav': true,
+  };
+
   // Select option sources. `settings` supplies dynamic lists
   // (speed presets); `apis` supplies themes/font data.
   function resolveSelectOptions(source, settings, apis) {
@@ -2487,17 +2513,32 @@
         }
       } else {
         var groups = SECTION_GROUPS[section.id] || {};
+        var toggleRun = null;
+        var flushToggleRun = function () {
+          if (toggleRun) {
+            mainEl.appendChild(toggleRun);
+            toggleRun = null;
+          }
+        };
         (section.controls || []).forEach(function (control) {
           var groupTitleText = groups[control.key];
           if (groupTitleText) {
+            flushToggleRun();
             var subHead = el(doc, 'div', { class: 'section-group-head' });
             var subTitle = el(doc, 'div', { class: 'section-group-title' });
             subTitle.appendChild(el(doc, 'h3', { text: groupTitleText }));
             subHead.appendChild(subTitle);
             mainEl.appendChild(subHead);
           }
-          mainEl.appendChild(renderControlRow(control));
+          if (control.type === 'toggle' && TOGGLE_GRID_KEYS[control.key]) {
+            if (!toggleRun) toggleRun = el(doc, 'div', { class: 'control-grid-toggles' });
+            toggleRun.appendChild(renderControlRow(control));
+          } else {
+            flushToggleRun();
+            mainEl.appendChild(renderControlRow(control));
+          }
         });
+        flushToggleRun();
       }
       if (section.id === 'advanced') renderAdvancedTools(mainEl);
       if (section.id === 'profiles') renderProfilesTools(mainEl);
@@ -3225,6 +3266,7 @@
     countHealthStatuses: countHealthStatuses,
     MODULE_SECTION_MAP: MODULE_SECTION_MAP,
     SECTION_GROUPS: SECTION_GROUPS,
+    TOGGLE_GRID_KEYS: TOGGLE_GRID_KEYS,
     SECTION_MODULE_DEPS: SECTION_MODULE_DEPS,
     createOptionsApp: createOptionsApp,
   };
