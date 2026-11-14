@@ -823,31 +823,56 @@
       return saveNow();
     }
 
+    function isLayoutPresetMatches(preset) {
+      if (!preset || !preset.overrides || !preset.overrides.layout) return false;
+      var lo = preset.overrides.layout;
+      var cur = (state && state.layout) || {};
+      return Object.keys(lo).every(function (k) {
+        return cur[k] === lo[k];
+      });
+    }
+
     function updateLayoutPreview() {
       if (!layoutPresetsApi || !mainEl) return;
       var summaryEl = mainEl.querySelector('.layout-preview-summary');
       var gridEl = mainEl.querySelector('.layout-preview-grid');
       if (!summaryEl || !gridEl) return;
       var summary = layoutPresetsApi.layoutPreviewSummary(state);
+      var thumbSize = (state && state.layout && Number(state.layout.thumbnailSize)) || 0;
       summaryEl.textContent =
         summary.columns +
         ' columns · ' +
         summary.gap +
         ' px gap · ' +
+        (thumbSize > 0 ? thumbSize + ' px thumb · ' : '') +
         (summary.maxWidth > 0 ? 'max-width ' + summary.maxWidth + ' px' : 'full width') +
         '.';
+      var widthCap = summary.maxWidth > 0 ? Math.max(58, Math.min(96, Math.round((summary.maxWidth / 2000) * 100))) : 100;
       gridEl.setAttribute(
         'style',
-        'display: flex; gap: ' + Math.min(summary.gap, 24) + 'px; margin-top: 8px;'
+        'display: flex; gap: ' +
+          Math.min(summary.gap, 24) +
+          'px; margin: 10px auto 0; max-width: ' +
+          widthCap +
+          '%;'
       );
       gridEl.textContent = '';
       for (var i = 0; i < summary.columns; i++) {
         var cell = el(doc, 'div', { class: 'layout-preview-cell' });
-        cell.setAttribute(
-          'style',
-          'flex: 1; height: 48px; background: var(--ui-accent-soft, rgba(255, 0, 51, 0.12)); border: 1px solid var(--ui-border, #2a2a2a); border-radius: 6px;'
-        );
+        cell.appendChild(el(doc, 'div', { class: 'layout-preview-thumb' }));
+        cell.appendChild(el(doc, 'span', { class: 'layout-preview-title' }));
+        cell.appendChild(el(doc, 'span', { class: 'layout-preview-sub' }));
         gridEl.appendChild(cell);
+      }
+      if (layoutPresetsApi.LAYOUT_PRESETS) {
+        layoutPresetsApi.LAYOUT_PRESETS.forEach(function (preset) {
+          var card = mainEl.querySelector('.preset-card[data-preset-id="' + preset.id + '"]');
+          if (!card) return;
+          var active = isLayoutPresetMatches(preset);
+          card.classList.toggle('is-active', active);
+          var badge = card.querySelector('.preset-active-pill');
+          if (badge) badge.hidden = !active;
+        });
       }
     }
 
@@ -2596,7 +2621,11 @@
       );
       var layoutGrid = el(doc, 'div', { class: 'preset-grid' });
       layoutPresetsApi.LAYOUT_PRESETS.forEach(function (preset) {
-        var card = el(doc, 'div', { class: 'preset-card' });
+        var active = isLayoutPresetMatches(preset);
+        var card = el(doc, 'div', {
+          class: 'preset-card' + (active ? ' is-active' : ''),
+          'data-preset-id': preset.id,
+        });
         var head = el(doc, 'div', { class: 'preset-card-head' });
         head.appendChild(el(doc, 'strong', { class: 'preset-card-title', text: preset.name }));
         if (preset.overrides && preset.overrides.layout) {
@@ -2625,6 +2654,9 @@
         });
         var cardFoot = el(doc, 'div', { class: 'preset-card-foot' });
         cardFoot.appendChild(applyBtn);
+        var activePill = el(doc, 'span', { class: 'preset-active-pill', text: 'Active' });
+        activePill.hidden = !active;
+        cardFoot.appendChild(activePill);
         card.appendChild(cardFoot);
         layoutGrid.appendChild(card);
       });

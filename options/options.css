@@ -1662,6 +1662,11 @@ body {
   border-color: var(--ui-border-strong);
 }
 
+.preset-card.is-active {
+  border-color: var(--ui-accent);
+  background: var(--ui-surface);
+}
+
 .preset-card-head {
   display: flex;
   justify-content: space-between;
@@ -1694,6 +1699,59 @@ body {
 
 .preset-card-foot {
   margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.preset-active-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-accent);
+  background: var(--ui-accent-soft);
+  color: var(--ui-text);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.preset-active-pill[hidden] {
+  display: none;
+}
+
+.layout-preview-cell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+}
+
+.layout-preview-thumb {
+  height: 30px;
+  background: var(--ui-accent-soft);
+  border: 1px solid var(--ui-border-strong);
+  border-radius: 4px;
+}
+
+.layout-preview-title {
+  display: block;
+  height: 5px;
+  width: 85%;
+  border-radius: 3px;
+  background: var(--ui-border-strong);
+}
+
+.layout-preview-sub {
+  display: block;
+  height: 4px;
+  width: 55%;
+  border-radius: 3px;
+  background: var(--ui-border);
 }
 
 .preset-card-foot .btn {
