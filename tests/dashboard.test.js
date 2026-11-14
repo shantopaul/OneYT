@@ -515,3 +515,48 @@ test('dashboard: inline control rows, number units, section sub-groups & module 
     });
   });
 });
+
+test('dashboard: formatDefaultValue, CONTROL_DEPENDENCIES, quick presets & Sidebar live preview', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  const sidebar = require('../options/sections/sidebar');
+
+  assert.equal(options.formatDefaultValue(402, { unit: 'px' }), '402 px');
+  assert.equal(options.formatDefaultValue(true, {}), 'On');
+  assert.equal(options.formatDefaultValue('', {}), '(empty)');
+
+  const maxHeightControl = sidebar.controls.find((c) => c.key === 'sidebar.maxHeight');
+  assert.ok(Array.isArray(maxHeightControl.presets) && maxHeightControl.presets.length >= 3);
+
+  const stateHidden = defaults.cloneDefaults();
+  stateHidden.recommendations.hideSidebar = true;
+  assert.ok(
+    options.getControlInactiveReason('sidebar.customWidth', stateHidden).length > 0,
+    'sidebar.customWidth dims when recommendations sidebar is hidden'
+  );
+  const stateNoBar = defaults.cloneDefaults();
+  stateNoBar.sidebar.scrollbarVisible = false;
+  assert.ok(
+    options.getControlInactiveReason('sidebar.scrollbarWidth', stateNoBar).length > 0,
+    'sidebar.scrollbarWidth dims when scrollbar is hidden'
+  );
+  assert.equal(
+    options.getControlInactiveReason('sidebar.scrollbarWidth', defaults.cloneDefaults()),
+    '',
+    'active dependencies return empty reason'
+  );
+
+  const allDefaults = new Set(leafPaths(defaults.DEFAULT_SETTINGS));
+  Object.entries(options.CONTROL_DEPENDENCIES).forEach(([targetKey, rules]) => {
+    assert.ok(allDefaults.has(targetKey), 'dependent key exists in DEFAULT_SETTINGS: ' + targetKey);
+    rules.forEach((r) => {
+      assert.ok(allDefaults.has(r.key), 'rule parent exists in DEFAULT_SETTINGS: ' + r.key);
+      assert.ok(typeof r.reason === 'string' && r.reason.length > 0);
+    });
+  });
+
+  assert.ok(css.includes('.control-dep-badge'), 'dependency badge styled');
+  assert.ok(css.includes('.control-preset-chip'), 'quick-preset chips styled');
+  assert.ok(css.includes('.sidebar-preview-stage'), 'sidebar preview schematic styled');
+  assert.ok(src.includes('renderSidebarPreviewTools('), 'sidebar preview rendered');
+});
