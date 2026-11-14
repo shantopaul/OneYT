@@ -347,6 +347,13 @@
         hint: 'Remember volume is On — takes over once changed on YouTube',
       },
     ],
+    'layout.shelfItemsPerRow': [
+      {
+        key: 'layout.blockShorts',
+        equals: true,
+        hint: 'Block Shorts everywhere is On — Shorts shelves stay hidden; applies to other shelf cards',
+      },
+    ],
   };
 
   function getControlHint(key, currentState) {
@@ -440,7 +447,8 @@
     },
     layout: {
       'layout.blockShorts': 'Shorts & feed shelves',
-      'layout.homeColumns': 'Home grid & cards',
+      'layout.homeColumns': 'Home & feed grid',
+      'layout.channelWide': 'Channel page',
       'layout.hideComments': 'Watch page',
       'navigation.hideHome': 'Left navigation & guide',
     },
@@ -472,6 +480,8 @@
     'layout.hideLiveShelf': true,
     'layout.hideMixesShelf': true,
     'layout.hideNewsShelf': true,
+    'layout.hideChannelProfile': true,
+    'layout.fullVideoTitles': true,
     'navigation.hideHome': true,
     'navigation.hideShorts': true,
     'navigation.hideSubscriptions': true,
@@ -979,9 +989,12 @@
       if (!summaryEl || !gridEl) return;
       var summary = layoutPresetsApi.layoutPreviewSummary(state);
       var thumbSize = (state && state.layout && Number(state.layout.thumbnailSize)) || 0;
+      var responsive = !!(state && state.layout && state.layout.responsiveColumns);
       summaryEl.textContent =
         summary.columns +
-        ' columns · ' +
+        ' columns' +
+        (responsive ? ' (auto-adjust)' : '') +
+        ' · ' +
         summary.gap +
         ' px gap · ' +
         (thumbSize > 0 ? thumbSize + ' px thumb · ' : '') +
