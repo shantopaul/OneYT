@@ -2253,7 +2253,7 @@
         if (clearEl) clearEl.hidden = true;
         var row = mainEl.querySelector('[data-control-key="' + entry.key + '"]');
         if (row) {
-          row.scrollIntoView({ block: 'center' });
+          row.scrollIntoView({ block: 'center', behavior: 'smooth' });
           row.classList.add('highlight');
           setTimeout(function () {
             row.classList.remove('highlight');
@@ -2292,8 +2292,19 @@
           var item = el(doc, 'button', { type: 'button', class: 'search-result' });
           item.setAttribute('role', 'option');
           item.setAttribute('id', 'search-result-' + i);
-          item.appendChild(doc.createTextNode(entry.sectionTitle + ' — '));
-          appendHighlighted(item, entry.label, words);
+          var head = el(doc, 'div', { class: 'search-result-head' });
+          var labelEl = el(doc, 'span', { class: 'search-result-label' });
+          appendHighlighted(labelEl, entry.label, words);
+          head.appendChild(labelEl);
+          head.appendChild(
+            el(doc, 'span', { class: 'search-result-section', text: entry.sectionTitle })
+          );
+          item.appendChild(head);
+          if (entry.description) {
+            var descEl = el(doc, 'span', { class: 'search-result-desc' });
+            appendHighlighted(descEl, entry.description, words);
+            item.appendChild(descEl);
+          }
           item.addEventListener('click', function () {
             activate(entry);
           });
@@ -2349,6 +2360,23 @@
         if (resultsEl && !resultsEl.contains(event.target) && event.target !== searchEl) {
           closeResults();
         }
+      });
+      doc.addEventListener('keydown', function (event) {
+        if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+        var target = event.target;
+        var tag = target && target.tagName;
+        if (
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT' ||
+          (target && target.isContentEditable) ||
+          doc.querySelector('.control-shortcut.capturing')
+        ) {
+          return;
+        }
+        event.preventDefault();
+        searchEl.focus();
+        if (typeof searchEl.select === 'function') searchEl.select();
       });
     }
 
