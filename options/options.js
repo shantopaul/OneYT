@@ -120,6 +120,7 @@
       { key: 'modules.sidebar', label: 'Sidebar' },
       { key: 'modules.recommendations', label: 'Recommendations' },
     ],
+    home: [{ key: 'modules.layout', label: 'Layout' }],
     layout: [
       { key: 'modules.layout', label: 'Layout' },
       { key: 'modules.navigation', label: 'Navigation' },
@@ -445,9 +446,13 @@
       'sidebar.scrollbarVisible': 'Scrollbar & scroll behaviour',
       'recommendations.hideSidebar': 'Recommendations feed',
     },
+    home: {
+      'layout.homeColumns': 'Feed grid & row counts',
+      'layout.cardSpacing': 'Cards, spacing & titles',
+      'layout.hideShortsHome': 'Home feed shelves & clutter',
+    },
     layout: {
-      'layout.blockShorts': 'Shorts & feed shelves',
-      'layout.homeColumns': 'Home & feed grid',
+      'layout.blockShorts': 'Shorts & global blocking',
       'layout.channelWide': 'Channel page',
       'layout.hideComments': 'Watch page',
       'navigation.hideHome': 'Left navigation & guide',
@@ -778,6 +783,10 @@
     sidebar: [
       ['rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }],
       ['path', { d: 'M9 3v18' }],
+    ],
+    home: [
+      ['path', { d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' }],
+      ['polyline', { points: '9 22 9 12 15 12 15 22' }],
     ],
     layout: [
       ['rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }],
@@ -1461,7 +1470,7 @@
       if (key === 'playback.speedPresets' && inputsByKey['playback.defaultSpeed']) {
         inputsByKey['playback.defaultSpeed'].set(getPath(state, 'playback.defaultSpeed'));
       }
-      if (currentSection === 'layout' && key.indexOf('layout.') === 0) {
+      if (currentSection === 'home' && key.indexOf('layout.') === 0) {
         updateLayoutPreview();
       }
       if (
@@ -3338,7 +3347,7 @@
       if (section.id === 'health') renderHealthTools(mainEl);
       if (section.id === 'appearance') renderCssTemplateTools(mainEl);
       if (section.id === 'appearance') renderSavedThemeTools(mainEl);
-      if (section.id === 'layout') renderLayoutEditorTools(mainEl);
+      if (section.id === 'home') renderLayoutEditorTools(mainEl);
       if (section.id === 'sidebar') renderSidebarPreviewTools(mainEl);
       updateControlDependencies();
       checkShortcutWarnings();
@@ -3983,10 +3992,10 @@
             applyDashboardTheme();
             refreshValues();
             // The layout preview is drawn in renderSection,
-            // not in refreshValues: re-render the Layout
-            // section so an external change visibly updates
-            // the preview instead of leaving stale numbers.
-            if (currentSection === 'layout') renderSection('layout');
+            // not in refreshValues: re-render the Home section
+            // so an external change visibly updates the preview
+            // instead of leaving stale numbers.
+            if (currentSection === 'home') renderSection('home');
           });
         }
       });
@@ -4095,6 +4104,7 @@
       'health',
       'player',
       'sidebar',
+      'home',
       'layout',
       'appearance',
       'playback',
