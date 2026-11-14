@@ -1314,6 +1314,10 @@ body {
   margin: 22px 0 12px;
 }
 
+.section-header + .section-group-head {
+  margin-top: 6px;
+}
+
 .section-group-title {
   display: inline-flex;
   align-items: center;

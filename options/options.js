@@ -105,6 +105,40 @@
     'modules.navigation': { id: 'productivity', label: 'Productivity' },
   };
 
+  var SECTION_GROUPS = {
+    player: {
+      'player.customWidth': 'Size & positioning',
+      'player.borderRadius': 'Frame & spacing',
+      'player.hideEndscreen': 'Clean watch overlay',
+      'player.miniPlayer.size': 'Mini-player',
+    },
+    sidebar: {
+      'sidebar.independentScroll': 'Sidebar scrolling',
+      'recommendations.hideSidebar': 'Recommendations feed',
+    },
+    layout: {
+      'layout.blockShorts': 'Shorts & feed shelves',
+      'layout.homeColumns': 'Home grid & cards',
+      'layout.hideComments': 'Watch page',
+      'navigation.hideHome': 'Left navigation & guide',
+    },
+    appearance: {
+      'appearance.theme': 'Theme preset',
+      'appearance.colors.accent': 'Custom colours',
+      'appearance.typography.fontFamily': 'Typography',
+      'appearance.borderRadius': 'Radius & spacing',
+      'appearance.customCSSEnabled': 'Custom CSS',
+    },
+    playback: {
+      'playback.defaultSpeed': 'Speed & volume',
+      'playback.autoplay': 'Quality, autoplay & captions',
+    },
+    productivity: {
+      'productivity.focusMode': 'Focus mode',
+      'productivity.focusHideComments': 'Hidden elements in focus mode',
+    },
+  };
+
   // Select option sources. `settings` supplies dynamic lists
   // (speed presets); `apis` supplies themes/font data.
   function resolveSelectOptions(source, settings, apis) {
@@ -2059,7 +2093,16 @@
           updateModulesSummary();
         }
       } else {
+        var groups = SECTION_GROUPS[section.id] || {};
         (section.controls || []).forEach(function (control) {
+          var groupTitleText = groups[control.key];
+          if (groupTitleText) {
+            var subHead = el(doc, 'div', { class: 'section-group-head' });
+            var subTitle = el(doc, 'div', { class: 'section-group-title' });
+            subTitle.appendChild(el(doc, 'h3', { text: groupTitleText }));
+            subHead.appendChild(subTitle);
+            mainEl.appendChild(subHead);
+          }
           mainEl.appendChild(renderControlRow(control));
         });
       }
@@ -2783,6 +2826,7 @@
     resolveDashboardTheme: resolveDashboardTheme,
     countHealthStatuses: countHealthStatuses,
     MODULE_SECTION_MAP: MODULE_SECTION_MAP,
+    SECTION_GROUPS: SECTION_GROUPS,
     createOptionsApp: createOptionsApp,
   };
 
