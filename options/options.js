@@ -251,6 +251,34 @@
     'productivity.focusHideNav': [
       { key: 'productivity.focusMode', equals: true, reason: 'Applies when Focus Mode is On' },
     ],
+    'layout.hideShortsHome': [
+      {
+        key: 'layout.blockShorts',
+        equals: false,
+        reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'layout.hideShortsWatch': [
+      {
+        key: 'layout.blockShorts',
+        equals: false,
+        reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'navigation.hideShorts': [
+      {
+        key: 'layout.blockShorts',
+        equals: false,
+        reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'navigation.guideWidth': [
+      {
+        key: 'navigation.compact',
+        equals: false,
+        reason: 'Overridden while "Compact guide" is On',
+      },
+    ],
   };
 
   function getControlInactiveReason(key, currentState) {
