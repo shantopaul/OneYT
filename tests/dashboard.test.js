@@ -485,3 +485,33 @@ test('dashboard: preset card grids, semantic notices, theme swatches & Enter sub
   assert.ok(src.includes('function bindEnterSubmit('), 'Enter key form submission helper exists');
   assert.ok(src.includes('theme-swatch-dot'), 'saved theme color swatch dots rendered');
 });
+
+test('dashboard: inline control rows, number units, section sub-groups & module deps match schemas', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.css'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'options', 'options.js'), 'utf8');
+  assert.ok(css.includes('.control-row-grid'), '2-sided compact control row grid styled');
+  assert.ok(css.includes('.control-number-unit'), 'unit pill styled next to number input');
+  assert.ok(css.includes('.module-status-banner'), 'disabled module warning banner styled');
+  assert.ok(src.includes('control-row-inline'), 'inline class applied to compact controls');
+  assert.ok(src.includes('renderModuleStatusBanner('), 'module status banner helper rendered');
+
+  const sections = loadSections();
+  const byId = Object.fromEntries(sections.map((s) => [s.id, s]));
+  Object.entries(options.SECTION_GROUPS).forEach(([sectionId, groups]) => {
+    const sec = byId[sectionId];
+    assert.ok(sec, 'SECTION_GROUPS references real section ' + sectionId);
+    const controlKeys = new Set(sec.controls.map((c) => c.key));
+    Object.keys(groups).forEach((key) => {
+      assert.ok(controlKeys.has(key), 'SECTION_GROUPS key ' + key + ' missing in ' + sectionId);
+    });
+  });
+
+  const allDefaults = new Set(leafPaths(defaults.DEFAULT_SETTINGS));
+  Object.entries(options.SECTION_MODULE_DEPS).forEach(([sectionId, deps]) => {
+    assert.ok(byId[sectionId], 'SECTION_MODULE_DEPS references real section ' + sectionId);
+    assert.ok(Array.isArray(deps) && deps.length > 0, 'non-empty deps for ' + sectionId);
+    deps.forEach((dep) => {
+      assert.ok(allDefaults.has(dep.key), 'module key ' + dep.key + ' exists in DEFAULT_SETTINGS');
+    });
+  });
+});
