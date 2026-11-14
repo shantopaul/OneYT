@@ -327,6 +327,89 @@
     return node;
   }
 
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  // Vector paths (24x24 viewBox) built with createElementNS —
+  // never innerHTML — so section nav stays CSP/security-clean.
+  var SECTION_ICONS = {
+    general: [
+      ['circle', { cx: '12', cy: '12', r: '3' }],
+      [
+        'path',
+        {
+          d: 'M12 2v3m0 14v3M4.93 4.93l2.12 2.12m9.9 9.9l2.12 2.12M2 12h3m14 0h3M4.93 19.07l2.12-2.12m9.9-9.9l2.12-2.12',
+        },
+      ],
+    ],
+    profiles: [['path', { d: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z' }]],
+    health: [['path', { d: 'M22 12h-4l-3 9L9 3l-3 9H2' }]],
+    player: [
+      ['rect', { x: '2', y: '4', width: '20', height: '16', rx: '2' }],
+      ['polygon', { points: '10 9 16 12 10 15 10 9' }],
+    ],
+    sidebar: [
+      ['rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }],
+      ['path', { d: 'M9 3v18' }],
+    ],
+    layout: [
+      ['rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }],
+      ['rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' }],
+      ['rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' }],
+      ['rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' }],
+    ],
+    appearance: [
+      [
+        'path',
+        {
+          d: 'M12 3a9 9 0 0 0 0 18h1a2 2 0 0 0 2-2v-.5a1.5 1.5 0 0 1 1.5-1.5H18a3 3 0 0 0 3-3A9 9 0 0 0 12 3z',
+        },
+      ],
+      ['circle', { cx: '8', cy: '11', r: '1' }],
+      ['circle', { cx: '11', cy: '7.5', r: '1' }],
+      ['circle', { cx: '15', cy: '8.5', r: '1' }],
+    ],
+    playback: [
+      ['polygon', { points: '13 19 22 12 13 5 13 19' }],
+      ['polygon', { points: '2 19 11 12 2 5 2 19' }],
+    ],
+    productivity: [
+      ['circle', { cx: '12', cy: '12', r: '9' }],
+      ['circle', { cx: '12', cy: '12', r: '5' }],
+      ['circle', { cx: '12', cy: '12', r: '1' }],
+    ],
+    keyboard: [
+      ['rect', { x: '2', y: '5', width: '20', height: '14', rx: '2' }],
+      ['path', { d: 'M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10' }],
+    ],
+    advanced: [
+      ['path', { d: 'M16 18l6-6-6-6' }],
+      ['path', { d: 'M8 6l-6 6 6 6' }],
+    ],
+  };
+
+  function svgIcon(doc, sectionId, className) {
+    if (typeof doc.createElementNS !== 'function') return null;
+    var shapes = SECTION_ICONS[sectionId] || SECTION_ICONS.general;
+    var svg = doc.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '1.75');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    if (className) svg.setAttribute('class', className);
+    shapes.forEach(function (spec) {
+      var child = doc.createElementNS(SVG_NS, spec[0]);
+      var attrs = spec[1];
+      for (var key in attrs) {
+        child.setAttribute(key, attrs[key]);
+      }
+      svg.appendChild(child);
+    });
+    return svg;
+  }
+
   function createOptionsApp(deps) {
     var doc = deps.document;
     var storage = deps.storage;
@@ -1674,15 +1757,17 @@
       });
       mainEl.textContent = '';
       var header = el(doc, 'div', { class: 'section-header' });
-      header.appendChild(el(doc, 'h2', { text: section.title }));
+      var headerCopy = el(doc, 'div', { class: 'section-header-copy' });
+      headerCopy.appendChild(el(doc, 'h2', { text: section.title }));
       if (section.description) {
-        header.appendChild(el(doc, 'p', { class: 'section-desc', text: section.description }));
+        headerCopy.appendChild(el(doc, 'p', { class: 'section-desc', text: section.description }));
       }
+      header.appendChild(headerCopy);
       if ((section.controls || []).length > 0) {
         var resetSectionBtn = el(doc, 'button', {
           type: 'button',
-          class: 'btn btn-small',
-          text: 'Reset this section',
+          class: 'btn btn-small section-reset-btn',
+          text: 'Reset section',
         });
         resetSectionBtn.addEventListener('click', function () {
           var next = defaultsApi.deepClone(state);
@@ -1860,6 +1945,21 @@
       sectionEl.appendChild(listBox);
     }
 
+    function updateHealthNavBadge() {
+      if (!navEl) return;
+      var healthBtn = navEl.querySelector('.nav-item[data-section="health"]');
+      if (!healthBtn) return;
+      var dot = healthBtn.querySelector('.nav-status-dot');
+      if (!dot) return;
+      var broken =
+        healthApi &&
+        healthApi.summarizeHealth &&
+        healthApi.summarizeHealth(healthRecord).status === 'broken';
+      dot.style.display = broken ? 'inline-block' : 'none';
+      if (broken) dot.setAttribute('title', 'Some features need attention');
+      else dot.removeAttribute('title');
+    }
+
     function renderNav() {
       navEl.textContent = '';
       sections.forEach(function (section) {
@@ -1867,13 +1967,21 @@
           type: 'button',
           class: 'nav-item',
           'data-section': section.id,
-          text: section.title,
         });
+        var icon = svgIcon(doc, section.id, 'nav-icon');
+        if (icon) btn.appendChild(icon);
+        btn.appendChild(el(doc, 'span', { class: 'nav-label', text: section.title }));
+        if (section.id === 'health') {
+          var dot = el(doc, 'span', { class: 'nav-status-dot', 'aria-hidden': 'true' });
+          dot.style.display = 'none';
+          btn.appendChild(dot);
+        }
         btn.addEventListener('click', function () {
           renderSection(section.id);
         });
         navEl.appendChild(btn);
       });
+      updateHealthNavBadge();
     }
 
     function appendHighlighted(parent, text, words) {
@@ -2106,6 +2214,7 @@
         .get(HEALTH_KEY)
         .then(function (stored) {
           healthRecord = healthApi ? healthApi.validateHealthRecord(stored) : {};
+          updateHealthNavBadge();
           if (currentSection === 'health') renderSection('health');
         })
         .catch(function () {});
@@ -2133,6 +2242,7 @@
       bindSearch();
       return load().then(function () {
         applyDashboardTheme();
+        updateHealthNavBadge();
         if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
           window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
             if (getPath(state, 'ui.dashboardTheme') === 'system') applyDashboardTheme();
