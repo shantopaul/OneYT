@@ -5,7 +5,7 @@ const defaults = require('../shared/defaults');
 const { createFakeElement, createFakeDocument, createFakeDom, quietLogger } = require('./fake-dom');
 const { createSidebarModule } = require('../content/modules/sidebar/sidebar');
 const { createPlayerModule } = require('../content/modules/player/player');
-const { createLayoutModule, shortsWatchUrl } = require('../content/modules/layout/layout');
+const { createLayoutModule, shortsWatchUrl, isShortsUrl } = require('../content/modules/layout/layout');
 const { createNavigationModule } = require('../content/modules/navigation/navigation');
 
 function settingsWith(patch) {
@@ -497,6 +497,107 @@ test('layout: blockShorts sets the class on every page type and redirects off /s
   mod.apply(settingsWith({ layout: { blockShorts: true } }), 'watch');
   mod.disable();
   assert.equal(doc._root._classes.has('oneyt-block-shorts'), false);
+});
+
+test('layout: isShortsUrl matches YouTube /shorts paths and full URLs only', () => {
+  assert.equal(isShortsUrl('/shorts/RcN-GvhiIpQ'), true);
+  assert.equal(isShortsUrl('/shorts/RcN-GvhiIpQ/'), true);
+  assert.equal(isShortsUrl('/shorts'), true);
+  assert.equal(isShortsUrl('https://www.youtube.com/shorts/RcN-GvhiIpQ'), true);
+  assert.equal(isShortsUrl('https://m.youtube.com/shorts/RcN-GvhiIpQ?feature=share'), true);
+  assert.equal(isShortsUrl('https://www.youtube.com/watch?v=RcN-GvhiIpQ'), false);
+  assert.equal(isShortsUrl('https://example.com/shorts/RcN-GvhiIpQ'), false);
+  assert.equal(isShortsUrl(''), false);
+  assert.equal(isShortsUrl(null), false);
+});
+
+test('layout: removeAllShorts hides all Shorts, blocks /shorts/ URLs (never opens), and cleans up listeners', () => {
+  const doc = createFakeDocument();
+  const docListeners = new Map();
+  doc.addEventListener = (type, fn) => {
+    if (!docListeners.has(type)) docListeners.set(type, new Set());
+    docListeners.get(type).add(fn);
+  };
+  doc.removeEventListener = (type, fn) => {
+    if (docListeners.has(type)) docListeners.get(type).delete(fn);
+  };
+  let paused = 0;
+  const fakeVideo = { muted: false, pause: () => { paused++; } };
+  doc.querySelectorAll = (sel) => (sel === 'video' ? [fakeVideo] : []);
+
+  const winListeners = new Map();
+  const win = {
+    addEventListener: (type, fn) => {
+      if (!winListeners.has(type)) winListeners.set(type, new Set());
+      winListeners.get(type).add(fn);
+    },
+    removeEventListener: (type, fn) => {
+      if (winListeners.has(type)) winListeners.get(type).delete(fn);
+    },
+  };
+
+  const redirected = [];
+  const mod = createLayoutModule({
+    document: doc,
+    window: win,
+    location: { pathname: '/shorts/RcN-GvhiIpQ' },
+    redirect: (url) => redirected.push(url),
+  });
+
+  // Precedence over blockShorts: redirects to / (never /watch?v=...) and stops Shorts video.
+  mod.apply(settingsWith({ layout: { removeAllShorts: true, blockShorts: true } }), 'shorts');
+  assert.deepEqual(redirected, ['/']);
+  assert.equal(paused, 1);
+  assert.equal(fakeVideo.muted, true);
+  assert.equal(doc._root._classes.has('oneyt-block-shorts'), true);
+  assert.equal(doc._root._classes.has('oneyt-remove-all-shorts'), true);
+
+  // Intercepts link clicks on /shorts/ URLs so they do not open at all.
+  let prevented = false;
+  let stopped = false;
+  const shortsAnchor = { getAttribute: (n) => (n === 'href' ? '/shorts/RcN-GvhiIpQ' : null) };
+  for (const fn of docListeners.get('click') || []) {
+    fn({
+      target: { closest: () => shortsAnchor },
+      preventDefault: () => { prevented = true; },
+      stopPropagation: () => { stopped = true; },
+      stopImmediatePropagation: () => {},
+    });
+  }
+  assert.equal(prevented, true);
+  assert.equal(stopped, true);
+
+  // Intercepts non-Shorts anchor normally (no preventDefault).
+  let watchPrevented = false;
+  const watchAnchor = { getAttribute: (n) => (n === 'href' ? '/watch?v=dQw4w9WgXcQ' : null) };
+  for (const fn of docListeners.get('click') || []) {
+    fn({
+      target: { closest: () => watchAnchor },
+      preventDefault: () => { watchPrevented = true; },
+      stopPropagation: () => {},
+    });
+  }
+  assert.equal(watchPrevented, false);
+
+  // Intercepts yt-navigate-start targeting /shorts/.
+  let navPrevented = false;
+  for (const fn of winListeners.get('yt-navigate-start') || []) {
+    fn({
+      detail: {
+        endpoint: { commandMetadata: { webCommandMetadata: { url: '/shorts/RcN-GvhiIpQ' } } },
+      },
+      preventDefault: () => { navPrevented = true; },
+      stopPropagation: () => {},
+    });
+  }
+  assert.equal(navPrevented, true);
+
+  // disable() clears classes and detaches click/navigation interceptors.
+  mod.disable();
+  assert.equal(doc._root._classes.has('oneyt-block-shorts'), false);
+  assert.equal(doc._root._classes.has('oneyt-remove-all-shorts'), false);
+  assert.equal((docListeners.get('click') || new Set()).size, 0);
+  assert.equal((winListeners.get('yt-navigate-start') || new Set()).size, 0);
 });
 
 test('layout: hide comments + watch spacing on watch; cleanup elsewhere', () => {

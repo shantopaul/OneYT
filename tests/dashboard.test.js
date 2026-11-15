@@ -837,4 +837,20 @@ test('dashboard: row-fixer parity — Home section, feed rows, responsive column
     focusCss.includes('html.oneyt-enabled.oneyt-focus.oneyt-focus-hide-shorts ytd-rich-section-renderer:has('),
     'focusHideShorts should collapse enclosing ytd-rich-section-renderer'
   );
+
+  // removeAllShorts control in Home, dependencies, and full Shorts removal CSS rules.
+  const removeShortsCtrl = homeSection.controls.find((c) => c.key === 'layout.removeAllShorts');
+  assert.ok(removeShortsCtrl && removeShortsCtrl.type === 'toggle');
+  assert.equal(options.SECTION_GROUPS.home['layout.removeAllShorts'], 'Home feed shelves & clutter');
+
+  const removeState = defaults.cloneDefaults();
+  removeState.layout.removeAllShorts = true;
+  assert.ok(options.getControlInactiveReason('layout.hideShortsHome', removeState).length > 0);
+  assert.ok(options.getControlInactiveReason('navigation.hideShorts', removeState).length > 0);
+  assert.ok(options.getControlInactiveReason('layout.blockShorts', removeState).length > 0);
+  assert.ok(options.getControlHint('layout.shelfItemsPerRow', removeState).length > 0);
+
+  assert.ok(layoutCss.includes('oneyt-remove-all-shorts ytd-shorts'));
+  assert.ok(layoutCss.includes('ytm-shorts-lockup-view-model'));
+  assert.ok(layoutCss.includes("grid-shelf-view-model:has(a[href^='/shorts/'])"));
 });
