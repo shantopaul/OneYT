@@ -66,6 +66,7 @@
         },
         layout: {
           blockShorts: false,
+          removeAllShorts: false,
           hideShortsHome: false,
           hideShortsWatch: false,
           hideTopicChips: false,

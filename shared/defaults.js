@@ -87,6 +87,7 @@
 
     layout: {
       blockShorts: false, // v1.1: hide Shorts everywhere + open /shorts/ links as normal videos
+      removeAllShorts: false, // totally hide all Shorts across YouTube + block /shorts/ URLs from opening
       hideShortsHome: false,
       hideShortsWatch: false,
       hideTopicChips: false, // hide the topic filter chips row on the home feed
