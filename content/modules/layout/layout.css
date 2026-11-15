@@ -69,15 +69,33 @@ html.oneyt-enabled.oneyt-block-shorts ytd-rich-section-renderer:has(ytd-rich-she
 html.oneyt-enabled.oneyt-block-shorts [page-subtype='home'] ytd-rich-section-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-rich-section-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts ytd-reel-shelf-renderer,
+html.oneyt-enabled.oneyt-block-shorts grid-shelf-view-model:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts ytd-guide-entry-renderer:has(a[href='/shorts']),
+html.oneyt-enabled.oneyt-block-shorts ytd-guide-entry-renderer:has(a[href^='/shorts']),
+html.oneyt-enabled.oneyt-block-shorts ytd-guide-entry-renderer:has(a[title='Shorts']),
 html.oneyt-enabled.oneyt-block-shorts ytd-mini-guide-entry-renderer:has(a[href='/shorts']),
+html.oneyt-enabled.oneyt-block-shorts ytd-mini-guide-entry-renderer:has(a[href^='/shorts']),
+html.oneyt-enabled.oneyt-block-shorts ytd-mini-guide-entry-renderer:has(a[title='Shorts']),
 html.oneyt-enabled.oneyt-block-shorts ytd-rich-item-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts ytd-video-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts ytd-compact-video-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts yt-lockup-view-model:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts ytm-shorts-lockup-view-model,
+html.oneyt-enabled.oneyt-block-shorts ytm-shorts-lockup-view-model-v2,
+html.oneyt-enabled.oneyt-block-shorts ytd-reel-item-renderer,
+html.oneyt-enabled.oneyt-block-shorts ytd-playlist-video-renderer:has(a[href^='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts ytd-notification-renderer:has(a[href*='/shorts/']),
+html.oneyt-enabled.oneyt-block-shorts ytd-rich-grid-renderer[is-shorts-grid],
 html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-item-section-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts [page-subtype='subscriptions'] ytd-grid-video-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts [page-subtype='channels'] ytd-item-section-renderer:has(a[href^='/shorts/']),
 html.oneyt-enabled.oneyt-block-shorts [page-subtype='hashtag-landing-page'] ytd-rich-item-renderer:has(a[href^='/shorts/']) {
-  display: none;
+  display: none !important;
+}
+
+/* Hard-block Shorts player UI while redirecting /shorts/ URLs (layout.removeAllShorts). */
+html.oneyt-enabled.oneyt-remove-all-shorts ytd-shorts {
+  display: none !important;
 }
 
 /* Channel-page Shorts tab (layout.blockShorts, v1.11): the
