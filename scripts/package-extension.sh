@@ -21,9 +21,9 @@ OUT="oneyt-${VERSION}.zip"
 python3 - <<'PY'
 import json, os, sys
 m = json.load(open('manifest.json'))
-cs = m['content_scripts'][0]
+cs_files = [f for cs in m['content_scripts'] for f in cs.get('js', []) + cs.get('css', [])]
 files = ['background/service-worker.js', 'popup/popup.html', m['options_page']] \
-    + cs['js'] + cs['css'] + [m['icons'][k] for k in m['icons']]
+    + cs_files + [m['icons'][k] for k in m['icons']]
 missing = [f for f in files if not os.path.exists(f)]
 if missing:
     print('missing files:', missing, file=sys.stderr)

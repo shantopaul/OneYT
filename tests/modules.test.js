@@ -6,6 +6,13 @@ const { createFakeElement, createFakeDocument, createFakeDom, quietLogger } = re
 const { createSidebarModule } = require('../content/modules/sidebar/sidebar');
 const { createPlayerModule } = require('../content/modules/player/player');
 const { createLayoutModule, shortsWatchUrl, isShortsUrl } = require('../content/modules/layout/layout');
+const {
+  SETTINGS_KEY,
+  SHORTS_CACHE_KEY,
+  modeFromSettings,
+  redirectTarget,
+  runEarlyShortsBlock,
+} = require('../content/early-shorts-block');
 const { createNavigationModule } = require('../content/modules/navigation/navigation');
 
 function settingsWith(patch) {
@@ -598,6 +605,142 @@ test('layout: removeAllShorts hides all Shorts, blocks /shorts/ URLs (never open
   assert.equal(doc._root._classes.has('oneyt-remove-all-shorts'), false);
   assert.equal((docListeners.get('click') || new Set()).size, 0);
   assert.equal((winListeners.get('yt-navigate-start') || new Set()).size, 0);
+});
+
+test('layout: syncs localStorage oneyt.shortsBlockMode across remove, watch, off, and disable', () => {
+  const store = new Map();
+  const ls = {
+    getItem: (k) => (store.has(k) ? store.get(k) : null),
+    setItem: (k, v) => store.set(k, String(v)),
+  };
+  const doc = createFakeDocument();
+  const mod = createLayoutModule({
+    document: doc,
+    location: { pathname: '/' },
+    localStorage: ls,
+    redirect: () => {},
+  });
+
+  mod.apply(settingsWith({ layout: { removeAllShorts: true, blockShorts: false } }), 'home');
+  assert.equal(store.get(SHORTS_CACHE_KEY), 'remove');
+
+  mod.apply(settingsWith({ layout: { removeAllShorts: false, blockShorts: true } }), 'home');
+  assert.equal(store.get(SHORTS_CACHE_KEY), 'watch');
+
+  mod.apply(settingsWith({ layout: { removeAllShorts: false, blockShorts: false } }), 'home');
+  assert.equal(store.get(SHORTS_CACHE_KEY), 'off');
+
+  mod.apply(settingsWith({ layout: { removeAllShorts: true } }), 'home');
+  assert.equal(store.get(SHORTS_CACHE_KEY), 'remove');
+  mod.disable();
+  assert.equal(store.get(SHORTS_CACHE_KEY), 'off');
+});
+
+test('early-shorts-block: synchronous localStorage hit stops load and replaces URL with 0ms delay', () => {
+  const lsStore = new Map([[SHORTS_CACHE_KEY, 'remove']]);
+  const ls = {
+    getItem: (k) => (lsStore.has(k) ? lsStore.get(k) : null),
+    setItem: (k, v) => lsStore.set(k, String(v)),
+  };
+
+  let stopped = 0;
+  const replaced = [];
+  const doc = { documentElement: { style: {} } };
+  const outcome = runEarlyShortsBlock({
+    location: { pathname: '/shorts/RcN-GvhiIpQ', replace: (u) => replaced.push(u) },
+    window: { stop: () => stopped++ },
+    document: doc,
+    localStorage: ls,
+    storage: null,
+  });
+
+  assert.equal(outcome, 'redirected-sync');
+  assert.equal(stopped, 1);
+  assert.deepEqual(replaced, ['/']);
+  assert.equal(doc.documentElement.style.display, 'none');
+
+  // Watch mode cache redirects /shorts/<id> synchronously to /watch?v=<id>.
+  lsStore.set(SHORTS_CACHE_KEY, 'watch');
+  const watchReplaced = [];
+  const watchDoc = { documentElement: { style: {} } };
+  const watchOutcome = runEarlyShortsBlock({
+    location: { pathname: '/shorts/RcN-GvhiIpQ', replace: (u) => watchReplaced.push(u) },
+    window: { stop: () => stopped++ },
+    document: watchDoc,
+    localStorage: ls,
+    storage: null,
+  });
+
+  assert.equal(watchOutcome, 'redirected-sync');
+  assert.equal(stopped, 2);
+  assert.deepEqual(watchReplaced, ['/watch?v=RcN-GvhiIpQ']);
+});
+
+test('early-shorts-block: stale or empty cache hides visibility while confirming chrome.storage.local', async () => {
+  assert.equal(modeFromSettings(null), 'off');
+  assert.equal(modeFromSettings({ enabled: false, layout: { removeAllShorts: true } }), 'off');
+  assert.equal(modeFromSettings({ enabled: true, modules: { layout: false }, layout: { removeAllShorts: true } }), 'off');
+  assert.equal(redirectTarget('/watch?v=RcN-GvhiIpQ', 'remove'), null);
+
+  // Case 1: localStorage stale ('off'), storage says removeAllShorts = true -> no flash, async redirect to /.
+  const lsStore = new Map([[SHORTS_CACHE_KEY, 'off']]);
+  const ls = {
+    getItem: (k) => (lsStore.has(k) ? lsStore.get(k) : null),
+    setItem: (k, v) => lsStore.set(k, String(v)),
+  };
+  let stopped = 0;
+  const replaced = [];
+  const doc = { documentElement: { style: {} } };
+  const promise = runEarlyShortsBlock({
+    location: { pathname: '/shorts/RcN-GvhiIpQ', replace: (u) => replaced.push(u) },
+    window: { stop: () => stopped++ },
+    document: doc,
+    localStorage: ls,
+    storage: {
+      get: async () => ({
+        [SETTINGS_KEY]: { enabled: true, modules: { layout: true }, layout: { removeAllShorts: true } },
+      }),
+    },
+  });
+  // Before async storage resolves, document visibility is hidden to prevent paint flash.
+  assert.equal(doc.documentElement.style.visibility, 'hidden');
+  assert.equal(await promise, 'redirected-async');
+  assert.equal(stopped, 1);
+  assert.deepEqual(replaced, ['/']);
+  assert.equal(doc.documentElement.style.display, 'none');
+  assert.equal(lsStore.get(SHORTS_CACHE_KEY), 'remove');
+
+  // Case 2: storage says blocking is OFF -> visibility is cleanly restored, no redirect.
+  lsStore.clear();
+  const allowedDoc = { documentElement: { style: {} } };
+  const allowedReplaced = [];
+  const allowedOutcome = await runEarlyShortsBlock({
+    location: { pathname: '/shorts/RcN-GvhiIpQ', replace: (u) => allowedReplaced.push(u) },
+    window: { stop: () => stopped++ },
+    document: allowedDoc,
+    localStorage: ls,
+    storage: {
+      get: async () => ({
+        [SETTINGS_KEY]: { enabled: true, modules: { layout: true }, layout: { removeAllShorts: false, blockShorts: false } },
+      }),
+    },
+  });
+  assert.equal(allowedOutcome, 'allowed');
+  assert.deepEqual(allowedReplaced, []);
+  assert.equal(allowedDoc.documentElement.style.visibility, '');
+  assert.equal(lsStore.get(SHORTS_CACHE_KEY), 'off');
+
+  // Case 3: storage error restores visibility instead of leaving a blank page.
+  const errDoc = { documentElement: { style: {} } };
+  const errOutcome = await runEarlyShortsBlock({
+    location: { pathname: '/shorts/RcN-GvhiIpQ', replace: () => {} },
+    window: { stop: () => {} },
+    document: errDoc,
+    localStorage: null,
+    storage: { get: () => Promise.reject(new Error('Extension context invalidated')) },
+  });
+  assert.equal(errOutcome, 'error');
+  assert.equal(errDoc.documentElement.style.visibility, '');
 });
 
 test('layout: hide comments + watch spacing on watch; cleanup elsewhere', () => {
