@@ -89,11 +89,19 @@
     return value;
   }
 
+  var SHORTS_CACHE_KEY = 'oneyt.shortsBlockMode';
+
   function createLayoutModule(deps) {
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
     var win = deps.window || (typeof window !== 'undefined' ? window : null);
     var loc = deps.location || (typeof location !== 'undefined' ? location : null);
+    var ls =
+      Object.prototype.hasOwnProperty.call(deps, 'localStorage')
+        ? deps.localStorage
+        : typeof localStorage !== 'undefined'
+          ? localStorage
+          : null;
     // Default redirect: location.replace (no history entry, so
     // Back does not return to the Shorts page). Overridden in
     // tests with a recorder.
@@ -180,6 +188,13 @@
       setVar('--oneyt-channel-columns', null);
       setVar('--oneyt-channel-shelf-items-per-row', null);
       setAttr('data-oneyt-channel-shelf-cols', null);
+    }
+
+    function writeShortsModeCache(mode) {
+      if (!ls || typeof ls.setItem !== 'function') return;
+      try {
+        ls.setItem(SHORTS_CACHE_KEY, mode);
+      } catch {}
     }
 
     function stopShortsMedia() {
@@ -401,6 +416,7 @@
       setClass('oneyt-block-shorts', blockAll);
       setClass('oneyt-remove-all-shorts', blockUrl);
       syncUrlInterceptors(blockUrl);
+      writeShortsModeCache(blockUrl ? 'remove' : layout.blockShorts === true ? 'watch' : 'off');
     }
 
     return {
@@ -411,9 +427,11 @@
       enable: function () {},
       disable: function () {
         cleanup();
+        writeShortsModeCache('off');
       },
       destroy: function () {
         cleanup();
+        writeShortsModeCache('off');
       },
     };
   }

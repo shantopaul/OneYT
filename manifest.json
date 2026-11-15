@@ -45,6 +45,11 @@
       ],
       "matches": ["https://*.youtube.com/*", "https://youtube.com/*"],
       "run_at": "document_idle"
+    },
+    {
+      "js": ["content/early-shorts-block.js"],
+      "matches": ["https://*.youtube.com/shorts*", "https://youtube.com/shorts*"],
+      "run_at": "document_start"
     }
   ],
   "description": "Your YouTube. Your Layout. Your Rules. Customise player, layout, sidebar, themes, playback and focus — privately, locally.",
