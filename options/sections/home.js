@@ -124,6 +124,25 @@
         keywords: ['home', 'title', 'full', 'truncate', 'clamp', 'multiline', 'expand'],
       },
       {
+        key: 'layout.removeAllShorts',
+        type: 'toggle',
+        label: 'Remove all Shorts & block /shorts/ URLs',
+        description:
+          'Hide Shorts completely across all of YouTube (Home, sidebar, search, watch, channels & tabs) and block /shorts/ URLs so they never open.',
+        keywords: [
+          'shorts',
+          'remove',
+          'block',
+          'url',
+          'hide',
+          'total',
+          'full',
+          'disable',
+          'home',
+          'not open',
+        ],
+      },
+      {
         key: 'layout.hideShortsHome',
         type: 'toggle',
         label: 'Hide Shorts on Home',

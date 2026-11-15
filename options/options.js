@@ -286,12 +286,22 @@
     ],
     'layout.hideShortsHome': [
       {
+        key: 'layout.removeAllShorts',
+        equals: false,
+        reason: 'Already hidden by "Remove all Shorts & block /shorts/ URLs"',
+      },
+      {
         key: 'layout.blockShorts',
         equals: false,
         reason: 'Already hidden by "Block Shorts everywhere"',
       },
     ],
     'layout.hideShortsWatch': [
+      {
+        key: 'layout.removeAllShorts',
+        equals: false,
+        reason: 'Already hidden by "Remove all Shorts & block /shorts/ URLs"',
+      },
       {
         key: 'layout.blockShorts',
         equals: false,
@@ -300,9 +310,21 @@
     ],
     'navigation.hideShorts': [
       {
+        key: 'layout.removeAllShorts',
+        equals: false,
+        reason: 'Already hidden by "Remove all Shorts & block /shorts/ URLs"',
+      },
+      {
         key: 'layout.blockShorts',
         equals: false,
         reason: 'Already hidden by "Block Shorts everywhere"',
+      },
+    ],
+    'layout.blockShorts': [
+      {
+        key: 'layout.removeAllShorts',
+        equals: false,
+        reason: 'Overridden while "Remove all Shorts & block /shorts/ URLs" blocks /shorts/ URLs',
       },
     ],
     'navigation.guideWidth': [
@@ -352,6 +374,11 @@
       },
     ],
     'layout.shelfItemsPerRow': [
+      {
+        key: 'layout.removeAllShorts',
+        equals: true,
+        hint: 'Remove all Shorts is On — Shorts shelves stay hidden; applies to other shelf cards',
+      },
       {
         key: 'layout.blockShorts',
         equals: true,
@@ -452,7 +479,7 @@
     home: {
       'layout.homeColumns': 'Feed grid & row counts',
       'layout.cardSpacing': 'Cards, spacing & titles',
-      'layout.hideShortsHome': 'Home feed shelves & clutter',
+      'layout.removeAllShorts': 'Home feed shelves & clutter',
     },
     layout: {
       'layout.blockShorts': 'Shorts & global blocking',
