@@ -54,6 +54,29 @@
     return '/watch?v=' + m[1];
   }
 
+  // Pure: true when url or pathname points to a YouTube /shorts or /shorts/<id> page.
+  function isShortsUrl(url) {
+    if (typeof url !== 'string' || !url) return false;
+    var trimmed = url.trim();
+    if (!trimmed) return false;
+    if (trimmed.charAt(0) === '/') {
+      return /^\/shorts(?:\/|$|\?)/.test(trimmed);
+    }
+    try {
+      var parsed = new URL(trimmed, 'https://www.youtube.com');
+      if (
+        parsed.hostname !== 'www.youtube.com' &&
+        parsed.hostname !== 'youtube.com' &&
+        parsed.hostname !== 'm.youtube.com'
+      ) {
+        return false;
+      }
+      return /^\/shorts(?:\/|$)/.test(parsed.pathname);
+    } catch {
+      return false;
+    }
+  }
+
   // Clamp a number to the dashboard control's range. Non-numbers
   // pass through unchanged (the caller's type check decides what
   // happens to them). A hand-edited import bypasses the dashboard
@@ -69,6 +92,7 @@
   function createLayoutModule(deps) {
     deps = deps || {};
     var doc = deps.document || (typeof document !== 'undefined' ? document : null);
+    var win = deps.window || (typeof window !== 'undefined' ? window : null);
     var loc = deps.location || (typeof location !== 'undefined' ? location : null);
     // Default redirect: location.replace (no history entry, so
     // Back does not return to the Shorts page). Overridden in
@@ -78,6 +102,8 @@
       function (url) {
         if (loc && typeof loc.replace === 'function') loc.replace(url);
       };
+    var blockShortsUrlActive = false;
+    var interceptorsBound = false;
 
     function rootEl() {
       return doc && doc.documentElement ? doc.documentElement : null;
@@ -156,6 +182,74 @@
       setAttr('data-oneyt-channel-shelf-cols', null);
     }
 
+    function stopShortsMedia() {
+      if (!doc || typeof doc.querySelectorAll !== 'function') return;
+      var videos = doc.querySelectorAll('video');
+      for (var i = 0; i < videos.length; i++) {
+        try {
+          videos[i].muted = true;
+          if (typeof videos[i].pause === 'function') videos[i].pause();
+        } catch {}
+      }
+    }
+
+    function onShortsLinkClick(event) {
+      if (!blockShortsUrlActive || !event) return;
+      var target = event.target;
+      var link = target && typeof target.closest === 'function' ? target.closest('a[href]') : null;
+      if (!link) return;
+      var href =
+        (typeof link.getAttribute === 'function' && link.getAttribute('href')) || link.href || '';
+      if (!isShortsUrl(href)) return;
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') {
+        event.stopImmediatePropagation();
+      }
+    }
+
+    function onNavigateStart(event) {
+      if (!blockShortsUrlActive || !event || !event.detail) return;
+      var ep = event.detail.endpoint;
+      var navUrl =
+        (ep &&
+          ep.commandMetadata &&
+          ep.commandMetadata.webCommandMetadata &&
+          ep.commandMetadata.webCommandMetadata.url) ||
+        event.detail.url ||
+        '';
+      if (!isShortsUrl(navUrl)) return;
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      stopShortsMedia();
+      if (loc && loc.pathname && isShortsUrl(loc.pathname)) {
+        redirectFn('/');
+      }
+    }
+
+    function syncUrlInterceptors(active) {
+      blockShortsUrlActive = !!active;
+      if (active && !interceptorsBound) {
+        if (doc && typeof doc.addEventListener === 'function') {
+          doc.addEventListener('click', onShortsLinkClick, true);
+          doc.addEventListener('auxclick', onShortsLinkClick, true);
+        }
+        if (win && typeof win.addEventListener === 'function') {
+          win.addEventListener('yt-navigate-start', onNavigateStart, true);
+        }
+        interceptorsBound = true;
+      } else if (!active && interceptorsBound) {
+        if (doc && typeof doc.removeEventListener === 'function') {
+          doc.removeEventListener('click', onShortsLinkClick, true);
+          doc.removeEventListener('auxclick', onShortsLinkClick, true);
+        }
+        if (win && typeof win.removeEventListener === 'function') {
+          win.removeEventListener('yt-navigate-start', onNavigateStart, true);
+        }
+        interceptorsBound = false;
+      }
+    }
+
     function cleanup() {
       clearWatch();
       clearHomeOnly();
@@ -165,6 +259,8 @@
       setClass('oneyt-hide-channel-profile', false);
       setClass('oneyt-full-video-titles', false);
       setClass('oneyt-block-shorts', false);
+      setClass('oneyt-remove-all-shorts', false);
+      syncUrlInterceptors(false);
     }
 
     // Off the Shorts player page: /shorts/VIDEOID -> /watch?v=VIDEOID.
@@ -175,6 +271,13 @@
       var url = shortsWatchUrl(path);
       if (!url) return;
       redirectFn(url);
+    }
+
+    // Hard-block /shorts and /shorts/<id> URLs: stop any playing Shorts
+    // video immediately and replace history back onto YouTube Home (/).
+    function blockShortsPage() {
+      stopShortsMedia();
+      redirectFn('/');
     }
 
     function applyWatch(layout) {
@@ -237,9 +340,15 @@
     function apply(settings, page) {
       if (!settings || !settings.layout) return;
       var layout = settings.layout;
-      // Block Shorts: redirect off the Shorts player page first.
-      if (page === 'shorts' && layout.blockShorts === true) {
-        redirectShorts();
+      var blockUrl = layout.removeAllShorts === true;
+      var blockAll = blockUrl || layout.blockShorts === true;
+      // Block Shorts: redirect or hard-block /shorts URLs first.
+      if (page === 'shorts' || (blockUrl && loc && loc.pathname && isShortsUrl(loc.pathname))) {
+        if (blockUrl) {
+          blockShortsPage();
+        } else if (layout.blockShorts === true) {
+          redirectShorts();
+        }
       }
       if (page === 'watch') {
         applyWatch(layout);
@@ -289,7 +398,9 @@
       // the page branches so cleanup() in the else branch
       // cannot strip it. disable()/destroy() still remove it
       // via cleanup().
-      setClass('oneyt-block-shorts', layout.blockShorts === true);
+      setClass('oneyt-block-shorts', blockAll);
+      setClass('oneyt-remove-all-shorts', blockUrl);
+      syncUrlInterceptors(blockUrl);
     }
 
     return {
@@ -307,7 +418,11 @@
     };
   }
 
-  var api = { createLayoutModule: createLayoutModule, shortsWatchUrl: shortsWatchUrl };
+  var api = {
+    createLayoutModule: createLayoutModule,
+    shortsWatchUrl: shortsWatchUrl,
+    isShortsUrl: isShortsUrl,
+  };
 
   var ns = (globalThis.OneYT = globalThis.OneYT || {});
   ns.modules = ns.modules || {};
