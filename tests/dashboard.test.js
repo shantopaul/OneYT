@@ -772,6 +772,21 @@ test('dashboard: row-fixer parity — Home section, feed rows, responsive column
       'home section has control for layout.' + k
     );
   });
+  assert.ok(
+    homeSection.controls.some((c) => c.key === 'navigation.hideShorts'),
+    'home section includes navigation.hideShorts toggle'
+  );
+  assert.equal(
+    layoutSection.controls.some((c) => c.key === 'navigation.hideShorts'),
+    false,
+    'navigation.hideShorts moved from layout to home'
+  );
+  const navCss = fs.readFileSync(
+    path.join(__dirname, '..', 'content', 'modules', 'navigation', 'navigation.css'),
+    'utf8'
+  );
+  assert.ok(navCss.includes("oneyt-nav-hide-shorts ytd-guide-entry-renderer:has(a[href='/shorts'])"));
+  assert.ok(navCss.includes('oneyt-nav-hide-shorts ytd-mini-guide-entry-renderer:has('));
 
   const channelExpected = ['channelWide', 'channelColumns', 'channelShelfItemsPerRow'];
   channelExpected.forEach((k) => {
