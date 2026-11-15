@@ -38,6 +38,7 @@ zip -q -r "$OUT" \
   content \
   popup \
   options \
+  onboarding \
   shared \
   assets/icons \
   -x "*/.*" -x "*/node_modules/*"

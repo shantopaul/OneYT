@@ -63,5 +63,5 @@
   "name": "OneYT — All-in-One YouTube Customizer",
   "options_page": "options/options.html",
   "permissions": ["activeTab", "storage"],
-  "version": "1.16.1"
+  "version": "1.16.2"
 }

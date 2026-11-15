@@ -15,7 +15,22 @@ news shelves), 1.8.0 (Phase 16 presets / profiles),
 1.13.0 (Phase 21 saved themes + export/share),
 1.14.0 (Phase 22 advanced layout editor),
 1.15.0 (Phase 23 player accent color),
-1.16.0 (Phase 24 custom font).
+1.16.0 (Phase 24 custom font), 1.16.1 (Code-check round 1),
+1.16.2 (Shorts blocking & zero-delay redirect).
+
+## 1.16.2 — 2026-11-15
+
+Shorts removal, `/shorts/` URL blocking & sidebar controls. Tests 282 → 287.
+
+Added:
+
+- **Remove all Shorts & block `/shorts/` URLs** (`layout.removeAllShorts`) under **Home**: hides all Shorts shelves, `ytm-shorts-lockup-view-model` cards, Shorts nav/channel tabs, and `ytd-shorts`, intercepts clicks and `yt-navigate-start` on `/shorts/*`, stops Shorts playback, and redirects to YouTube Home (`/`).
+- **Zero-delay `document_start` Shorts URL interceptor** (`content/early-shorts-block.js`): runs at `document_start` on `/shorts*` routes, using a synchronized `localStorage` hint (`oneyt.shortsBlockMode`) plus zero-flash `chrome.storage.local` verification to abort page load (`window.stop()`) and redirect immediately before any frame paints.
+- **Hide Shorts button in sidebar** (`navigation.hideShorts`) under **Home**, hiding Shorts in both the expanded guide (`ytd-guide-entry-renderer`) and mini sidebar (`ytd-mini-guide-entry-renderer`).
+
+Fixed:
+
+- `scripts/package-extension.sh` now validates files across all `manifest.json` `content_scripts` entries.
 
 ## 1.16.1 — 2026-11-10 (Code-check round 1)
 
