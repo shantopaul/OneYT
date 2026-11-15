@@ -120,7 +120,10 @@
       { key: 'modules.sidebar', label: 'Sidebar' },
       { key: 'modules.recommendations', label: 'Recommendations' },
     ],
-    home: [{ key: 'modules.layout', label: 'Layout' }],
+    home: [
+      { key: 'modules.layout', label: 'Layout' },
+      { key: 'modules.navigation', label: 'Navigation' },
+    ],
     layout: [
       { key: 'modules.layout', label: 'Layout' },
       { key: 'modules.navigation', label: 'Navigation' },

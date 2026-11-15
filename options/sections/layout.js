@@ -89,13 +89,6 @@
         keywords: ['navigation', 'guide', 'home', 'hide'],
       },
       {
-        key: 'navigation.hideShorts',
-        type: 'toggle',
-        label: 'Hide Shorts from guide',
-        description: 'Hide the Shorts entry in the left guide.',
-        keywords: ['navigation', 'guide', 'shorts', 'hide'],
-      },
-      {
         key: 'navigation.hideSubscriptions',
         type: 'toggle',
         label: 'Hide Subscriptions from guide',

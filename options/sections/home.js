@@ -131,6 +131,14 @@
         keywords: ['shorts', 'hide', 'home'],
       },
       {
+        key: 'navigation.hideShorts',
+        type: 'toggle',
+        label: 'Hide Shorts button in sidebar',
+        description:
+          'Hide the Shorts button from the left YouTube sidebar (expanded and mini guide).',
+        keywords: ['shorts', 'sidebar', 'slide', 'guide', 'button', 'hide', 'home', 'navigation'],
+      },
+      {
         key: 'layout.hideTopicChips',
         type: 'toggle',
         label: 'Hide topic chips bar on Home',
