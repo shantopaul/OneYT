@@ -8,7 +8,12 @@ html.oneyt-enabled.oneyt-nav-hide-home ytd-guide-entry-renderer:has(a[href='/'])
   display: none;
 }
 
-html.oneyt-enabled.oneyt-nav-hide-shorts ytd-guide-entry-renderer:has(a[href='/shorts']) {
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-guide-entry-renderer:has(a[href='/shorts']),
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-guide-entry-renderer:has(a[href^='/shorts']),
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-guide-entry-renderer:has(a[title='Shorts']),
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-mini-guide-entry-renderer:has(a[href='/shorts']),
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-mini-guide-entry-renderer:has(a[href^='/shorts']),
+html.oneyt-enabled.oneyt-nav-hide-shorts ytd-mini-guide-entry-renderer:has(a[title='Shorts']) {
   display: none;
 }
 
